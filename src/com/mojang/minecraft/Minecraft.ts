@@ -48,8 +48,6 @@ export class Minecraft {
     private frames: number = 0
     private lastTime: number = 0
 
-    private pointerLockActivatedAt: number = null
-
     public constructor(parent: HTMLCanvasElement, width: number, height: number) {
         this.parent = parent
         this.width = width
@@ -87,15 +85,6 @@ export class Minecraft {
         this.player = new Player(this.level)
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.checkGlError("Post startup")
-
-        document.onpointerlockchange = () => {
-            if (document.pointerLockElement == this.parent) {
-                this.mouseGrabbed = true
-                this.pointerLockActivatedAt = Date.now()
-            } else {
-                this.mouseGrabbed = false
-            }
-        }
     }
 
     private checkGlError(string: string): void {
@@ -152,12 +141,7 @@ export class Minecraft {
     }
 
     public grabMouse(): void {
-        if (this.mouseGrabbed) {
-            return
-        }
-        if (this.pointerLockActivatedAt != null && Date.now() - this.pointerLockActivatedAt < 1000) {
-            return
-        }
+        if (this.mouseGrabbed) return
         this.mouseGrabbed = true
         this.parent.requestPointerLock()
     }
@@ -201,6 +185,7 @@ export class Minecraft {
     }
 
     public tick(): void {
+        this.mouseGrabbed = document.pointerLockElement == this.parent
         if (!this.mouseGrabbed && mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT)) {
             this.grabMouse()
         }
@@ -211,6 +196,7 @@ export class Minecraft {
             }
             if (mouse.buttonPressed(MouseButton.RIGHT)) {
                 this.editMode = (this.editMode + 1) % 2
+                console.log(this.editMode)
             }
 
             // Keyboard
@@ -283,7 +269,13 @@ export class Minecraft {
     }
 
     private pick(a: number): void {
-        // TODO
+        this.hitResult = new HitResult(
+            0, 
+            Math.floor(this.player.x), 
+            Math.floor(this.player.y - 2), 
+            Math.floor(this.player.z),
+            1
+        )
     }
 
     public render(a: number): void {

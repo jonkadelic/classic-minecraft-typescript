@@ -121,12 +121,12 @@ export class LevelRenderer implements LevelListener {
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
-        x0 /= 16
-        x1 /= 16
-        y0 /= 16
-        y1 /= 16
-        z0 /= 16
-        z1 /= 16
+        x0 = Math.floor(x0 / LevelRenderer.CHUNK_SIZE)
+        x1 = Math.floor(x1 / LevelRenderer.CHUNK_SIZE)
+        y0 = Math.floor(y0 / LevelRenderer.CHUNK_SIZE)
+        y1 = Math.floor(y1 / LevelRenderer.CHUNK_SIZE)
+        z0 = Math.floor(z0 / LevelRenderer.CHUNK_SIZE)
+        z1 = Math.floor(z1 / LevelRenderer.CHUNK_SIZE)
         if (x0 < 0) {
             x0 = 0
         }

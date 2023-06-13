@@ -8,11 +8,19 @@ import { GrassTile } from "./GrassTile";
 import { DirtTile } from "./DirtTile";
 import { Bush } from "./Bush";
 import { Tiles } from "./Tiles";
+import { Vec3 } from "../../phys/Vec3";
+import { HitResult } from "../../HitResult";
 
 export class Tile {
     public static tiles: Tile[] = new Array(256)
     public tex: number
     public id: number
+    public x0: number = 0
+    public y0: number = 0
+    public z0: number = 0
+    public x1: number = 1
+    public y1: number = 1
+    public z1: number = 1
 
     public constructor(id: number, tex: number = undefined) {
         this.id = id;
@@ -68,12 +76,12 @@ export class Tile {
         let u1 = u0 + (1 / 16.0)
         let v0 = Math.floor(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
-        let x0 = x
-        let x1 = x + 1
-        let y0 = y
-        let y1 = y + 1
-        let z0 = z
-        let z1 = z + 1
+        let x0 = x + this.x0
+        let x1 = x + this.x1
+        let y0 = y + this.y0
+        let y1 = y + this.y1
+        let z0 = z + this.z0
+        let z1 = z + this.z1
         if (face == 0) {
             t.vertexUV(x0, y0, z1, u0, v1);
             t.vertexUV(x0, y0, z0, u0, v0);
@@ -131,59 +139,65 @@ export class Tile {
     }
 
     public renderFaceNoTexture(t: Tesselator, x: number, y: number, z: number, face: number): void {
-        let x0 = x
-        let x1 = x + 1
-        let y0 = y
-        let y1 = y + 1
-        let z0 = z
-        let z1 = z + 1
+        let x0 = x + this.x0
+        let x1 = x + this.x1
+        let y0 = y + this.y0
+        let y1 = y + this.y1
+        let z0 = z + this.z0
+        let z1 = z + this.z1
         if (face == 0) {
-            t.vertex(x0, y0, z1)
-            t.vertex(x0, y0, z0)
-            t.vertex(x1, y0, z0)
-            t.vertex(x1, y0, z0)
-            t.vertex(x1, y0, z1)
-            t.vertex(x0, y0, z1)
+            t.vertex(x0, y0, z1);
+            t.vertex(x0, y0, z0);
+            t.vertex(x1, y0, z0);
+            
+            t.vertex(x1, y0, z0);
+            t.vertex(x1, y0, z1);
+            t.vertex(x0, y0, z1);
         }
         if (face == 1) {
-            t.vertex(x1, y1, z1)
-            t.vertex(x1, y1, z0)
-            t.vertex(x0, y1, z0)
-            t.vertex(x0, y1, z0)
-            t.vertex(x0, y1, z1)
-            t.vertex(x1, y1, z1)
+            t.vertex(x1, y1, z1);
+            t.vertex(x1, y1, z0);
+            t.vertex(x0, y1, z0);
+            
+            t.vertex(x0, y1, z0);
+            t.vertex(x0, y1, z1);
+            t.vertex(x1, y1, z1);
         }
         if (face == 2) {
-            t.vertex(x0, y1, z0)
-            t.vertex(x1, y1, z0)
-            t.vertex(x1, y0, z0)
-            t.vertex(x1, y0, z0)
-            t.vertex(x0, y0, z0)
-            t.vertex(x0, y1, z0)
+            t.vertex(x0, y1, z0);
+            t.vertex(x1, y1, z0);
+            t.vertex(x1, y0, z0);
+            
+            t.vertex(x1, y0, z0);
+            t.vertex(x0, y0, z0);
+            t.vertex(x0, y1, z0);
         }
         if (face == 3) {
-            t.vertex(x0, y1, z1)
-            t.vertex(x0, y0, z1)
-            t.vertex(x1, y0, z1)
-            t.vertex(x1, y0, z1)
-            t.vertex(x1, y1, z1)
-            t.vertex(x0, y1, z1)
+            t.vertex(x0, y1, z1);
+            t.vertex(x0, y0, z1);
+            t.vertex(x1, y0, z1);
+            
+            t.vertex(x1, y0, z1);
+            t.vertex(x1, y1, z1);
+            t.vertex(x0, y1, z1);
         }
         if (face == 4) {
-            t.vertex(x0, y1, z1)
-            t.vertex(x0, y0, z1)
-            t.vertex(x0, y0, z0)
-            t.vertex(x0, y0, z0)
-            t.vertex(x0, y1, z0)
-            t.vertex(x0, y1, z1)
+            t.vertex(x0, y1, z1);
+            t.vertex(x0, y1, z0);
+            t.vertex(x0, y0, z0);
+            
+            t.vertex(x0, y0, z0);
+            t.vertex(x0, y0, z1);
+            t.vertex(x0, y1, z1);
         }
         if (face == 5) {
-            t.vertex(x1, y1, z0)
-            t.vertex(x1, y0, z0)
-            t.vertex(x1, y0, z1)
-            t.vertex(x1, y0, z1)
-            t.vertex(x1, y1, z1)
-            t.vertex(x1, y1, z0)
+            t.vertex(x1, y0, z1);
+            t.vertex(x1, y0, z0);
+            t.vertex(x1, y1, z0);
+            
+            t.vertex(x1, y1, z0);
+            t.vertex(x1, y1, z1);
+            t.vertex(x1, y0, z1);
         }
     }
 
@@ -224,5 +238,88 @@ export class Tile {
             }
             xx++
         }
+    }
+
+    public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult {
+        a = a.add(-x, -y, -z)
+        b = b.add(-x, -y, -z)
+        let x0clip = a.clipX(b, this.x0)
+        let x1clip = a.clipX(b, this.x1)
+        let y0clip = a.clipY(b, this.y0)
+        let y1clip = a.clipY(b, this.y1)
+        let z0clip = a.clipZ(b, this.z0)
+        let z1clip = a.clipZ(b, this.z1)
+        if (!this.inYZ(x0clip)) {
+            x0clip = null
+        }
+        if (!this.inYZ(x1clip)) {
+            x1clip = null
+        }
+        if (!this.inXZ(y0clip)) {
+            y0clip = null
+        }
+        if (!this.inXZ(y1clip)) {
+            y1clip = null
+        }
+        if (!this.inXY(z0clip)) {
+            z0clip = null
+        }
+        if (!this.inXY(z1clip)) {
+            z1clip = null
+        }
+        let vec = null
+        if (x0clip != null) {
+            vec = x0clip
+        }
+        if (x1clip != null && (vec == null || a.distanceTo(x1clip) < a.distanceTo(vec))) {
+            vec = x1clip
+        }
+        if (y0clip != null && (vec == null || a.distanceTo(y0clip) < a.distanceTo(vec))) {
+            vec = y0clip
+        }
+        if (y1clip != null && (vec == null || a.distanceTo(y1clip) < a.distanceTo(vec))) {
+            vec = y1clip
+        }
+        if (z0clip != null && (vec == null || a.distanceTo(z0clip) < a.distanceTo(vec))) {
+            vec = z0clip
+        }
+        if (z1clip != null && (vec == null || a.distanceTo(z1clip) < a.distanceTo(vec))) {
+            vec = z1clip
+        }
+        if (vec == null) {
+            return null
+        }
+        let face = 0
+        if (vec == x0clip) {
+            face = 4
+        }
+        if (vec == x1clip) {
+            face = 5
+        }
+        if (vec == y0clip) {
+            face = 0
+        }
+        if (vec == y1clip) {
+            face = 1
+        }
+        if (vec == z0clip) {
+            face = 2
+        }
+        if (vec == z1clip) {
+            face = 3
+        }
+        return new HitResult(0, x, y, z, face)
+    }
+
+    private inYZ(v: Vec3): boolean {
+        return v.y >= this.y0 && v.y <= this.y1 && v.z >= this.z0 && v.z <= this.z1
+    }
+
+    private inXZ(v: Vec3): boolean {
+        return v.x >= this.x0 && v.x <= this.x1 && v.z >= this.z0 && v.z <= this.z1
+    }
+
+    private inXY(v: Vec3): boolean {
+        return v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
     }
 }

@@ -1,5 +1,7 @@
 import { Random } from "../../../util/Random";
+import { HitResult } from "../HitResult";
 import { AABB } from "../phys/AABB";
+import { Vec3 } from "../phys/Vec3";
 import { LevelGen } from "./LevelGen";
 import { LevelListener } from "./LevelListener";
 import { Tile } from "./tile/Tile";
@@ -181,6 +183,94 @@ export class Level {
             let tile = Tile.tiles[this.getTile(x, y, z)]
             if (tile != null) {
                 tile.tick(this, x, y, z, this.random)
+            }
+        }
+    }
+
+    public clip(a: Vec3, b: Vec3): HitResult {
+        if (Number.isNaN(a.x) || Number.isNaN(a.y) || Number.isNaN(a.z)) {
+            return null
+        }
+        if (Number.isNaN(b.x) || Number.isNaN(b.y) || Number.isNaN(b.z)) {
+            return null
+        }
+        let xb = Math.floor(b.x)
+        let yb = Math.floor(b.y)
+        let zb = Math.floor(b.z)
+        let xa = Math.floor(a.x)
+        let ya = Math.floor(a.y)
+        let za = Math.floor(a.z)
+        for (let i = 20; i >= 0; i--) {
+            if (Number.isNaN(a.x) || Number.isNaN(a.y) || Number.isNaN(a.z)) {
+                return null
+            }
+            if (xb == xa && yb == ya && zb == za) {
+                return null
+            }
+            let f1 = 999
+            let f2 = 999
+            let f3 = 999
+            if (xb > xa) {
+                f1 = xa + 1
+            }
+            if (xb < xa) {
+                f1 = xa
+            }
+            if (yb > ya) {
+                f2 = ya + 1
+            }
+            if (yb < ya) {
+                f2 = ya
+            }
+            if (zb > za) {
+                f3 = za + 1
+            }
+            if (zb < za) {
+                f3 = za
+            }
+            let f4 = 999
+            let f5 = 999
+            let f6 = 999
+            let dx = b.x - a.x
+            let dy = b.y - a.y
+            let dz = b.z - a.z
+            if (f1 != 999) {
+                f4 = (f1 - a.x) / dx
+            }
+            if (f2 != 999) {
+                f5 = (f2 - a.y) / dy
+            }
+            if (f3 != 999) {
+                f6 = (f3 - a.z) / dz
+            }
+            let face = 0
+            if (f4 < f5 && f4 < f6) {
+                if (xb > xa) {
+                    face = 4
+                } else {
+                    face = 5
+                }
+                a.x = f1
+                a.y += dy * f4
+                a.z += dz * f4
+            } else if (f5 < f6) {
+                if (yb > ya) {
+                    face = 0
+                } else {
+                    face = 1
+                }
+                a.x += dx * f5
+                a.y = f2
+                a.z += dz * f5
+            } else {
+                if (zb > za) {
+                    face = 2
+                } else {
+                    face = 3
+                }
+                a.x += dx * f6
+                a.y += dy * f6
+                a.z = f3
             }
         }
     }
