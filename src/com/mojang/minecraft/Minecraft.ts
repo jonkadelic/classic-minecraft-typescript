@@ -17,8 +17,8 @@ import { Tiles } from "./level/tile/Tiles";
 import { Vec3 } from "./phys/Vec3";
 
 export let gl: WebGLRenderingContext
-export let mouse = new Mouse()
-export let keyboard = new Keyboard()
+export let mouse: any
+export let keyboard: any
 export let matrix = new Matrix()
 export let shader: Shader = null
 
@@ -57,6 +57,9 @@ export class Minecraft {
         this.width = width
         this.height = height
         this.textures = new Textures()
+
+        mouse = new Mouse()
+        keyboard = new Keyboard()
     }
 
     public init(): void {
@@ -189,6 +192,7 @@ export class Minecraft {
     }
 
     public tick(): void {
+        keyboard.update()
         this.mouseGrabbed = document.pointerLockElement == this.parent
         if (!this.mouseGrabbed && mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT)) {
             this.grabMouse()
@@ -338,7 +342,7 @@ export class Minecraft {
         this.drawGui(a)
         this.checkGlError("Rendered gui")
         mouse.update()
-        keyboard.update()
+
     }
 
     private drawGui(a: number): void {

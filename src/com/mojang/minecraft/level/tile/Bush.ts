@@ -24,14 +24,14 @@ export class Bush extends Tile {
         let tex = this.getTexture(15)
         let u0 = (tex % 16) / 16.0
         let u1 = u0 + (1 / 16.0)
-        let v0 = (tex / 16) / 16.0
+        let v0 = Math.floor(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         let rots = 2
         t.color_f(1, 1, 1)
         let r = 0
         while (r < rots) {
-            let xa = Math.sin(r * Math.PI / rots + 0.7853981633974483) * 0.5
-            let za = Math.cos(r * Math.PI / rots + 0.7853981633974483) * 0.5
+            let xa = Math.sin(r * Math.PI / rots + Math.PI / 4) * 0.5
+            let za = Math.cos(r * Math.PI / rots + Math.PI / 4) * 0.5
             let x0 = x + 0.5 - xa
             let x1 = x + 0.5 + xa
             let y0 = y + 0
