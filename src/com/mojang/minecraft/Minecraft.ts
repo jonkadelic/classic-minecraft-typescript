@@ -14,6 +14,7 @@ import { Matrix } from "../../util/Matrix";
 import { Frustum } from "./renderer/Frustum";
 import { Shader } from "../../../shader";
 import { Tiles } from "./level/tile/Tiles";
+import { Vec3 } from "./phys/Vec3";
 
 export let gl: WebGLRenderingContext
 export let mouse = new Mouse()
@@ -47,6 +48,9 @@ export class Minecraft {
 
     private frames: number = 0
     private lastTime: number = 0
+
+    private mouse0: boolean = false
+    private mouse1: boolean = false
 
     public constructor(parent: HTMLCanvasElement, width: number, height: number) {
         this.parent = parent
@@ -192,11 +196,20 @@ export class Minecraft {
         if (this.mouseGrabbed) {
             // Mouse
             if (mouse.buttonPressed(MouseButton.LEFT)) {
-                this.handleMouseClick()
+                if (!this.mouse0) {
+                    this.mouse0 = true
+                    this.handleMouseClick()
+                }
+            } else {
+                this.mouse0 = false
             }
             if (mouse.buttonPressed(MouseButton.RIGHT)) {
-                this.editMode = (this.editMode + 1) % 2
-                console.log(this.editMode)
+                if (!this.mouse1) {
+                    this.mouse1 = true
+                    this.editMode = (this.editMode + 1) % 2
+                }
+            } else {
+                this.mouse1 = false
             }
 
             // Keyboard
@@ -269,13 +282,19 @@ export class Minecraft {
     }
 
     private pick(a: number): void {
-        this.hitResult = new HitResult(
-            0, 
-            Math.floor(this.player.x), 
-            Math.floor(this.player.y - 2), 
-            Math.floor(this.player.z),
-            1
-        )
+        let yRot = this.player.yRot
+        let xRot = this.player.xRot
+        let cosY = Math.cos(-yRot * Math.PI / 180 - Math.PI)
+        let sinY = Math.sin(-yRot * Math.PI / 180 - Math.PI)
+        let cosX = Math.cos(-xRot * Math.PI / 180)
+        let sinX = Math.sin(-xRot * Math.PI / 180)
+        let pickRange = 5.0
+        let offsetX = sinY * cosX
+        let offsetY = sinX
+        let offsetZ = cosY * cosX
+        let playerVec = new Vec3(this.player.x, this.player.y, this.player.z)
+        let endVec = playerVec.add(offsetX * pickRange, offsetY * pickRange, offsetZ * pickRange)
+        this.hitResult = this.level.clip(playerVec, endVec)
     }
 
     public render(a: number): void {

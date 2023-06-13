@@ -40,10 +40,10 @@ export class Vec3 {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z
-        if (dx * dx + dy * dy + dz * dz < 1e-6) {
+        if (dx * dx < 1e-7) {
             return null
         }
-        let d = (other.x - this.x) / lerp
+        let d = (lerp - this.x) / dx
         if (d < 0) {
             return null
         }
@@ -57,10 +57,10 @@ export class Vec3 {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z
-        if (dx * dx + dy * dy + dz * dz < 1e-6) {
+        if (dy * dy < 1e-7) {
             return null
         }
-        let d = (other.y - this.y) / lerp
+        let d = (lerp - this.y) / dy
         if (d < 0) {
             return null
         }
@@ -74,10 +74,10 @@ export class Vec3 {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z
-        if (dx * dx + dy * dy + dz * dz < 1e-6) {
+        if (dz * dz < 1e-7) {
             return null
         }
-        let d = (other.z - this.z) / lerp
+        let d = (lerp - this.z) / dz
         if (d < 0) {
             return null
         }

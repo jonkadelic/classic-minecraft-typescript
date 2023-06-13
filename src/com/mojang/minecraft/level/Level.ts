@@ -169,7 +169,7 @@ export class Level {
 
     public isSolidTile(x: number, y: number, z: number): boolean {
         let tile = Tile.tiles[this.getTile(x, y, z)]
-        return tile == null ? false : tile.isSolid()
+        return tile != null && tile.isSolid()
     }
 
     public tick(): void {
@@ -272,6 +272,34 @@ export class Level {
                 a.y += dy * f6
                 a.z = f3
             }
+
+            xa = Math.floor(a.x)
+            if (face == 5) {
+                xa--
+            }
+
+            ya = Math.floor(a.y)
+            if (face == 1) {
+                ya--
+            }
+            
+            za = Math.floor(a.z)
+            if (face == 3) {
+                za--
+            }
+
+            let tileId = this.getTile(xa, ya, za)
+            let tile = Tile.tiles[tileId]
+            if (tileId <= 0) {
+                continue
+            }
+
+            let hitResult: HitResult
+            if ((hitResult = tile.clip(xa, ya, za, a, b)) != null) {
+                return hitResult
+            }
         }
+
+        return null
     }
 }

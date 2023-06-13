@@ -63,7 +63,7 @@ export class Tile {
     }
 
     private shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
-        return !level.isSolidTile(x, y, z) && (level.isLit(x, y, z) !== (layer == 1));
+        return !level.isSolidTile(x, y, z) && (level.isLit(x, y, z) != (layer == 1));
     }
 
     protected getTexture(face: number): number {
@@ -312,14 +312,14 @@ export class Tile {
     }
 
     private inYZ(v: Vec3): boolean {
-        return v.y >= this.y0 && v.y <= this.y1 && v.z >= this.z0 && v.z <= this.z1
+        return v != null && v.y >= this.y0 && v.y <= this.y1 && v.z >= this.z0 && v.z <= this.z1
     }
 
     private inXZ(v: Vec3): boolean {
-        return v.x >= this.x0 && v.x <= this.x1 && v.z >= this.z0 && v.z <= this.z1
+        return v != null && v.x >= this.x0 && v.x <= this.x1 && v.z >= this.z0 && v.z <= this.z1
     }
 
     private inXY(v: Vec3): boolean {
-        return v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
+        return v != null && v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
     }
 }
