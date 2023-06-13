@@ -364,11 +364,9 @@ export function main() {
     canvas.height = window.innerHeight
     document.body.appendChild(canvas)
 
-    let g = canvas.getContext("webgl")
+    let g = canvas.getContext("webgl", {antialias: false})
     if (!g) throw new Error("Failed to get WebGL context")
     gl = g
-
-    gl.getContextAttributes().antialias = false
 
     const minecraft = new Minecraft(canvas, canvas.width, canvas.height)
     minecraft.run()
