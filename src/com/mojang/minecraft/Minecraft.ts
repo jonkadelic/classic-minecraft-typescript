@@ -153,8 +153,8 @@ export class Minecraft {
         this.parent.requestPointerLock()
     }
 
-    private handleMouseClick(): void {
-        if (this.editMode == 0) {
+    private handleMouseClick(click: number): void {
+        if (click == 0) {
             if (this.hitResult != null) {
                 let oldTile: Tile = Tile.tiles[this.level.getTile(this.hitResult.x, this.hitResult.y, this.hitResult.z)]
                 let changed = this.level.setTile(this.hitResult.x, this.hitResult.y, this.hitResult.z, 0)
@@ -162,7 +162,7 @@ export class Minecraft {
                     oldTile.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine)
                 }
             }
-        } else if (this.hitResult != null) {
+        } else if (click == 1 && this.hitResult != null) {
             let aabb: AABB;
             let x = this.hitResult.x
             let y = this.hitResult.y
@@ -202,7 +202,7 @@ export class Minecraft {
             if (mouse.buttonPressed(MouseButton.LEFT)) {
                 if (!this.mouse0) {
                     this.mouse0 = true
-                    this.handleMouseClick()
+                    this.handleMouseClick(0)
                 }
             } else {
                 this.mouse0 = false
@@ -210,7 +210,7 @@ export class Minecraft {
             if (mouse.buttonPressed(MouseButton.RIGHT)) {
                 if (!this.mouse1) {
                     this.mouse1 = true
-                    this.editMode = (this.editMode + 1) % 2
+                    this.handleMouseClick(1)
                 }
             } else {
                 this.mouse1 = false
