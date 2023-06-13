@@ -8,6 +8,7 @@ import { Textures } from "../renderer/Textures";
 import { Chunk } from "./Chunk";
 import { Level } from "./Level";
 import { LevelListener } from "./LevelListener";
+import { Tesselator } from "../renderer/Tesselator";
 
 export class LevelRenderer implements LevelListener {
     public static readonly MAX_REBUILDS_PER_FRAME = 8
@@ -112,12 +113,7 @@ export class LevelRenderer implements LevelListener {
         }
     }
 
-    public pick(player: Player, frustum: Frustum): void {
-        // TODO
-    }
-
     public renderHit(h: HitResult, mode: number, tileType: number): void {
-        // TODO
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {

@@ -65,7 +65,7 @@ export class Level {
                     let y11 = oldDepth > y ? oldDepth : y
                     let i = 0
                     while (i < this.levelListeners.length) {
-                        this.levelListeners[i++].lightColumnChanged(x, z, y10, y11)
+                        this.levelListeners[i].lightColumnChanged(x, z, y10, y11)
                         i++
                     }
                 }

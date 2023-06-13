@@ -37,33 +37,45 @@ export class Tile {
         let c2 = 0.8
         let c3 = 0.6
         if (this.shouldRenderFace(level, x, y - 1, z, layer)) {
-            t.color_f(c1, c1, c1)
+            let darkness = 0.0
+            if (!level.isLit(x, y - 1, z)) darkness = 0.4
+            t.color_f(c1 - darkness, c1 - darkness, c1 - darkness)
             this.renderFace(t, x, y, z, 0)
         }
         if (this.shouldRenderFace(level, x, y + 1, z, layer)) {
-            t.color_f(c1, c1, c1)
+            let darkness = 0.0
+            if (!level.isLit(x, y + 1, z)) darkness = 0.4
+            t.color_f(c1 - darkness, c1 - darkness, c1 - darkness)
             this.renderFace(t, x, y, z, 1)
         }
         if (this.shouldRenderFace(level, x, y, z - 1, layer)) {
-            t.color_f(c2, c2, c2)
+            let darkness = 0.0
+            if (!level.isLit(x, y, z - 1)) darkness = 0.3
+            t.color_f(c2 - darkness, c2 - darkness, c2 - darkness)
             this.renderFace(t, x, y, z, 2)
         }
         if (this.shouldRenderFace(level, x, y, z + 1, layer)) {
-            t.color_f(c2, c2, c2)
+            let darkness = 0.0
+            if (!level.isLit(x, y, z + 1)) darkness = 0.3
+            t.color_f(c2 - darkness, c2 - darkness, c2 - darkness)
             this.renderFace(t, x, y, z, 3)
         }
         if (this.shouldRenderFace(level, x - 1, y, z, layer)) {
-            t.color_f(c3, c3, c3)
+            let darkness = 0.0
+            if (!level.isLit(x - 1, y, z)) darkness = 0.2
+            t.color_f(c3 - darkness, c3 - darkness, c3 - darkness)
             this.renderFace(t, x, y, z, 4)
         }
         if (this.shouldRenderFace(level, x + 1, y, z, layer)) {
-            t.color_f(c3, c3, c3)
+            let darkness = 0.0
+            if (!level.isLit(x + 1, y, z)) darkness = 0.2
+            t.color_f(c3 - darkness, c3 - darkness, c3 - darkness)
             this.renderFace(t, x, y, z, 5)
         }
     }
 
     private shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
-        return !level.isSolidTile(x, y, z) && (level.isLit(x, y, z) != (layer == 1));
+        return !level.isSolidTile(x, y, z);
     }
 
     protected getTexture(face: number): number {
