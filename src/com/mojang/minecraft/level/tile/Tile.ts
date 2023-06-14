@@ -86,7 +86,7 @@ export class Tile {
         let tex = this.getTexture(face)
         let u0 = (tex % 16) / 16.0
         let u1 = u0 + (1 / 16.0)
-        let v0 = Math.floor(tex / 16) / 16.0
+        let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         let x0 = x + this.x0
         let x1 = x + this.x1

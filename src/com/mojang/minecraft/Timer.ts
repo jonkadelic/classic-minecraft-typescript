@@ -25,9 +25,9 @@ export class Timer {
         if (passedNs > Timer.MAX_NS_PER_UPDATE) {
             passedNs = Timer.MAX_NS_PER_UPDATE
         }
-        this.fps = Math.floor(Timer.NS_PER_SECOND / passedNs)
+        this.fps = Math.trunc(Timer.NS_PER_SECOND / passedNs)
         this.passedTime += passedNs * this.timeScale * this.ticksPerSecond / Timer.NS_PER_SECOND
-        this.ticks = Math.floor(this.passedTime)
+        this.ticks = Math.trunc(this.passedTime)
         if (this.ticks > Timer.MAX_TICKS_PER_UPDATE) {
             this.ticks = Timer.MAX_TICKS_PER_UPDATE
         }

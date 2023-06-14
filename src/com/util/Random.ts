@@ -25,7 +25,7 @@ export class Random {
     public constructor();
     public constructor(seedVal?: number) {
         if (seedVal === undefined) {
-            seedVal = Math.floor(Math.random() * Random.p2_48)
+            seedVal = Math.trunc(Math.random() * Random.p2_48)
         }
         this.setSeed(seedVal)
     }

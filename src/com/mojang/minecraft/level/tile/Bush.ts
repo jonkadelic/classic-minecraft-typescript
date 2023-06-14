@@ -24,7 +24,7 @@ export class Bush extends Tile {
         let tex = this.getTexture(15)
         let u0 = (tex % 16) / 16.0
         let u1 = u0 + (1 / 16.0)
-        let v0 = Math.floor(tex / 16) / 16.0
+        let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         let rots = 2
         t.color_f(1, 1, 1)

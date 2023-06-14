@@ -30,7 +30,7 @@ export class Particle extends Entity {
         this.uo = Math.random() * 3.0
         this.vo = Math.random() * 3.0
         this.size = Math.random() * 0.5 + 0.5
-        this.lifetime = Math.floor(4 / (Math.random() * 0.9 + 0.1))
+        this.lifetime = Math.trunc(4 / (Math.random() * 0.9 + 0.1))
         this.age = 0
     }
 
@@ -55,7 +55,7 @@ export class Particle extends Entity {
     public renderParticle(t: Tesselator, a: number, xa: number, ya: number, za: number, xa2: number, za2: number): void {
         let u0 = ((this.tex % 16) + this.uo / 4) / 16
         let u1 = u0 + 0.015609375
-        let v0 = (Math.floor(this.tex / 16) + this.vo / 4) / 16
+        let v0 = (Math.trunc(this.tex / 16) + this.vo / 4) / 16
         let v1 = v0 + 0.015609375
         let r = 0.1 * this.size
         let x = this.xo + (this.x - this.xo) * a

@@ -32,6 +32,14 @@ export class Level {
         this.calcLightDepths(0, 0, w, h)
     }
 
+    public regenerate(): void {
+        this.blocks = new LevelGen(this.width, this.height, this.depth).generateMap()
+        this.calcLightDepths(0, 0, this.width, this.height)
+        for (let i = 0; i < this.levelListeners.length; i++) {
+            this.levelListeners[i].allChanged()
+        }
+    }
+
     public load(): boolean {
         let level = localStorage.getItem("level")
         if (level == null) {
@@ -98,12 +106,12 @@ export class Level {
 
     public getCubes(aABB: AABB): AABB[] {
         let aABBs: AABB[] = []
-        let x0 = Math.floor(aABB.x0)
-        let x1 = Math.floor(aABB.x1 + 1)
-        let y0 = Math.floor(aABB.y0)
-        let y1 = Math.floor(aABB.y1 + 1)
-        let z0 = Math.floor(aABB.z0)
-        let z1 = Math.floor(aABB.z1 + 1)
+        let x0 = Math.trunc(aABB.x0)
+        let x1 = Math.trunc(aABB.x1 + 1)
+        let y0 = Math.trunc(aABB.y0)
+        let y1 = Math.trunc(aABB.y1 + 1)
+        let z0 = Math.trunc(aABB.z0)
+        let z1 = Math.trunc(aABB.z1 + 1)
         if (x0 < 0) {
             x0 = 0
         }
@@ -202,12 +210,12 @@ export class Level {
         if (Number.isNaN(b.x) || Number.isNaN(b.y) || Number.isNaN(b.z)) {
             return null
         }
-        let xb = Math.floor(b.x)
-        let yb = Math.floor(b.y)
-        let zb = Math.floor(b.z)
-        let xa = Math.floor(a.x)
-        let ya = Math.floor(a.y)
-        let za = Math.floor(a.z)
+        let xb = Math.trunc(b.x)
+        let yb = Math.trunc(b.y)
+        let zb = Math.trunc(b.z)
+        let xa = Math.trunc(a.x)
+        let ya = Math.trunc(a.y)
+        let za = Math.trunc(a.z)
         for (let i = 20; i >= 0; i--) {
             if (Number.isNaN(a.x) || Number.isNaN(a.y) || Number.isNaN(a.z)) {
                 return null
@@ -281,17 +289,17 @@ export class Level {
                 a.z = f3
             }
 
-            xa = Math.floor(a.x)
+            xa = Math.trunc(a.x)
             if (face == 5) {
                 xa--
             }
 
-            ya = Math.floor(a.y)
+            ya = Math.trunc(a.y)
             if (face == 1) {
                 ya--
             }
             
-            za = Math.floor(a.z)
+            za = Math.trunc(a.z)
             if (face == 3) {
                 za--
             }

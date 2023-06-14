@@ -101,8 +101,8 @@ export class LevelRenderer implements LevelListener {
             if (i1 && !i0) {
                 return 1
             }
-            let t0 = Math.floor((now - c0.dirtiedTime) / 2000)
-            let t1 = Math.floor((now - c1.dirtiedTime) / 2000)
+            let t0 = Math.trunc((now - c0.dirtiedTime) / 2000)
+            let t1 = Math.trunc((now - c1.dirtiedTime) / 2000)
             if (t0 < t1) {
                 return -1
             }
@@ -165,12 +165,12 @@ export class LevelRenderer implements LevelListener {
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
-        x0 = Math.floor(x0 / LevelRenderer.CHUNK_SIZE)
-        x1 = Math.floor(x1 / LevelRenderer.CHUNK_SIZE)
-        y0 = Math.floor(y0 / LevelRenderer.CHUNK_SIZE)
-        y1 = Math.floor(y1 / LevelRenderer.CHUNK_SIZE)
-        z0 = Math.floor(z0 / LevelRenderer.CHUNK_SIZE)
-        z1 = Math.floor(z1 / LevelRenderer.CHUNK_SIZE)
+        x0 = Math.trunc(x0 / LevelRenderer.CHUNK_SIZE)
+        x1 = Math.trunc(x1 / LevelRenderer.CHUNK_SIZE)
+        y0 = Math.trunc(y0 / LevelRenderer.CHUNK_SIZE)
+        y1 = Math.trunc(y1 / LevelRenderer.CHUNK_SIZE)
+        z0 = Math.trunc(z0 / LevelRenderer.CHUNK_SIZE)
+        z1 = Math.trunc(z1 / LevelRenderer.CHUNK_SIZE)
         if (x0 < 0) {
             x0 = 0
         }

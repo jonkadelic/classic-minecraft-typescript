@@ -253,6 +253,10 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.Y)) {
                 this.yMouseAxis *= -1
             }
+            if (keyboard.keyJustPressed(Keys.N)) {
+                this.level.regenerate()
+                this.player.resetPos()
+            }
         }
         this.level.tick()
         this.particleEngine.tick()
@@ -360,8 +364,8 @@ export class Minecraft {
     }
 
     private drawGui(a: number): void {
-        let screenWidth = Math.floor(this.width * 240 / this.height)
-        let screenHeight = Math.floor(this.height * 240 / this.height)
+        let screenWidth = Math.trunc(this.width * 240 / this.height)
+        let screenHeight = Math.trunc(this.height * 240 / this.height)
         gl.clear(gl.DEPTH_BUFFER_BIT)
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
@@ -391,8 +395,8 @@ export class Minecraft {
         this.font.drawShadow(Minecraft.VERSION_STRING, 2, 2, 0xFFFFFF)
         this.font.drawShadow(this.fpsString, 2, 12, 0xFFFFFF)
         this.checkGlError("GUI: Draw text")
-        let wc = Math.floor(screenWidth / 2)
-        let hc = Math.floor(screenHeight / 2)
+        let wc = Math.trunc(screenWidth / 2)
+        let hc = Math.trunc(screenHeight / 2)
         t.init()
         t.vertex(wc + 1, hc - 4, 0.0);
         t.vertex(wc - 0, hc - 4, 0.0);

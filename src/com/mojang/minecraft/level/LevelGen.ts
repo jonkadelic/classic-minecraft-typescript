@@ -24,12 +24,9 @@ export class LevelGen {
         let cf = new NoiseMap(1).read(w, h)
         let rockMap = new NoiseMap(1).read(w, h)
         let blocks = new Array(w * h * d)
-        let x = 0
-        while (x < w) {
-            let y = 0
-            while (y < d) {
-                let z = 0
-                while (z < h) {
+        for (let x = 0; x < w; x++) {
+            for (let y = 0; y < d; y++) {
+                for (let z = 0; z < h; z++) {
                     let dh: number = 0
                     let dh1 = heightmap1[x + z * this.width]
                     let dh2 = heightmap2[x + z * this.width]
@@ -42,8 +39,8 @@ export class LevelGen {
                     } else {
                         dh2 = dh1
                     }
-                    dh = Math.floor(dh / 8) + Math.floor(d / 3)
-                    let rh = Math.floor(rockMap[x + z * this.width] / 8) + Math.floor(d / 3)
+                    dh = Math.trunc(dh / 8) + Math.trunc(d / 3)
+                    let rh = Math.trunc(rockMap[x + z * this.width] / 8) + Math.trunc(d / 3)
                     if (rh > dh - 2) {
                         rh = dh - 2
                     }
@@ -59,13 +56,51 @@ export class LevelGen {
                         id = Tiles.rock.id
                     }
                     blocks[i] = id
-                    z++
                 }
-                y++
             }
-            x++
         }
-        // TODO
+        // Caves
+        let count = Math.trunc(w * h * d / 256 / 64)
+        for (let i = 0; i < count; i++) {
+            let x = this.random.nextFloat() * w
+            let y = this.random.nextFloat() * d
+            let z = this.random.nextFloat() * h
+            let length = Math.trunc(this.random.nextFloat() * this.random.nextFloat() * 150)
+            let dir1 = this.random.nextFloat() * Math.PI * 2
+            let dira1 = 0.0
+            let dir2 = this.random.nextFloat() * Math.PI * 2
+            let dira2 = 0.0
+            for (let l = 0; l < length; l++) {
+                x = x + Math.sin(dir1) * Math.cos(dir2)
+                z = z + Math.cos(dir1) * Math.cos(dir2)
+                y = y + Math.sin(dir2)
+                dir1 += dira1 * 0.2
+                dira1 *= 0.9
+                dira1 += this.random.nextFloat() - this.random.nextFloat()
+                dir2 += dira2 * 0.5
+                dir2 *= 0.5
+                dira2 *= 0.9
+                dira2 += this.random.nextFloat() - this.random.nextFloat()
+                let size = Math.sin(l * Math.PI / length) * 2.5 + 1.0
+                for (let xx = Math.trunc(x - size); xx <= Math.trunc(x + size); xx++) {
+                    for (let yy = Math.trunc(y - size); yy <= Math.trunc(y + size); yy++) {
+                        for (let zz = Math.trunc(z - size); zz <= Math.trunc(z + size); zz++) {
+                            let ii = (yy * this.height + zz) * this.width + xx
+                            let xd = xx - x
+                            let yd = yy - y
+                            let zd = zz - z
+                            let dd = xd * xd + yd * yd * 2 + zd * zd
+                            if (dd < size * size &&
+                                    xx >= 1 && yy >= 1 && zz >= 1 &&
+                                    xx < this.width - 1 && yy < this.depth - 1 && zz < this.height - 1 &&
+                                    blocks[ii] == Tiles.rock.id) {
+                                blocks[ii] = 0
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return blocks
     }
 }

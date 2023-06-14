@@ -26,7 +26,7 @@ export class Entity {
         this.resetPos()
     }
 
-    protected resetPos(): void {
+    public resetPos(): void {
         let x = Math.random() * this.level.width
         let y = this.level.depth + 10
         let z = Math.random() * this.level.height
@@ -113,9 +113,9 @@ export class Entity {
     }
 
     public isLit(): boolean {
-        let xTile = Math.floor(this.x)
-        let yTile = Math.floor(this.y)
-        let zTile = Math.floor(this.z)
+        let xTile = Math.trunc(this.x)
+        let yTile = Math.trunc(this.y)
+        let zTile = Math.trunc(this.z)
         return this.level.isLit(xTile, yTile, zTile)
     }
 
