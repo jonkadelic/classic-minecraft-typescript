@@ -18,4 +18,6 @@ void main(void) {
     fogAmount = clamp(fogAmount, 0.0, 1.0);
 
     gl_FragColor = mix(rgba, uFogColor, fogAmount);
+
+    gl_FragColor = rgba;
 }

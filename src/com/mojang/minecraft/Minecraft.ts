@@ -357,8 +357,8 @@ export class Minecraft {
     }
 
     private drawGui(a: number): void {
-        let screenWidth = this.width * 240 / this.height
-        let screenHeight = this.height * 240 / this.height
+        let screenWidth = Math.floor(this.width * 240 / this.height)
+        let screenHeight = Math.floor(this.height * 240 / this.height)
         gl.clear(gl.DEPTH_BUFFER_BIT)
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
@@ -387,8 +387,8 @@ export class Minecraft {
         this.checkGlError("GUI: Draw selected")
         // TODO: Text
         this.checkGlError("GUI: Draw text")
-        let wc = screenWidth / 2
-        let hc = screenHeight / 2
+        let wc = Math.floor(screenWidth / 2)
+        let hc = Math.floor(screenHeight / 2)
         t.init()
         t.vertexUV(wc + 1, hc - 4, 0.0, 0, 1);
         t.vertexUV(wc - 0, hc - 4, 0.0, 0, 1);
