@@ -50,8 +50,7 @@ export class LevelRenderer implements LevelListener {
                     if (z1 > level.height) {
                         z1 = level.height
                     }
-                    this.chunks[(x + y * this.xChunks) * this.zChunks + z] = new Chunk(level, x0, y0, z0, x1, y1, z1)
-
+                    this.setChunk(x, y, z, new Chunk(level, x0, y0, z0, x1, y1, z1))
                 }
             }
         }
@@ -192,10 +191,18 @@ export class LevelRenderer implements LevelListener {
         for (let x = x0; x <= x1; x++) {
             for (let y = y0; y <= y1; y++) {
                 for (let z = z0; z <= z1; z++) {
-                    this.chunks[(x + y * this.xChunks) * this.zChunks + z].setDirty()
+                    this.getChunk(x, y, z).setDirty()
                 }
             }
         }
+    }
+
+    private getChunk(x: number, y: number, z: number): Chunk {
+        return this.chunks[(y * this.xChunks * this.zChunks) + (x * this.zChunks) + z]
+    }
+
+    private setChunk(x: number, y: number, z: number, chunk: Chunk): void {
+        this.chunks[(y * this.xChunks * this.zChunks) + (x * this.zChunks) + z] = chunk
     }
 
     public tileChanged(x: number, y: number, z: number): void {

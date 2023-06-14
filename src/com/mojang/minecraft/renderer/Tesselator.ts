@@ -18,10 +18,8 @@ export class Tesselator {
     }
 
     public flush(buffer: RenderBuffer): void {
-        if (this.vertices > 0) {
-            buffer.configure(this.hasTexture, this.hasColor)
-            buffer.bufferData(new Float32Array(this.array), this.vertices)
-        }
+        buffer.configure(this.hasTexture, this.hasColor)
+        buffer.bufferData(new Float32Array(this.array), this.vertices)
         this.clear()
     }
 
