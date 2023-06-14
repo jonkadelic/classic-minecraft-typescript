@@ -1,3 +1,4 @@
+import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft";
 import { Player } from "../Player";
 import { Level } from "../level/Level";
@@ -9,15 +10,12 @@ export class ParticleEngine {
     protected level: Level
     private particles: Particle[] = []
     private textures: Textures
-    private buffer: WebGLBuffer
-    private vertices: number = 0
+    private buffer: RenderBuffer
 
     public constructor(level: Level, textures: Textures) {
         this.level = level
         this.textures = textures
-        let buf = gl.createBuffer()
-        if (!buf) throw new Error("Failed to create buffer")
-        this.buffer = buf
+        this.buffer = new RenderBuffer(gl.DYNAMIC_DRAW)
     }
 
     public add(particle: Particle): void {
@@ -44,14 +42,14 @@ export class ParticleEngine {
         let ya =  Math.cos(player.xRot * Math.PI / 180)
         let t = Tesselator.instance
         t.color_f(0.8, 0.8, 0.8)
-        t.init(this.buffer)
+        t.init()
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i]
             if (p.isLit() !== (layer === 1)) {
                 p.renderParticle(t, a, xa, ya, za, xa2, za2)
             }
         }
-        this.vertices = t.flush()
-        Tesselator.drawBuffer(this.buffer, this.vertices)
+        t.flush(this.buffer)
+        this.buffer.draw()
     }
 }

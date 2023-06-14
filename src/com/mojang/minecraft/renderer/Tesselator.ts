@@ -1,3 +1,4 @@
+import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft"
 
 export class Tesselator {
@@ -8,50 +9,26 @@ export class Tesselator {
     private r: number = 0
     private g: number = 0
     private b: number = 0
-    private len: number = 3
-    private p: number = 0
-    private buffer: WebGLBuffer = null
     public static instance: Tesselator = new Tesselator()
 
     private constructor() {
     }
 
-    public static drawBuffer(buffer: WebGLBuffer, vertices: number): void {
-        const bytesPerFloat = 4
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-        // Texture UV
-        gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 8, 0)
-        gl.enableVertexAttribArray(0)
-        // Color RGB
-        gl.vertexAttribPointer(1, 3, gl.FLOAT, false, bytesPerFloat * 8, bytesPerFloat * 2)
-        gl.enableVertexAttribArray(1)
-        // Vertex XYZ
-        gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 8, bytesPerFloat * 5)
-        gl.enableVertexAttribArray(2)
-
-        gl.drawArrays(gl.TRIANGLES, 0, vertices)
-    }
-
-    public flush(): number {
+    public flush(buffer: RenderBuffer): void {
         if (this.vertices > 0) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.array), gl.STATIC_DRAW)
+            buffer.bufferData(new Float32Array(this.array), this.vertices)
         }
-        let tmpVertices = this.vertices
         this.clear()
-        return tmpVertices;
     }
 
     private clear(): void {
         this.vertices = 0
-        this.p = 0
         this.array = []
     }
 
-    public init(buffer: WebGLBuffer): void {
+    public init(): void {
         this.clear()
-        this.buffer = buffer
+        this.color_f(1, 1, 1)
     }
 
     public tex(u: number, v: number): void {
@@ -60,7 +37,6 @@ export class Tesselator {
     }
 
     public color_f(r: number, g: number, b: number): void {
-
         this.r = r
         this.g = g
         this.b = b

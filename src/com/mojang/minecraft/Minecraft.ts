@@ -15,6 +15,8 @@ import { Frustum } from "./renderer/Frustum";
 import { Shader } from "../../../shader";
 import { Tiles } from "./level/tile/Tiles";
 import { Vec3 } from "./phys/Vec3";
+import { RenderBuffer } from "../../util/RenderBuffer";
+import { Tesselator } from "./renderer/Tesselator";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -51,6 +53,8 @@ export class Minecraft {
 
     private mouse0: boolean = false
     private mouse1: boolean = false
+
+    private guiBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
 
     public constructor(parent: HTMLCanvasElement, width: number, height: number) {
         this.parent = parent
@@ -353,7 +357,58 @@ export class Minecraft {
     }
 
     private drawGui(a: number): void {
-        // TODO
+        let screenWidth = this.width * 240 / this.height
+        let screenHeight = this.height * 240 / this.height
+        gl.clear(gl.DEPTH_BUFFER_BIT)
+        matrix.setActive(Matrix.PROJECTION)
+        matrix.loadIdentity()
+        matrix.ortho(0, screenWidth, screenHeight, 0, 100, 300)
+        matrix.setActive(Matrix.MODELVIEW)
+        matrix.loadIdentity()
+        matrix.translate(0, 0, -200)
+        this.checkGlError("GUI: Init")
+        matrix.push()
+        matrix.translate(screenWidth - 16, 16, 0)
+        let t = Tesselator.instance
+        matrix.scale(16, 16, 16)
+        matrix.rotate(30, 1, 0, 0)
+        matrix.rotate(45, 0, 1, 0)
+        matrix.translate(-1.5, 0.5, -0.5)
+        matrix.scale(-1.0, -1.0, 1.0)
+        let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
+        gl.bindTexture(gl.TEXTURE_2D, id)
+        t.init()
+        t.color_f(1, 1, 1)
+        Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0)
+        t.flush(this.guiBuffer)
+        matrix.applyUniforms()
+        this.guiBuffer.draw()
+        matrix.pop()
+        this.checkGlError("GUI: Draw selected")
+        // TODO: Text
+        this.checkGlError("GUI: Draw text")
+        let wc = screenWidth / 2
+        let hc = screenHeight / 2
+        t.init()
+        t.vertexUV(wc + 1, hc - 4, 0.0, 0, 1);
+        t.vertexUV(wc - 0, hc - 4, 0.0, 0, 1);
+        t.vertexUV(wc - 0, hc + 5, 0.0, 0, 1);
+        
+        t.vertexUV(wc - 0, hc + 5, 0.0, 0, 1);
+        t.vertexUV(wc + 1, hc + 5, 0.0, 0, 1);
+        t.vertexUV(wc + 1, hc - 4, 0.0, 0, 1);
+        
+        t.vertexUV(wc + 5, hc - 0, 0.0, 0, 1);
+        t.vertexUV(wc - 4, hc - 0, 0.0, 0, 1);
+        t.vertexUV(wc - 4, hc + 1, 0.0, 0, 1);
+        
+        t.vertexUV(wc - 4, hc + 1, 0.0, 0, 1);
+        t.vertexUV(wc + 5, hc + 1, 0.0, 0, 1);
+        t.vertexUV(wc + 5, hc - 0, 0.0, 0, 1);
+        t.flush(this.guiBuffer);
+        matrix.applyUniforms();
+        this.guiBuffer.draw();
+        this.checkGlError("GUI: Draw crosshair")
     }
 
     private setupFog(i: number): void {
@@ -375,8 +430,8 @@ export class Minecraft {
 
 export function main() {
     const canvas = document.createElement("canvas")
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth * 0.9
+    canvas.height = window.innerHeight * 0.9
     document.body.appendChild(canvas)
 
     let g = canvas.getContext("webgl", {antialias: false})

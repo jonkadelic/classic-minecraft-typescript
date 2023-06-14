@@ -1,3 +1,4 @@
+import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft";
 import { Player } from "../Player";
 import { AABB } from "../phys/AABB";
@@ -19,8 +20,7 @@ export class Chunk {
     public readonly y: number
     public readonly z: number
     public dirty: boolean = true
-    private buffers: WebGLBuffer[] = []
-    private vertices: number[] = []
+    private buffers: RenderBuffer[] = []
     public dirtiedTime: number = 0
     private static t: Tesselator = Tesselator.instance
     public static updates: number = 0
@@ -39,15 +39,14 @@ export class Chunk {
         this.y = (y0 + y1) / 2
         this.z = (z0 + z1) / 2
         this.aabb = new AABB(x0, y0, z0, x1, y1, z1)
-        this.buffers = [gl.createBuffer(), gl.createBuffer()]
-        this.vertices = [0, 0]
+        this.buffers = [new RenderBuffer(gl.STATIC_DRAW), new RenderBuffer(gl.STATIC_DRAW)]
     }
 
     private rebuildLayer(layer: number): void {
         this.dirty = false
         Chunk.updates++
         let before = Date.now()
-        Chunk.t.init(this.buffers[layer])
+        Chunk.t.init()
         let tiles = 0
         for (let x = this.x0; x < this.x1; x++) {
             for (let y = this.y0; y < this.y1; y++) {
@@ -60,7 +59,7 @@ export class Chunk {
                 }
             }
         }
-        this.vertices[layer] = Chunk.t.flush()
+        Chunk.t.flush(this.buffers[layer])
         let after = Date.now()
         if (tiles > 0) {
             Chunk.totalTime += after - before
@@ -74,7 +73,7 @@ export class Chunk {
     }
 
     public render(layer: number): void {
-        Tesselator.drawBuffer(this.buffers[layer], this.vertices[layer])
+        this.buffers[layer].draw()
     }
 
     public setDirty(): void {

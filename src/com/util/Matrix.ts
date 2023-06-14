@@ -1,4 +1,5 @@
 import { mat4 } from "gl-matrix";
+import { gl, shader } from "../mojang/minecraft/Minecraft";
 
 export class Matrix {
     public static readonly MODELVIEW = 0
@@ -47,8 +48,16 @@ export class Matrix {
         mat4.rotate(this.peek(), this.peek(), angle * Math.PI / 180, [x, y, z])
     }
 
+    public scale(x: number, y: number, z: number): void {
+        mat4.scale(this.peek(), this.peek(), [x, y, z])
+    }
+
     public perspective(fov: number, aspect: number, near: number, far: number): void {
         mat4.perspective(this.peek(), fov * Math.PI / 180, aspect, near, far)
+    }
+
+    public ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): void {
+        mat4.ortho(this.peek(), left, right, bottom, top, near, far)
     }
 
     public getFloat(stack: number): number[] {
@@ -59,5 +68,11 @@ export class Matrix {
             floatArray[i] = matrix[i]
         }
         return floatArray
+    }
+
+    public applyUniforms(): void {
+        if (shader == null) return
+        gl.uniformMatrix4fv(shader.getUniformLocation("uMVMatrix"), false, new Float32Array(this.getFloat(Matrix.MODELVIEW)));
+        gl.uniformMatrix4fv(shader.getUniformLocation("uPMatrix"), false, new Float32Array(this.getFloat(Matrix.PROJECTION)));
     }
 }
