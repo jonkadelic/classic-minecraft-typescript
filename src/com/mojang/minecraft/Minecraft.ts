@@ -17,6 +17,7 @@ import { Tiles } from "./level/tile/Tiles";
 import { Vec3 } from "./phys/Vec3";
 import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
+import { Font } from "./gui/Font";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -42,9 +43,10 @@ export class Minecraft {
     public pause: boolean = false
     private yMouseAxis: number = -1
     public textures: Textures
+    public font: Font
     private editMode: number = 0
     private running: boolean = false
-    private fpsString: String = ""
+    private fpsString: string = ""
     private mouseGrabbed: boolean = false
     private hitResult: HitResult = null
 
@@ -91,6 +93,7 @@ export class Minecraft {
         matrix.loadIdentity()
         matrix.setActive(Matrix.MODELVIEW)
         this.checkGlError("Startup")
+        this.font = new Font("./default.png", this.textures)
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
@@ -385,7 +388,8 @@ export class Minecraft {
         this.guiBuffer.draw()
         matrix.pop()
         this.checkGlError("GUI: Draw selected")
-        // TODO: Text
+        this.font.drawShadow(Minecraft.VERSION_STRING, 2, 2, 0xFFFFFF)
+        this.font.drawShadow(this.fpsString, 2, 12, 0xFFFFFF)
         this.checkGlError("GUI: Draw text")
         let wc = Math.floor(screenWidth / 2)
         let hc = Math.floor(screenHeight / 2)
