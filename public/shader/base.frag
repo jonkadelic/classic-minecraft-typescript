@@ -11,13 +11,15 @@ uniform bool uHasTexture;
 uniform bool uHasColor;
 
 void main(void) {
-    highp vec3 texelColor = vec3(1.0, 1.0, 1.0);
+    highp vec4 texelColor = vec4(1.0, 1.0, 1.0, 1.0);
     if (uHasTexture) {
-        texelColor = texture2D(uSampler, vTextureCoord).rgb; 
+        texelColor = texture2D(uSampler, vTextureCoord).rgba; 
+        if (texelColor.a <= 0.0) {
+            discard;
+        }
     }
-    highp vec4 rgba = vec4(texelColor.rgb, 1.0);
     if (uHasColor) {
-        rgba = vec4(texelColor.rgb * vColor.rgb, 1.0);
+        texelColor = vec4(texelColor.rgb * vColor.rgb, texelColor.a);
     }
 
     #define LOG2 1.442695
@@ -26,7 +28,7 @@ void main(void) {
     highp float fogAmount = 1.0 - exp2(-uFogDensity * uFogDensity * fogDistance * fogDistance * LOG2);
     fogAmount = clamp(fogAmount, 0.0, 1.0);
 
-    gl_FragColor = mix(rgba, uFogColor, fogAmount);
+    gl_FragColor = mix(texelColor, uFogColor, fogAmount);
 
-    gl_FragColor = rgba;
+    gl_FragColor = texelColor;
 }
