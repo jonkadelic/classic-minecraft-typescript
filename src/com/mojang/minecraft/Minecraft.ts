@@ -198,8 +198,10 @@ export class Minecraft {
     public tick(): void {
         keyboard.update()
         this.mouseGrabbed = document.pointerLockElement == this.parent
-        if (!this.mouseGrabbed && mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT)) {
+        mouse.setLock(this.mouseGrabbed)
+        if (!this.mouseGrabbed && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
             this.grabMouse()
+            return
         }
         if (this.mouseGrabbed) {
             // Mouse
