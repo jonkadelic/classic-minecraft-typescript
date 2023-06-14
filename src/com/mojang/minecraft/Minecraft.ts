@@ -217,7 +217,7 @@ export class Minecraft {
             if (mouse.buttonPressed(MouseButton.LEFT)) {
                 if (!this.mouse0) {
                     this.mouse0 = true
-                    this.handleMouseClick(0)
+                    this.handleMouseClick(this.editMode)
                 }
             } else {
                 this.mouse0 = false
@@ -225,7 +225,7 @@ export class Minecraft {
             if (mouse.buttonPressed(MouseButton.RIGHT)) {
                 if (!this.mouse1) {
                     this.mouse1 = true
-                    this.handleMouseClick(1)
+                    this.editMode = (this.editMode + 1) % 2
                 }
             } else {
                 this.mouse1 = false
@@ -433,10 +433,7 @@ export class Minecraft {
 }
 
 export function main() {
-    const canvas = document.createElement("canvas")
-    canvas.width = window.innerWidth * 0.9
-    canvas.height = window.innerHeight * 0.9
-    document.body.appendChild(canvas)
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement
 
     let g = canvas.getContext("webgl", {antialias: false})
     if (!g) throw new Error("Failed to get WebGL context")

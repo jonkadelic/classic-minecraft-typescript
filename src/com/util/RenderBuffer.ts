@@ -33,21 +33,21 @@ export class RenderBuffer {
         if (this.hasTexture && this.hasColor) {
             // Texture UV
             gl.uniform1f(shader.getUniformLocation("uHasTexture"), 1)
-            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 8, 0)
+            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 9, 0)
             gl.enableVertexAttribArray(0)
-            // Color RGB
+            // Color RGBA
             gl.uniform1f(shader.getUniformLocation("uHasColor"), 1)
-            gl.vertexAttribPointer(1, 3, gl.FLOAT, false, bytesPerFloat * 8, bytesPerFloat * 2)
+            gl.vertexAttribPointer(1, 4, gl.FLOAT, false, bytesPerFloat * 9, bytesPerFloat * 2)
             gl.enableVertexAttribArray(1)
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 8, bytesPerFloat * 5)
+            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 9, bytesPerFloat * 6)
             gl.enableVertexAttribArray(2)
         } else if (this.hasTexture) {
             // Texture UV
             gl.uniform1f(shader.getUniformLocation("uHasTexture"), 1)
             gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 5, 0)
             gl.enableVertexAttribArray(0)
-            // Color RGB
+            // Color RGBA
             gl.uniform1f(shader.getUniformLocation("uHasColor"), 0)
             gl.disableVertexAttribArray(1)
             // Vertex XYZ
@@ -57,18 +57,18 @@ export class RenderBuffer {
             // Texture UV
             gl.uniform1f(shader.getUniformLocation("uHasTexture"), 0)
             gl.disableVertexAttribArray(0)
-            // Color RGB
+            // Color RGBA
             gl.uniform1f(shader.getUniformLocation("uHasColor"), 1)
-            gl.vertexAttribPointer(1, 3, gl.FLOAT, false, bytesPerFloat * 5, 0)
+            gl.vertexAttribPointer(1, 4, gl.FLOAT, false, bytesPerFloat * 7, 0)
             gl.enableVertexAttribArray(1)
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 5, bytesPerFloat * 2)
+            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 7, bytesPerFloat * 4)
             gl.enableVertexAttribArray(2)
         } else {
             // Texture UV
             gl.uniform1f(shader.getUniformLocation("uHasTexture"), 0)
             gl.disableVertexAttribArray(0)
-            // Color RGB
+            // Color RGBA
             gl.uniform1f(shader.getUniformLocation("uHasColor"), 0)
             gl.disableVertexAttribArray(1)
             // Vertex XYZ

@@ -1,0 +1,106 @@
+@charset "UTF-8";
+
+a:link {
+	color: #aaf;
+}
+
+a:hover {
+	color: #fff;
+}
+
+a:visited {
+	color: #aaa;
+}
+
+a:active {
+	color: #ff0;
+}
+
+#content {
+    margin-left: auto;
+    margin-right: auto;
+    width: 854px;
+}
+
+#footer {
+	text-align: center;
+    font-size: 10px;
+    height: 10px;
+    padding-top:2px;
+    padding-bottom:2px;
+    position:fixed;
+    bottom:2px;
+    right:2px;
+}
+
+body, html {
+	border: none;
+	margin: 0;
+	padding: 0;
+	background-color: #222;
+	color: #e0d0d0;
+	background-image:url('/img/bg.gif');
+	font-weight: normal;
+	font-family: sans-serif;
+    height:100%;	
+}
+
+#toppanel {
+	height: 48px;
+	background-color: #555;
+	background-image:url('/img/top-bg.gif');
+	border-bottom: 3px solid #000;	
+}
+
+#toppanel #prepurchasesplash {
+	position: absolute;
+	top: 18px;
+	left: 66px;
+}
+
+#toppanel .buynow {
+	float: right;
+	position: relative;
+	top: 11px;
+	padding-left: 8px;
+}
+
+#toppanel .donate {
+	float: right;
+	position: relative;
+	top: 14px;
+	padding-left: 8px;
+}
+
+#toppanel #links {
+	float: left;
+	margin: 7px;
+	font-size: 13px;
+}
+
+#toppanel #loginpanel {
+	float: right;
+	margin: 12px;
+	font-size: 18px;
+}
+
+#toppanel #logo {
+	float: left;
+	border: 0px; 
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.pad {
+	margin: 4px;
+}
+
+.rightgap {
+	padding-right: 16px;
+}

@@ -1,13 +1,68 @@
-<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="SHORTCUT ICON" href="img/favicon.ico" />
+  <title>Minecraft</title>
+  <script type="module" src="/src/main.ts"></script>
+</head>
+
+<body>
+  <div id="top">
+    <h1><span>Minecraft</span></h1>
+
+    <ul id="navigation">
+      <li><a href="http://www.minecraft.net">Home</a></li>
+      <li><a href="http://notch.tumblr.com">Dev blog</a></li>
+    </ul>
+
+    <ul id="additional">
+
+
+      Not logged in. <a href="login.jsp">Log in</a> or <a href="register.jsp">register</a>.
+
+      <!--     <li><a href="#about">About</a></li>
+    <li><a href="#controls">Controls</a></li> -->
+    </ul>
+
+  </div>
+
+  <center>
+    <table width="854px">
+      <tr>
+        <td width="854px">
+          <br><br><br>
+
+
+          <center>
+            <font color="#ff0000">You won't be able to save unless you log in.</font>
+          </center>
+
+          <canvas width="854" height="480" id="canvas"></canvas><br>
+          <center>
+            <font size="-1">This game requires <a href="http://www.java.com/">Java</a>. Press escape to release the
+              mouse.<br>
+              Please read <a
+                href="http://notch.tumblr.com/post/111609953/ok-so-heres-the-deal-on-the-problems-with-level">this</a>
+              if you're having trouble loading/saving maps.</font>
+          </center>
+          <br>
+          <h2>Controls:</h2>
+          WASD to move<br>
+          Space to jump<br>
+          R to respawn above the level<br>
+          G to add a mob<br>
+          Y to swap mouse Y axis<br>
+          F to toggle rendering distance<br>
+          Escape to release mouse and open game menu<br>
+          1-4 to change building block type<br>
+          Left mouse button to remove or add a block<br>
+          Right mouse button to switch editing mode<br>
+        </td>
+      </tr>
+    </table>
+    <center>
+</body>
+
 </html>

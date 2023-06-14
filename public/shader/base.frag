@@ -1,5 +1,5 @@
 varying highp vec2 vTextureCoord;
-varying highp vec3 vColor;
+varying highp vec4 vColor;
 varying highp vec3 vPosition;
 
 uniform sampler2D uSampler;
@@ -19,7 +19,7 @@ void main(void) {
         }
     }
     if (uHasColor) {
-        texelColor = vec4(texelColor.rgb * vColor.rgb, texelColor.a);
+        texelColor = texelColor * vColor;
     }
 
     #define LOG2 1.442695
@@ -31,4 +31,7 @@ void main(void) {
     gl_FragColor = mix(texelColor, uFogColor, fogAmount);
 
     gl_FragColor = texelColor;
+    // if (uHasColor) {
+    //     gl_FragColor = vec4(vColor.a, 0.0, 0.0, 1.0);
+    // }
 }

@@ -1,5 +1,5 @@
 attribute vec2 aTextureCoord;
-attribute vec3 aColor;
+attribute vec4 aColor;
 attribute vec3 aVertexPosition;
 
 uniform mat4 uMVMatrix;
@@ -9,7 +9,7 @@ uniform bool uHasTexture;
 uniform bool uHasColor;
 
 varying highp vec2 vTextureCoord;
-varying highp vec3 vColor;
+varying highp vec4 vColor;
 varying highp vec3 vPosition;
 
 void main(void) {
@@ -23,7 +23,7 @@ void main(void) {
     if (uHasColor) {
         vColor = aColor;
     } else {
-        vColor = vec3(1.0, 1.0, 1.0);
+        vColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
 
     vPosition = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;

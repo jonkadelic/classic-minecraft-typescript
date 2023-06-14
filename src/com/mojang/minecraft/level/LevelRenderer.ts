@@ -9,6 +9,9 @@ import { Chunk } from "./Chunk";
 import { Level } from "./Level";
 import { LevelListener } from "./LevelListener";
 import { Tesselator } from "../renderer/Tesselator";
+import { RenderBuffer } from "../../../util/RenderBuffer";
+import { Tile } from "./tile/Tile";
+import { Tiles } from "./tile/Tiles";
 
 export class LevelRenderer implements LevelListener {
     public static readonly MAX_REBUILDS_PER_FRAME = 8
@@ -19,6 +22,7 @@ export class LevelRenderer implements LevelListener {
     private yChunks: number
     private zChunks: number
     private textures: Textures
+    private hitRenderBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
 
     public constructor(level: Level, textures: Textures) {
         this.level = level
@@ -113,6 +117,51 @@ export class LevelRenderer implements LevelListener {
     }
 
     public renderHit(h: HitResult, mode: number, tileType: number): void {
+        let t = Tesselator.instance
+        gl.enable(gl.BLEND)
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+        t.init()
+        t.color_f(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
+        if (mode == 0) {
+            for (let i = 0; i < 6; i++) {
+                Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
+            }
+            t.flush(this.hitRenderBuffer)
+            this.hitRenderBuffer.draw()
+        } else {
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+            let br = Math.sin(Date.now() / 100) * 0.2 + 0.8
+            t.color_f(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
+            let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
+            gl.bindTexture(gl.TEXTURE_2D, id)
+            let x = h.x
+            let y = h.y
+            let z = h.z
+            if (h.f == 0) {
+                y--
+            }
+            if (h.f == 1) {
+                y++
+            }
+            if (h.f == 2) {
+                z--
+            }
+            if (h.f == 3) {
+                z++
+            }
+            if (h.f == 4) {
+                x--
+            }
+            if (h.f == 5) {
+                x++
+            }
+            for (let i = 0; i < 6; i++) {
+                Tile.tiles[tileType].renderFace(t, x, y, z, i)
+            }
+            t.flush(this.hitRenderBuffer)
+            this.hitRenderBuffer.draw()
+        }
+        gl.disable(gl.BLEND)
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {

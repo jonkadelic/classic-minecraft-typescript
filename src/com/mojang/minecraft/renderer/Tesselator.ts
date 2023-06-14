@@ -9,6 +9,7 @@ export class Tesselator {
     private r: number = 0
     private g: number = 0
     private b: number = 0
+    private a: number = 0
     private hasColor: boolean = false
     private hasTexture: boolean = false
     public static instance: Tesselator = new Tesselator()
@@ -41,10 +42,11 @@ export class Tesselator {
         this.hasTexture = true
     }
 
-    public color_f(r: number, g: number, b: number): void {
+    public color_f(r: number, g: number, b: number, a: number = 1): void {
         this.r = r
         this.g = g
         this.b = b
+        this.a = a
         this.hasColor = true
     }
 
@@ -62,6 +64,7 @@ export class Tesselator {
             this.array.push(this.r)
             this.array.push(this.g)
             this.array.push(this.b)
+            this.array.push(this.a)
         }
         this.array.push(x)
         this.array.push(y)
@@ -69,10 +72,11 @@ export class Tesselator {
         this.vertices++
     }
 
-    public color_i(c: number): void {
+    public color_i(c: number, a: number = 255): void {
+        a = a & 0xff
         const r: number = (c >> 16) & 0xff
         const g: number = (c >> 8) & 0xff
         const b: number = c & 0xff
-        this.color_f(r / 255, g / 255, b / 255)
+        this.color_f(r / 255, g / 255, b / 255, a / 255)
     }
 }
