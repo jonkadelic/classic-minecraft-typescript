@@ -1,5 +1,5 @@
 import { RenderBuffer } from "../../../util/RenderBuffer";
-import { gl } from "../Minecraft";
+import { gl, matrix } from "../Minecraft";
 import { Textures } from "../renderer/Textures";
 import { Tesselator } from "../renderer/Tesselator";
 
