@@ -275,14 +275,10 @@ export class Minecraft {
     private setupCamera(a: number): void {
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
-        matrix.perspective(70, this.width / this.height, 0.05, 1000)
+        matrix.perspective(90, this.width / this.height, 0.05, 1000)
         matrix.setActive(Matrix.MODELVIEW)
         matrix.loadIdentity()
         this.moveCameraToPlayer(a)
-    }
-
-    private setupPickCamera(a: number, x: number, y: number): void {
-        // TODO
     }
 
     private pick(a: number): void {
@@ -350,7 +346,15 @@ export class Minecraft {
     }
 
     private setupFog(i: number): void {
-        // TODO
+        if (shader == null) return
+        shader.use()
+        if (i == 0) {
+            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
+            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor0)
+        } else if (i == 1) {
+            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.01)
+            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor1)
+        }
     }
 
     public static checkError(): void {
