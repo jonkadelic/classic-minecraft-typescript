@@ -92,6 +92,10 @@ export class Minecraft {
         this.player = new Player(this.level)
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.checkGlError("Post startup")
+
+        window.onunload = () => {
+            this.destroy()
+        }
     }
 
     private checkGlError(string: string): void {

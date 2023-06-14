@@ -13,6 +13,7 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
+    "base256-encoding": "^2.0.2",
     "gl-matrix": "^3.4.3",
     "syncinput": "^1.3.9",
     "webgl-debug": "^2.0.1"

@@ -6,6 +6,7 @@ import { LevelGen } from "./LevelGen";
 import { LevelListener } from "./LevelListener";
 import { Tile } from "./tile/Tile";
 import { Tiles } from "./tile/Tiles";
+import Base256 from "base256-encoding"
 
 export class Level {
     private static readonly TILE_UPDATE_INTERVAL = 400
@@ -36,17 +37,24 @@ export class Level {
         if (level == null) {
             return false
         }
-        this.blocks = level.split(",").map((s) => parseInt(s))
+        this.blocks = Array.from(Base256.decode(level))
 
         this.calcLightDepths(0, 0, this.width, this.height)
         for (let i = 0; i < this.levelListeners.length; i++) {
             this.levelListeners[i].allChanged()
         }
+        console.log("Loaded level")
         return true
     }
 
     public save(): void {
-        localStorage.setItem("level", this.blocks.join(","))
+        let toWrite = Base256.encode(new Uint8Array(this.blocks))
+        try {
+            localStorage.setItem("level", toWrite)
+            console.log("Saved level: " + toWrite.length + " bytes")
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     public calcLightDepths(x0: number, y0: number, x1: number, y1: number): void {
