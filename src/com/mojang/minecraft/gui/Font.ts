@@ -8,7 +8,7 @@ export class Font {
     public fontTexture: WebGLTexture = null
     private buffer: RenderBuffer
 
-    public constructor(resourceName: string, textureManager: Textures) {
+    public constructor(name: string, textures: Textures) {
         this.buffer = new RenderBuffer(gl.DYNAMIC_DRAW)
         
         let canvas = document.createElement("canvas")
@@ -18,53 +18,54 @@ export class Font {
         const imageLoadPromise = new Promise(resolve => {
             img = new window.Image();
             img.onload = resolve;
-            img.src = resourceName;
+            img.src = name;
         });
         imageLoadPromise.then(() => {
             context.drawImage(img, 0, 0)
             
-            let i4: number = img.width
-            let i5: number = img.height
-            let i6 = context.getImageData(0, 0, i4, i5)
+            let w: number = img.width
+            let h: number = img.height
+            let rawPixels = context.getImageData(0, 0, w, h)
             
-            for (let i14: number = 0; i14 < 256; ++i14) {
-                i5 = i14 % 16;
-                let i7: number = Math.trunc(i14 / 16);
-                let i8: number = 0
-                
-                for (let z9: boolean = false; i8 < 8 && !z9; ++i8) {
-                    let i10: number = (i5 << 3) + i8
-                    z9 = true
+            for (let i: number = 0; i < 256; ++i) {
+                let xt = i % 16;
+                let yt: number = Math.trunc(i / 16);
+                let x: number = 0
+                let emptyColumn: boolean = false
+
+                for (; x < 8 && !emptyColumn; ++x) {
+                    let xPixel: number = (xt << 3) + x
+                    emptyColumn = true
                     
-                    for (let i11: number = 0; i11 < 8; ++i11) {
-                        let i12: number = ((i7 << 3) + i11) * i4
-                        if (i6.data[(i10 + i12) * 4 + 3] > 128) {
-                            z9 = false
+                    for (let y: number = 0; y < 8; ++y) {
+                        let yPixel: number = ((yt << 3) + y) * w
+                        if (rawPixels.data[(xPixel + yPixel) * 4 + 3] > 128) {
+                            emptyColumn = false
                         }
                     }
                 }
                 
-                if (i14 == 32) {
-                    i8 = 4
+                if (i == 32) {
+                    x = 4
                 }
 
-                this.charWidths[i14] = i8
+                this.charWidths[i] = x
             }
 
-            this.fontTexture = textureManager.loadTexture(resourceName, gl.NEAREST)
+            this.fontTexture = textures.loadTexture(name, gl.NEAREST)
             
             console.log("Font loaded")
         })
     }
     
-    public drawShadow(string: string, x: number, y: number, color: number): void {
-        this.draw(string, x + 1, y + 1, color, true)
-		this.draw(string, x, y, color, false)
+    public drawShadow(str: string, x: number, y: number, color: number): void {
+        this.draw(str, x + 1, y + 1, color, true)
+		this.draw(str, x, y, color, false)
     }
     
-    public draw(string: string, x: number, y: number, color: number, darken: boolean): void {
+    public draw(str: string, x: number, y: number, color: number, darken: boolean): void {
         if (darken) {
-			color = (color & 16579836) >> 2
+			color = (color & 0xFCFCFC) >> 2
 		}
         
 		gl.bindTexture(gl.TEXTURE_2D, this.fontTexture)
@@ -72,31 +73,32 @@ export class Font {
         t.init()
         t.color_i(color)
         
-        let i7: number = 0
-        for (let i8: number = 0; i8 < string.length; ++i8) {
-            let i9: number
-            if(string.charAt(i8) == '&') {
-                i9 = ((color = "0123456789abcdef".indexOf(string.charAt(i8))) & 8) << 3
-                let i10: number = (color & 1) * 191 + i9
-                let i11: number = ((color & 2) >> 1) * 191 + i9
-                color = ((color & 4) >> 2) * 191 + i9 << 16 | i11 << 8 | i10
-                i8 += 2
+        let xo: number = 0
+        for (let i: number = 0; i < str.length; ++i) {
+            if(str.charAt(i) == '&') {
+                let cc = ((color = "0123456789abcdef".indexOf(str.charAt(i))) & 8) << 3
+                let br = (cc & 8) * 8
+                let b = (cc & 1) * 191 + br
+                let g = ((cc & 2) >> 1) * 191 + br
+                let r = ((cc & 4) >> 2) * 191 + br
+                color = r << 16 | g << 8 | b
+                i += 2
 				if (darken) {
-					color = (color & 16579836) >> 2
+					color = (color & 0xFCFCFC) >> 2
 				}
 				t.color_i(color);
             }
-            let ch: number = string.charAt(i8).charCodeAt(0)
-            color = ch % 16 << 3
-			i9 = Math.trunc(ch / 16) << 3
-            t.vertexUV((x + i7), (y + 8), 0.0, color / 128.0, (i9 + 8) / 128.0);
-            t.vertexUV((x + i7 + 8), (y + 8), 0.0, (color + 8) / 128.0, (i9 + 8) / 128.0);
-            t.vertexUV((x + i7 + 8), y, 0.0, (color + 8) / 128.0, i9 / 128.0);
+            let ch: number = str.charAt(i).charCodeAt(0)
+            let ix = ch % 16 << 3
+			let iy = Math.trunc(ch / 16) << 3
+            t.vertexUV((x + xo), (y + 8), 0.0, ix / 128.0, (iy + 8) / 128.0);
+            t.vertexUV((x + xo + 8), (y + 8), 0.0, (ix + 8) / 128.0, (iy + 8) / 128.0);
+            t.vertexUV((x + xo + 8), y, 0.0, (ix + 8) / 128.0, iy / 128.0);
             
-            t.vertexUV((x + i7 + 8), y, 0.0, (color + 8) / 128.0, i9 / 128.0);
-            t.vertexUV((x + i7), y, 0.0, color / 128.0, i9 / 128.0);
-            t.vertexUV((x + i7), (y + 8), 0.0, color / 128.0, (i9 + 8) / 128.0);
-			i7 += this.charWidths[ch]
+            t.vertexUV((x + xo + 8), y, 0.0, (ix + 8) / 128.0, iy / 128.0);
+            t.vertexUV((x + xo), y, 0.0, ix / 128.0, iy / 128.0);
+            t.vertexUV((x + xo), (y + 8), 0.0, ix / 128.0, (iy + 8) / 128.0);
+			xo += this.charWidths[ch]
         }
         
         t.flush(this.buffer)
@@ -104,17 +106,17 @@ export class Font {
         this.buffer.draw()
     }
     
-    public getWidth(string: string): number {
-        let i2: number = 0
+    public width(str: string): number {
+        let len: number = 0
         
-        for (let i3: number = 0; i3 < string.length; ++i3) {
-            if(string.charAt(i3) == '&') {
-				++i3
+        for (let i: number = 0; i < str.length; ++i) {
+            if(str.charAt(i) == '&') {
+				++i
 			} else {
-				i2 += this.charWidths[string.charAt(i3).charCodeAt(0)]
+				len += this.charWidths[str.charAt(i).charCodeAt(0)]
 			}
         }
         
-        return i2
+        return len
     }
 }
