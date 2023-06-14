@@ -9,6 +9,8 @@ export class Tesselator {
     private r: number = 0
     private g: number = 0
     private b: number = 0
+    private hasColor: boolean = false
+    private hasTexture: boolean = false
     public static instance: Tesselator = new Tesselator()
 
     private constructor() {
@@ -16,6 +18,7 @@ export class Tesselator {
 
     public flush(buffer: RenderBuffer): void {
         if (this.vertices > 0) {
+            buffer.configure(this.hasTexture, this.hasColor)
             buffer.bufferData(new Float32Array(this.array), this.vertices)
         }
         this.clear()
@@ -28,18 +31,21 @@ export class Tesselator {
 
     public init(): void {
         this.clear()
-        this.color_f(1, 1, 1)
+        this.hasTexture = false
+        this.hasColor = false
     }
 
     public tex(u: number, v: number): void {
         this.u = u
         this.v = v
+        this.hasTexture = true
     }
 
     public color_f(r: number, g: number, b: number): void {
         this.r = r
         this.g = g
         this.b = b
+        this.hasColor = true
     }
 
     public vertexUV(x: number, y: number, z: number, u: number, v: number): void {
@@ -48,11 +54,15 @@ export class Tesselator {
     }
 
     public vertex(x: number, y: number, z: number): void {
-        this.array.push(this.u)
-        this.array.push(this.v)
-        this.array.push(this.r)
-        this.array.push(this.g)
-        this.array.push(this.b)
+        if (this.hasTexture) {
+            this.array.push(this.u)
+            this.array.push(this.v)
+        }
+        if (this.hasColor) {
+            this.array.push(this.r)
+            this.array.push(this.g)
+            this.array.push(this.b)
+        }
         this.array.push(x)
         this.array.push(y)
         this.array.push(z)

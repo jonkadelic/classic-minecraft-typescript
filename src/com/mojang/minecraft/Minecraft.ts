@@ -390,21 +390,21 @@ export class Minecraft {
         let wc = Math.floor(screenWidth / 2)
         let hc = Math.floor(screenHeight / 2)
         t.init()
-        t.vertexUV(wc + 1, hc - 4, 0.0, 0, 1);
-        t.vertexUV(wc - 0, hc - 4, 0.0, 0, 1);
-        t.vertexUV(wc - 0, hc + 5, 0.0, 0, 1);
+        t.vertex(wc + 1, hc - 4, 0.0);
+        t.vertex(wc - 0, hc - 4, 0.0);
+        t.vertex(wc - 0, hc + 5, 0.0);
         
-        t.vertexUV(wc - 0, hc + 5, 0.0, 0, 1);
-        t.vertexUV(wc + 1, hc + 5, 0.0, 0, 1);
-        t.vertexUV(wc + 1, hc - 4, 0.0, 0, 1);
+        t.vertex(wc - 0, hc + 5, 0.0);
+        t.vertex(wc + 1, hc + 5, 0.0);
+        t.vertex(wc + 1, hc - 4, 0.0);
         
-        t.vertexUV(wc + 5, hc - 0, 0.0, 0, 1);
-        t.vertexUV(wc - 4, hc - 0, 0.0, 0, 1);
-        t.vertexUV(wc - 4, hc + 1, 0.0, 0, 1);
+        t.vertex(wc + 5, hc - 0, 0.0);
+        t.vertex(wc - 4, hc - 0, 0.0);
+        t.vertex(wc - 4, hc + 1, 0.0);
         
-        t.vertexUV(wc - 4, hc + 1, 0.0, 0, 1);
-        t.vertexUV(wc + 5, hc + 1, 0.0, 0, 1);
-        t.vertexUV(wc + 5, hc - 0, 0.0, 0, 1);
+        t.vertex(wc - 4, hc + 1, 0.0);
+        t.vertex(wc + 5, hc + 1, 0.0);
+        t.vertex(wc + 5, hc - 0, 0.0);
         t.flush(this.guiBuffer);
         matrix.applyUniforms();
         this.guiBuffer.draw();

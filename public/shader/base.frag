@@ -7,9 +7,18 @@ uniform sampler2D uSampler;
 uniform highp vec4 uFogColor;
 uniform highp float uFogDensity;
 
+uniform bool uHasTexture;
+uniform bool uHasColor;
+
 void main(void) {
-    highp vec3 texelColor = texture2D(uSampler, vTextureCoord).rgb;
-    highp vec4 rgba = vec4(texelColor.rgb * vColor, 1.0);
+    highp vec3 texelColor = vec3(1.0, 1.0, 1.0);
+    if (uHasTexture) {
+        texelColor = texture2D(uSampler, vTextureCoord).rgb; 
+    }
+    highp vec4 rgba = vec4(texelColor.rgb, 1.0);
+    if (uHasColor) {
+        rgba = vec4(texelColor.rgb * vColor.rgb, 1.0);
+    }
 
     #define LOG2 1.442695
 
