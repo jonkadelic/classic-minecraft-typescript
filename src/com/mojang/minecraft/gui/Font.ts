@@ -1,3 +1,4 @@
+import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft";
 import { Textures } from "../renderer/Textures";
 import { Tesselator } from "../renderer/Tesselator";
@@ -66,7 +67,6 @@ export class Font {
 			color = (color & 16579836) >> 2
 		}
         
-        Tesselator.setUseTex(true)
 		gl.bindTexture(gl.TEXTURE_2D, this.fontTexture)
         let t = Tesselator.instance
         t.init()
