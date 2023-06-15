@@ -340,7 +340,7 @@ export class Minecraft {
             let yo = 0.0
             xo = mouse.delta.x
             yo = mouse.delta.y
-            if (Math.abs(xo) < 100)
+            if (Math.abs(xo) < this.width)
             {
                 this.player.turn(xo, yo * this.yMouseAxis)
             }
