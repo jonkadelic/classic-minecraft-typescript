@@ -102,7 +102,6 @@ export class Font {
         }
         
         t.flush(this.buffer)
-        matrix.applyUniforms()
         this.buffer.draw()
     }
     

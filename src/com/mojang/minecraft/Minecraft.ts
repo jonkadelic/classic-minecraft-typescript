@@ -14,10 +14,11 @@ import { Matrix } from "../../util/Matrix";
 import { Frustum } from "./renderer/Frustum";
 import { Shader } from "../../../shader";
 import { Tiles } from "./level/tile/Tiles";
-import { Vec3 } from "./phys/Vec3";
+import { Vec3 } from "./character/Vec3";
 import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
 import { Font } from "./gui/Font";
+import { Zombie } from "./character/Zombie";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -93,11 +94,16 @@ export class Minecraft {
         matrix.loadIdentity()
         matrix.setActive(Matrix.MODELVIEW)
         this.checkGlError("Startup")
-        this.font = new Font("./default.png", this.textures)
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
         this.particleEngine = new ParticleEngine(this.level, this.textures)
+        this.font = new Font("./default.png", this.textures)
+        for (let i = 0; i < 10; i++) {
+            let zombie = new Zombie(this.level, this.textures, 128, 0, 128)
+            zombie.resetPos()
+            this.entities.push(zombie)
+        }
         this.checkGlError("Post startup")
 
         window.onunload = () => {
@@ -253,6 +259,9 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.Y)) {
                 this.yMouseAxis *= -1
             }
+            if (keyboard.keyJustPressed(Keys.G)) {
+                this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+            }
             if (keyboard.keyJustPressed(Keys.N)) {
                 this.level.regenerate()
                 this.player.resetPos()
@@ -343,7 +352,7 @@ export class Minecraft {
         this.checkGlError("Rendered level")
         for (let i = 0; i < this.entities.length; i++) {
             let entity = this.entities[i]
-            if (entity.isLit() && frustum.isVisible(entity.bb)) {
+            if (true) {//entity.isLit() && frustum.isVisible(entity.bb)) {
                 entity.render(a)
             }
         }
@@ -388,7 +397,6 @@ export class Minecraft {
         t.color_f(1, 1, 1)
         Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0)
         t.flush(this.guiBuffer)
-        matrix.applyUniforms()
         this.guiBuffer.draw()
         matrix.pop()
         this.checkGlError("GUI: Draw selected")
@@ -414,7 +422,6 @@ export class Minecraft {
         t.vertex(wc + 5, hc + 1, 0.0);
         t.vertex(wc + 5, hc - 0, 0.0);
         t.flush(this.guiBuffer);
-        matrix.applyUniforms();
         this.guiBuffer.draw();
         this.checkGlError("GUI: Draw crosshair")
     }

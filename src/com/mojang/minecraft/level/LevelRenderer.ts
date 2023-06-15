@@ -75,7 +75,6 @@ export class LevelRenderer implements LevelListener {
         gl.bindTexture(gl.TEXTURE_2D, id)
         let frustum = Frustum.getFrustum()
         shader.use()
-        matrix.applyUniforms()
 
         for (let chunk of this.chunks) {
             // if (frustum.isVisible(chunk.aabb)) {

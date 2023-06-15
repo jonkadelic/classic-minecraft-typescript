@@ -1,4 +1,4 @@
-import { gl, shader } from "../mojang/minecraft/Minecraft";
+import { gl, matrix, shader } from "../mojang/minecraft/Minecraft";
 
 export class RenderBuffer {
     private buffer: WebGLBuffer = null
@@ -75,6 +75,8 @@ export class RenderBuffer {
             gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 3, 0)
             gl.enableVertexAttribArray(2)
         }
+
+        matrix.applyUniforms()
 
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices)
     }

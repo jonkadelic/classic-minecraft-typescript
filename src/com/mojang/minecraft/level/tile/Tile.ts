@@ -8,7 +8,7 @@ import { GrassTile } from "./GrassTile";
 import { DirtTile } from "./DirtTile";
 import { Bush } from "./Bush";
 import { Tiles } from "./Tiles";
-import { Vec3 } from "../../phys/Vec3";
+import { Vec3 } from "../../character/Vec3";
 import { HitResult } from "../../HitResult";
 
 export class Tile {
