@@ -271,6 +271,9 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.NUM7)) {
                 this.paintTexture = Tiles.leaves.id
             }
+            if (keyboard.keyJustPressed(Keys.NUM8)) {
+                this.paintTexture = Tiles.glass.id
+            }
             if (keyboard.keyJustPressed(Keys.Y)) {
                 this.yMouseAxis *= -1
             }

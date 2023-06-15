@@ -1,5 +1,6 @@
 import { Bush } from "./Bush";
 import { DirtTile } from "./DirtTile";
+import { GlassTile } from "./GlassTile";
 import { GrassTile } from "./GrassTile";
 import { LeafTile } from "./LeafTile";
 import { Sapling } from "./Sapling";
@@ -26,7 +27,7 @@ export class Tiles {
     public static treeTrunk: Tile = new TreeTile(17)
     public static leaves: Tile = new LeafTile(18, 22)
     public static sponge: Tile
-    public static glass: Tile
+    public static glass: Tile = new GlassTile(20, 49, false)
     public static cloth_00: Tile = new Tile(21, 64)
     public static cloth_01: Tile = new Tile(22, 65)
     public static cloth_02: Tile = new Tile(23, 66)
