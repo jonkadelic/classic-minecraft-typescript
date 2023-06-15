@@ -10,6 +10,8 @@ uniform highp float uFogDensity;
 uniform bool uHasTexture;
 uniform bool uHasColor;
 
+uniform highp vec4 uColor;
+
 void main(void) {
     highp vec4 texelColor = vec4(1.0, 1.0, 1.0, 1.0);
     if (uHasTexture) {
@@ -21,6 +23,7 @@ void main(void) {
     if (uHasColor) {
         texelColor = texelColor * vColor;
     }
+    texelColor = texelColor * uColor;
 
     #define LOG2 1.442695
 
@@ -31,7 +34,4 @@ void main(void) {
     gl_FragColor = mix(texelColor, uFogColor, fogAmount);
 
     gl_FragColor = texelColor;
-    // if (uHasColor) {
-    //     gl_FragColor = vec4(vColor.a, 0.0, 0.0, 1.0);
-    // }
 }

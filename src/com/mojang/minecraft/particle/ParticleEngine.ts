@@ -1,5 +1,5 @@
 import { RenderBuffer } from "../../../util/RenderBuffer";
-import { gl } from "../Minecraft";
+import { gl, shader } from "../Minecraft";
 import { Player } from "../Player";
 import { Level } from "../level/Level";
 import { Tesselator } from "../renderer/Tesselator";
@@ -41,7 +41,7 @@ export class ParticleEngine {
         let za2 = xa * Math.sin(player.xRot * Math.PI / 180)
         let ya =  Math.cos(player.xRot * Math.PI / 180)
         let t = Tesselator.instance
-        t.color_f(0.8, 0.8, 0.8)
+        shader.setColor(0.8, 0.8, 0.8, 1)
         t.init()
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i]

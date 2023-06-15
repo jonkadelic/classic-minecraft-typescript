@@ -70,13 +70,14 @@ export class Minecraft {
     }
 
     public init(): void {
+        shader = new Shader()
         fetch("shader/base.vert")
             .then(response => response.text())
             .then(text => {
                 fetch("shader/base.frag")
                     .then(response => response.text())
                     .then(text2 => {
-                        shader = new Shader(text, text2)
+                        shader.init(text, text2)
                     })
             })
 
@@ -303,7 +304,7 @@ export class Minecraft {
     private setupCamera(a: number): void {
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
-        matrix.perspective(90, this.width / this.height, 0.05, 1000)
+        matrix.perspective(70, this.width / this.height, 0.05, 1000)
         matrix.setActive(Matrix.MODELVIEW)
         matrix.loadIdentity()
         this.moveCameraToPlayer(a)
@@ -326,6 +327,7 @@ export class Minecraft {
     }
 
     public render(a: number): void {
+        if (!shader.isLoaded()) return
         gl.viewport(0, 0, this.width, this.height)
         if (this.mouseGrabbed) {
             let xo = 0.0
@@ -376,6 +378,7 @@ export class Minecraft {
         let screenWidth = Math.trunc(this.width * 240 / this.height)
         let screenHeight = Math.trunc(this.height * 240 / this.height)
         gl.clear(gl.DEPTH_BUFFER_BIT)
+        shader.setColor(1, 1, 1, 1)
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
         matrix.ortho(0, screenWidth, screenHeight, 0, 100, 300)
@@ -394,7 +397,6 @@ export class Minecraft {
         let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
         gl.bindTexture(gl.TEXTURE_2D, id)
         t.init()
-        t.color_f(1, 1, 1)
         Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0)
         t.flush(this.guiBuffer)
         this.guiBuffer.draw()
@@ -405,6 +407,7 @@ export class Minecraft {
         this.checkGlError("GUI: Draw text")
         let wc = Math.trunc(screenWidth / 2)
         let hc = Math.trunc(screenHeight / 2)
+        shader.setColor(1, 1, 1, 1)
         t.init()
         t.vertex(wc + 1, hc - 4, 0.0);
         t.vertex(wc - 0, hc - 4, 0.0);

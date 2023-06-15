@@ -1,11 +1,15 @@
 import { gl } from "./com/mojang/minecraft/Minecraft";
 
 export class Shader {
+    private loaded = false
     private program: WebGLProgram
     private attributeMap: Map<string, number> = new Map()
     private uniformMap: Map<string, WebGLUniformLocation> = new Map()
 
-    public constructor(vertex: string, fragment: string) {
+    public constructor() {
+    }
+
+    public init(vertex: string, fragment: string): void {
         let vertexShader = this.loadShader(gl.VERTEX_SHADER, vertex)
         let fragmentShader = this.loadShader(gl.FRAGMENT_SHADER, fragment)
         let program = gl.createProgram()
@@ -18,13 +22,20 @@ export class Shader {
         }
         this.program = program
         console.log("Loaded shader program")
+        this.loaded = true
+    }
+
+    public isLoaded(): boolean {
+        return this.loaded
     }
 
     public use(): void {
+        if (!this.loaded) return
         gl.useProgram(this.program)
     }
 
     public getAttributeLocation(name: string): number {
+        if (!this.loaded) return -1
         if (!this.attributeMap.has(name)) {
             let location = gl.getAttribLocation(this.program, name)
             if (location == -1) throw new Error("Failed to get attribute location: " + name)
@@ -34,12 +45,18 @@ export class Shader {
     }
 
     public getUniformLocation(name: string): WebGLUniformLocation {
+        if (!this.loaded) return null
         if (!this.uniformMap.has(name)) {
             let location = gl.getUniformLocation(this.program, name)
             if (!location) throw new Error("Failed to get uniform location: " + name)
             this.uniformMap.set(name, location)
         }
         return this.uniformMap.get(name)!
+    }
+
+    public setColor(r: number, g: number, b: number, a: number = 1): void {
+        if (!this.loaded) return
+        gl.uniform4f(this.getUniformLocation("uColor"), r, g, b, a)
     }
 
     private loadShader(type: number, source: string): WebGLShader {

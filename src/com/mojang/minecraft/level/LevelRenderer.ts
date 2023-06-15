@@ -119,7 +119,7 @@ export class LevelRenderer implements LevelListener {
         gl.enable(gl.BLEND)
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
         t.init()
-        t.color_f(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
+        shader.setColor(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
         if (mode == 0) {
             for (let i = 0; i < 6; i++) {
                 Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
@@ -129,7 +129,7 @@ export class LevelRenderer implements LevelListener {
         } else {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
             let br = Math.sin(Date.now() / 100) * 0.2 + 0.8
-            t.color_f(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
+            shader.setColor(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
             let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
             gl.bindTexture(gl.TEXTURE_2D, id)
             let x = h.x
@@ -153,9 +153,8 @@ export class LevelRenderer implements LevelListener {
             if (h.f == 5) {
                 x++
             }
-            for (let i = 0; i < 6; i++) {
-                Tile.tiles[tileType].renderFace(t, x, y, z, i)
-            }
+            Tile.tiles[tileType].render(t, this.level, 0, x, y, z)
+            Tile.tiles[tileType].render(t, this.level, 1, x, y, z)
             t.flush(this.hitRenderBuffer)
             this.hitRenderBuffer.draw()
         }
