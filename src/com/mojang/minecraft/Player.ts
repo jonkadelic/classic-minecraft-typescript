@@ -9,7 +9,7 @@ export class Player extends Entity {
         this.heightOffset = 1.62
     }
 
-    public tick(): void {
+    public override tick(): void {
         this.xo = this.x
         this.yo = this.y
         this.zo = this.z

@@ -1,6 +1,6 @@
+varying highp vec3 vPosition;
 varying highp vec2 vTextureCoord;
 varying highp vec4 vColor;
-varying highp vec3 vPosition;
 
 uniform sampler2D uSampler;
 

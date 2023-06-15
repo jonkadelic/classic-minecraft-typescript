@@ -5,10 +5,11 @@ export class Textures {
 
     public loadTexture(resourceName: string, mode: number): WebGLTexture {
         if (this.idMap.has(resourceName)) {
-            return this.idMap.get(resourceName);
+            return this.idMap.get(resourceName) as WebGLTexture;
         }
 
         const texture = gl.createTexture();
+        if (!texture) throw new Error("Failed to create texture");
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
         // Because images have to be downloaded over the internet

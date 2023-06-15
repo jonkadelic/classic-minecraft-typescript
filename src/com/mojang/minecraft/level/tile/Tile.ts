@@ -12,6 +12,7 @@ import { Vec3 } from "../../character/Vec3";
 import { HitResult } from "../../HitResult";
 
 export class Tile {
+    protected static random: Random = new Random()
     public static tiles: Tile[] = new Array(256)
     public tex: number
     public id: number
@@ -22,14 +23,10 @@ export class Tile {
     public y1: number = 1
     public z1: number = 1
 
-    public constructor(id: number, tex: number = undefined) {
+    public constructor(id: number, tex: number = 0) {
         this.id = id;
         Tile.tiles[id] = this
-        
-        if (tex)
-        {
-            this.tex = tex
-        }
+        this.tex = tex
     }
     
     public render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): void {
@@ -217,7 +214,7 @@ export class Tile {
         return new AABB(x, y, z, x + 1, y + 1, z + 1)
     }
     
-    public getAABB(x: number, y: number, z: number): AABB {
+    public getAABB(x: number, y: number, z: number): AABB | null {
         return new AABB(x, y, z, x + 1, y + 1, z + 1)
     }
 
@@ -252,7 +249,15 @@ export class Tile {
         }
     }
 
-    public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult {
+    public getResourceCount(): number {
+        return 1
+    }
+
+    public getResource(): number {
+        return this.id
+    }
+
+    public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult | null {
         a = a.add(-x, -y, -z)
         b = b.add(-x, -y, -z)
         let x0clip = a.clipX(b, this.x0)
@@ -323,15 +328,15 @@ export class Tile {
         return new HitResult(0, x, y, z, face)
     }
 
-    private inYZ(v: Vec3): boolean {
+    private inYZ(v: Vec3 | null): boolean {
         return v != null && v.y >= this.y0 && v.y <= this.y1 && v.z >= this.z0 && v.z <= this.z1
     }
 
-    private inXZ(v: Vec3): boolean {
+    private inXZ(v: Vec3 | null): boolean {
         return v != null && v.x >= this.x0 && v.x <= this.x1 && v.z >= this.z0 && v.z <= this.z1
     }
 
-    private inXY(v: Vec3): boolean {
+    private inXY(v: Vec3 | null): boolean {
         return v != null && v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
     }
 }

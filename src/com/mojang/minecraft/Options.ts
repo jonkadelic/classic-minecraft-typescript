@@ -142,6 +142,7 @@ export class Options {
             "limitFramerate": this.limitFramerate,
         }
         for (let i = 0; i < this.keyMappings.length; i++) {
+            // @ts-ignore
             obj["key_" + this.keyMappings[i].name] = this.keyMappings[i].defaultKey
         }
         let str = JSON.stringify(obj)

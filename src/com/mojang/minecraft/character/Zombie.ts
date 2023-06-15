@@ -10,11 +10,14 @@ export class Zombie extends Entity {
     public timeOffs: number = 0
     public speed: number = 0
     public rotA: number = 0
-    private static zombieModel: ZombieModel = new ZombieModel()
+    private static zombieModel: ZombieModel | null = null
     private textures: Textures
 
     public constructor(level: Level, textures: Textures, x: number, y: number, z: number) {
         super(level)
+        if (Zombie.zombieModel == null) {
+            Zombie.zombieModel = new ZombieModel()
+        }
         this.textures = textures
         this.rotA = (Math.random() + 1.0) * 0.01
         this.setPos(x, y, z)
@@ -66,7 +69,7 @@ export class Zombie extends Entity {
         matrix.translate(0, yy, 0)
         let c = 57.29578
         matrix.rotate(this.rot * c + 180, 0, 1, 0)
-        Zombie.zombieModel.render(time)
+        Zombie.zombieModel?.render(time)
         matrix.pop()
     }
 }

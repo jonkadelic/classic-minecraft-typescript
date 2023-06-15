@@ -203,7 +203,7 @@ export class Level {
         }
     }
 
-    public clip(a: Vec3, b: Vec3): HitResult {
+    public clip(a: Vec3, b: Vec3): HitResult | null {
         if (Number.isNaN(a.x) || Number.isNaN(a.y) || Number.isNaN(a.z)) {
             return null
         }
@@ -310,8 +310,8 @@ export class Level {
                 continue
             }
 
-            let hitResult: HitResult
-            if ((hitResult = tile.clip(xa, ya, za, a, b)) != null) {
+            let hitResult: HitResult | null = tile.clip(xa, ya, za, a, b)
+            if (hitResult != null) {
                 return hitResult
             }
         }

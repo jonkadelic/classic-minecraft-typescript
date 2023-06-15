@@ -23,6 +23,9 @@ export class Entity {
 
     public constructor(level: Level) {
         this.level = level
+        let w = this.bbWidth / 2
+        let h = this.bbHeight / 2
+        this.bb = new AABB(-w, -h, -w, w, h, w)
         this.resetPos()
     }
 
