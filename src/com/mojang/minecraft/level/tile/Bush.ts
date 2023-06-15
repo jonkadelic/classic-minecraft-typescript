@@ -18,16 +18,17 @@ export class Bush extends Tile {
     }
 
     public override render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): void {
-        if (level.isLit(x, y, z) != (layer != 1)) {
+        /*if (level.isLit(x, y, z) != (layer != 1)) {
             return
-        }
+        }*/
         let tex = this.getTexture(15)
         let u0 = (tex % 16) / 16.0
         let u1 = u0 + (1 / 16.0)
         let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         let rots = 2
-        t.color_f(1, 1, 1)
+        if (level.isLit(x, y, z)) t.color_f(1, 1, 1)
+        else t.color_f(0.6, 0.6, 0.6)
         let r = 0
         while (r < rots) {
             let xa = Math.sin(r * Math.PI / rots + Math.PI / 4) * 0.5

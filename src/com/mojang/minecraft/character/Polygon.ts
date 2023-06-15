@@ -27,7 +27,6 @@ export class Polygon {
     }
 
     public render(t: Tesselator): void {
-        shader.setColor(1, 1, 1)
         for (let i = this.vertexCount - 1; i >= 0; i--) {
             const vertex = this.vertices[i]
             t.vertexUV(vertex.pos.x, vertex.pos.y, vertex.pos.z, vertex.u / 63.999, vertex.v / 31.999)
