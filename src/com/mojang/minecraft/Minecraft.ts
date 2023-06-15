@@ -116,6 +116,11 @@ export class Minecraft {
         }
     }
 
+    public updateSize(width: number, height: number): void {
+        this.width = width
+        this.height = height
+    }
+
     private checkGlError(string: string): void {
         let errorCode = gl.getError()
         if (errorCode !== gl.NO_ERROR) {
@@ -467,6 +472,22 @@ export function main() {
 
     window.addEventListener("mousedown", (e) => {
         clickedElement = e.target as HTMLElement
+    })
+
+    window.addEventListener("resize", () => {
+        if (window.innerHeight == screen.height) {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            canvas.style.position = "fixed"
+            canvas.style.left = "0px"
+            canvas.style.top = "0px"
+        } else {
+            canvas.width = 854
+            canvas.height = 480
+            canvas.style.position = "static"
+        }
+        console.log("Resized to " + canvas.width + "x" + canvas.height)
+        minecraft.updateSize(canvas.width, canvas.height)
     })
 
     const minecraft = new Minecraft(canvas, canvas.width, canvas.height)
