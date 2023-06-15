@@ -25,7 +25,7 @@ export let mouse: any
 export let keyboard: any
 export let matrix = new Matrix()
 export let shader: Shader = new Shader()
-
+export let clickedElement: HTMLElement | null = null
 
 export class Minecraft {
     public static readonly VERSION_STRING = "0.0.11a"
@@ -218,7 +218,7 @@ export class Minecraft {
         keyboard.update()
         this.mouseGrabbed = document.pointerLockElement == this.parent
         mouse.setLock(this.mouseGrabbed)
-        if (!this.mouseGrabbed && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
+        if (!this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
@@ -457,6 +457,16 @@ export function main() {
     let g = canvas.getContext("webgl", {antialias: false})
     if (!g) throw new Error("Failed to get WebGL context")
     gl = g
+
+    window.addEventListener("keydown", (e) => {
+        if ((e as KeyboardEvent).code == "Space" && clickedElement == canvas) {
+            e.preventDefault()
+        }
+    })
+
+    window.addEventListener("mousedown", (e) => {
+        clickedElement = e.target as HTMLElement
+    })
 
     const minecraft = new Minecraft(canvas, canvas.width, canvas.height)
     minecraft.run()
