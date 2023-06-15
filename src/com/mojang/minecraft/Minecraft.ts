@@ -340,7 +340,10 @@ export class Minecraft {
             let yo = 0.0
             xo = mouse.delta.x
             yo = mouse.delta.y
-            this.player.turn(xo, yo * this.yMouseAxis)
+            if (Math.abs(xo) < 100)
+            {
+                this.player.turn(xo, yo * this.yMouseAxis)
+            }
         }
         this.checkGlError("Set viewport")
         this.pick(a)
