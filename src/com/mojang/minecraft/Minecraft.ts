@@ -24,7 +24,7 @@ export let gl: WebGLRenderingContext
 export let mouse: any
 export let keyboard: any
 export let matrix = new Matrix()
-export let shader: Shader = null
+export let shader: Shader = new Shader()
 
 
 export class Minecraft {
@@ -34,22 +34,27 @@ export class Minecraft {
     private fogColor0: number[] = new Array(4)
     private fogColor1: number[] = new Array(4)
     private timer: Timer = new Timer(20)
-    private level: Level = null
-    private levelRenderer: LevelRenderer = null
-    private player: Player = null
+    // @ts-ignore
+    private level: Level
+    // @ts-ignore
+    private levelRenderer: LevelRenderer
+    // @ts-ignore
+    private player: Player
     private paintTexture: number = 1
-    private particleEngine: ParticleEngine = null
+    // @ts-ignore
+    private particleEngine: ParticleEngine
     private entities: Entity[] = []
     private parent: HTMLCanvasElement
     public pause: boolean = false
     private yMouseAxis: number = -1
     public textures: Textures
+    // @ts-ignore
     public font: Font
     private editMode: number = 0
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
-    private hitResult: HitResult = null
+    private hitResult: HitResult | null = null
 
     private frames: number = 0
     private lastTime: number = 0
@@ -70,7 +75,6 @@ export class Minecraft {
     }
 
     public init(): void {
-        shader = new Shader()
         fetch("shader/base.vert")
             .then(response => response.text())
             .then(text => {
@@ -181,7 +185,7 @@ export class Minecraft {
                 }
             }
         } else if (click == 1 && this.hitResult != null) {
-            let aabb: AABB;
+            let aabb: AABB | null;
             let x = this.hitResult.x
             let y = this.hitResult.y
             let z = this.hitResult.z
@@ -203,7 +207,8 @@ export class Minecraft {
             if (this.hitResult.f == 5) {
                 x++
             }
-            if ((aabb = Tile.tiles[this.paintTexture].getAABB(x, y, z)) == null || this.isFree(aabb)) {
+            aabb = Tile.tiles[this.paintTexture].getAABB(x, y, z)
+            if (aabb == null || this.isFree(aabb)) {
                 this.level.setTile(x, y, z, this.paintTexture)
             }
         }
@@ -252,7 +257,7 @@ export class Minecraft {
                 this.paintTexture = Tiles.stoneBrick.id
             }
             if (keyboard.keyJustPressed(Keys.NUM4)) {
-                this.paintTexture = Tiles.bush.id
+                this.paintTexture = Tiles.sapling.id
             }
             if (keyboard.keyJustPressed(Keys.NUM5)) {
                 this.paintTexture = Tiles.wood.id

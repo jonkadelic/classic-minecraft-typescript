@@ -57,7 +57,7 @@ export class Bush extends Tile {
         }
     }
 
-    public override getAABB(x: number, y: number, z: number): AABB {
+    public override getAABB(x: number, y: number, z: number): AABB | null {
         return null
     }
 

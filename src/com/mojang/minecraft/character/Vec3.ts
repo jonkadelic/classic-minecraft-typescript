@@ -36,7 +36,7 @@ export class Vec3 {
         return dx * dx + dy * dy + dz * dz
     }
 
-    public clipX(other: Vec3, lerp: number): Vec3 {
+    public clipX(other: Vec3, lerp: number): Vec3 | null {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z
@@ -53,7 +53,7 @@ export class Vec3 {
         return new Vec3(this.x + dx * d, this.y + dy * d, this.z + dz * d)
     }
 
-    public clipY(other: Vec3, lerp: number): Vec3 {
+    public clipY(other: Vec3, lerp: number): Vec3 | null {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z
@@ -70,7 +70,7 @@ export class Vec3 {
         return new Vec3(this.x + dx * d, this.y + dy * d, this.z + dz * d)
     }
 
-    public clipZ(other: Vec3, lerp: number): Vec3 {
+    public clipZ(other: Vec3, lerp: number): Vec3 | null {
         let dx = other.x - this.x
         let dy = other.y - this.y
         let dz = other.z - this.z

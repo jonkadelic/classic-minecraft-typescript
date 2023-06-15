@@ -5,14 +5,16 @@ import { Tesselator } from "../renderer/Tesselator";
 
 export class Font {
     public charWidths: number[] = []
-    public fontTexture: WebGLTexture = null
+    public fontTexture: WebGLTexture | null = null
     private buffer: RenderBuffer
 
     public constructor(name: string, textures: Textures) {
         this.buffer = new RenderBuffer(gl.DYNAMIC_DRAW)
         
         let canvas = document.createElement("canvas")
-        let context = canvas.getContext("2d")
+        let cn = canvas.getContext("2d")
+        if (!cn) throw new Error("Failed to get 2D context")
+        let context = cn as CanvasRenderingContext2D
         
         let img: HTMLImageElement;
         const imageLoadPromise = new Promise(resolve => {
@@ -64,6 +66,8 @@ export class Font {
     }
     
     public draw(str: string, x: number, y: number, color: number, darken: boolean): void {
+        if (!this.fontTexture) return
+
         if (darken) {
 			color = (color & 0xFCFCFC) >> 2
 		}

@@ -56,8 +56,8 @@ export class LevelRenderer implements LevelListener {
         }
     }
 
-    public getAllDirtyChunks(): Chunk[] {
-        let dirtyChunks: Chunk[] = null
+    public getAllDirtyChunks(): Chunk[] | null {
+        let dirtyChunks: Chunk[] | null = null
         for (let chunk of this.chunks) {
             if (chunk.dirty) {
                 if (dirtyChunks == null) {

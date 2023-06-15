@@ -16,11 +16,9 @@ export class Random {
     private static readonly c1 = 0xdeec;
     private static readonly c0 = 0xe66d;
 
-    private s2: number;
-    private s1: number;
-    private s0: number;
-    private nextNextGaussian: number;
-    private haveNextNextGaussian: boolean;
+    private s2: number = 0;
+    private s1: number = 0;
+    private s0: number = 0;
 
     public constructor();
     public constructor(seedVal?: number) {

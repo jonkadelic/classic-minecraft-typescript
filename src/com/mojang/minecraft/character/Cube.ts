@@ -5,8 +5,8 @@ import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 
 export class Cube {
-    private vertices: Vertex[]
-    private polygons: Polygon[]
+    private vertices: Vertex[] = []
+    private polygons: Polygon[] = []
     private xTexOffs: number
     private yTexOffs: number
     public x: number = 0
@@ -16,7 +16,7 @@ export class Cube {
     public yRot: number = 0
     public zRot: number = 0
     private compiled: boolean = false
-    private renderBuffer: RenderBuffer
+    private renderBuffer: RenderBuffer = new RenderBuffer(gl.STATIC_DRAW)
 
     public constructor(xTexOffs: number, yTexOffs: number) {
         this.xTexOffs = xTexOffs

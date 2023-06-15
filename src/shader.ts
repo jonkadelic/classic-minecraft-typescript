@@ -1,8 +1,7 @@
 import { gl } from "./com/mojang/minecraft/Minecraft";
 
 export class Shader {
-    private loaded = false
-    private program: WebGLProgram
+    private program: WebGLProgram | null = null
     private attributeMap: Map<string, number> = new Map()
     private uniformMap: Map<string, WebGLUniformLocation> = new Map()
 
@@ -22,20 +21,19 @@ export class Shader {
         }
         this.program = program
         console.log("Loaded shader program")
-        this.loaded = true
     }
 
     public isLoaded(): boolean {
-        return this.loaded
+        return this.program != null
     }
 
     public use(): void {
-        if (!this.loaded) return
+        if (!this.program) return
         gl.useProgram(this.program)
     }
 
     public getAttributeLocation(name: string): number {
-        if (!this.loaded) return -1
+        if (!this.program) return -1
         if (!this.attributeMap.has(name)) {
             let location = gl.getAttribLocation(this.program, name)
             if (location == -1) throw new Error("Failed to get attribute location: " + name)
@@ -44,8 +42,8 @@ export class Shader {
         return this.attributeMap.get(name)!
     }
 
-    public getUniformLocation(name: string): WebGLUniformLocation {
-        if (!this.loaded) return null
+    public getUniformLocation(name: string): WebGLUniformLocation | null {
+        if (!this.program) return null
         if (!this.uniformMap.has(name)) {
             let location = gl.getUniformLocation(this.program, name)
             if (!location) throw new Error("Failed to get uniform location: " + name)
@@ -55,7 +53,7 @@ export class Shader {
     }
 
     public setColor(r: number, g: number, b: number, a: number = 1): void {
-        if (!this.loaded) return
+        if (!this.program) return
         gl.uniform4f(this.getUniformLocation("uColor"), r, g, b, a)
     }
 

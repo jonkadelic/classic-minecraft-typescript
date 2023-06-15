@@ -1,14 +1,16 @@
 import { gl, matrix, shader } from "../mojang/minecraft/Minecraft";
 
 export class RenderBuffer {
-    private buffer: WebGLBuffer = null
+    private buffer: WebGLBuffer
     private vertices: number = 0
     private usage: number
     private hasTexture: boolean = false
     private hasColor: boolean = false
 
     public constructor(usage: number = gl.STATIC_DRAW) {
-        this.buffer = gl.createBuffer()
+        let b = gl.createBuffer()
+        if (!b) throw new Error("Failed to create render buffer")
+        this.buffer = b
         this.usage = usage
     }
 
