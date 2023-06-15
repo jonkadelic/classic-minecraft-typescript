@@ -27,9 +27,8 @@ export class Bush extends Tile {
         let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         let rots = 2
-        if (level.isLit(x, y, z)) shader.setColor(1, 1, 1, 1)
-        else shader.setColor(0.6, 0.6, 0.6, 1)
-        t.color_f(1, 1, 1)
+        if (level.isLit(x, y, z)) t.color_f(1, 1, 1)
+        else t.color_f(0.6, 0.6, 0.6)
         let r = 0
         while (r < rots) {
             let xa = Math.sin(r * Math.PI / rots + Math.PI / 4) * 0.5
