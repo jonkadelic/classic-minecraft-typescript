@@ -71,7 +71,7 @@ export class Matrix {
     }
 
     public applyUniforms(): void {
-        if (shader == null) return
+        if (!shader.isLoaded()) return
         gl.uniformMatrix4fv(shader.getUniformLocation("uMVMatrix"), false, new Float32Array(this.getFloat(Matrix.MODELVIEW)));
         gl.uniformMatrix4fv(shader.getUniformLocation("uPMatrix"), false, new Float32Array(this.getFloat(Matrix.PROJECTION)));
     }

@@ -26,7 +26,7 @@ export class RenderBuffer {
     }
 
     public draw(): void {
-        if (shader == null) return
+        if (!shader.isLoaded()) return
 
         const bytesPerFloat = 4
 
@@ -37,6 +37,11 @@ export class RenderBuffer {
         let aVertexPosition = shader.getAttributeLocation("aVertexPosition")
         let uHasTexture = shader.getUniformLocation("uHasTexture")
         let uHasColor = shader.getUniformLocation("uHasColor")
+        if (aTextureCoord === null || aColor === null || aVertexPosition === null || uHasTexture === null || uHasColor === null) {
+            // console.error("Failed to get shader attributes")
+            return
+        }
+
         if (this.hasTexture && this.hasColor) {
             let stride = 9
             let offset = 0

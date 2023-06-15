@@ -435,7 +435,7 @@ export class Minecraft {
     }
 
     private setupFog(i: number): void {
-        if (shader == null) return
+        if (!shader.isLoaded()) return
         shader.use()
         if (i == 0) {
             gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)

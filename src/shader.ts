@@ -32,11 +32,12 @@ export class Shader {
         gl.useProgram(this.program)
     }
 
-    public getAttributeLocation(name: string): number {
-        if (!this.program) return -1
+    public getAttributeLocation(name: string): number | null {
+        if (!this.program) return null
+        this.use()
         if (!this.attributeMap.has(name)) {
             let location = gl.getAttribLocation(this.program, name)
-            if (location == -1) throw new Error("Failed to get attribute location: " + name)
+            if (location == -1) return null
             this.attributeMap.set(name, location)
         }
         return this.attributeMap.get(name)!
@@ -44,9 +45,10 @@ export class Shader {
 
     public getUniformLocation(name: string): WebGLUniformLocation | null {
         if (!this.program) return null
+        this.use();
         if (!this.uniformMap.has(name)) {
             let location = gl.getUniformLocation(this.program, name)
-            if (!location) throw new Error("Failed to get uniform location: " + name)
+            if (!location) return null
             this.uniformMap.set(name, location)
         }
         return this.uniformMap.get(name)!
