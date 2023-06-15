@@ -262,6 +262,9 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.NUM5)) {
                 this.paintTexture = Tiles.wood.id
             }
+            if (keyboard.keyJustPressed(Keys.NUM6)) {
+                this.paintTexture = Tiles.treeTrunk.id
+            }
             if (keyboard.keyJustPressed(Keys.Y)) {
                 this.yMouseAxis *= -1
             }

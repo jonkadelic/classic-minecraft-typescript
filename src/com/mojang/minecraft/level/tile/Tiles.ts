@@ -2,6 +2,7 @@ import { Bush } from "./Bush";
 import { DirtTile } from "./DirtTile";
 import { GrassTile } from "./GrassTile";
 import { Tile } from "./Tile";
+import { TreeTile } from "./TreeTile";
 
 export class Tiles {
     public static rock: Tile = new Tile(1, 1)
@@ -20,7 +21,7 @@ export class Tiles {
     public static goldOre: Tile
     public static ironOre: Tile
     public static coalOre: Tile
-    public static treeTrunk: Tile
+    public static treeTrunk: Tile = new TreeTile(17)
     public static leaves: Tile
     public static sponge: Tile
     public static glass: Tile

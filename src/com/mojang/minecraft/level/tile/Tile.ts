@@ -12,6 +12,7 @@ import { Vec3 } from "../../character/Vec3";
 import { HitResult } from "../../HitResult";
 
 export class Tile {
+    protected static random: Random = new Random()
     public static tiles: Tile[] = new Array(256)
     public tex: number
     public id: number
@@ -246,6 +247,14 @@ export class Tile {
             }
             xx++
         }
+    }
+
+    public getResourceCount(): number {
+        return 1
+    }
+
+    public getResource(): number {
+        return this.id
     }
 
     public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult | null {
