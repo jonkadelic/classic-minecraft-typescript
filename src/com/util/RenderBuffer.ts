@@ -32,50 +32,81 @@ export class RenderBuffer {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
 
+        let aTextureCoord = shader.getAttributeLocation("aTextureCoord")
+        let aColor = shader.getAttributeLocation("aColor")
+        let aVertexPosition = shader.getAttributeLocation("aVertexPosition")
+        let uHasTexture = shader.getUniformLocation("uHasTexture")
+        let uHasColor = shader.getUniformLocation("uHasColor")
         if (this.hasTexture && this.hasColor) {
+            let stride = 9
+            let offset = 0
+
             // Texture UV
-            gl.uniform1f(shader.getUniformLocation("uHasTexture"), 1)
-            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 9, 0)
-            gl.enableVertexAttribArray(0)
+            gl.uniform1f(uHasTexture, 1)
+            gl.vertexAttribPointer(aTextureCoord, 2, gl.FLOAT, false, stride * bytesPerFloat, offset)
+            gl.enableVertexAttribArray(aTextureCoord)
+            offset += 2
+
             // Color RGBA
-            gl.uniform1f(shader.getUniformLocation("uHasColor"), 1)
-            gl.vertexAttribPointer(1, 4, gl.FLOAT, false, bytesPerFloat * 9, bytesPerFloat * 2)
-            gl.enableVertexAttribArray(1)
+            gl.uniform1f(uHasColor, 1)
+            gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aColor)
+            offset += 4
+
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 9, bytesPerFloat * 6)
-            gl.enableVertexAttribArray(2)
+            gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aVertexPosition)
+            offset += 3
         } else if (this.hasTexture) {
+            let stride = 5
+            let offset = 0
+
             // Texture UV
-            gl.uniform1f(shader.getUniformLocation("uHasTexture"), 1)
-            gl.vertexAttribPointer(0, 2, gl.FLOAT, false, bytesPerFloat * 5, 0)
-            gl.enableVertexAttribArray(0)
+            gl.uniform1f(uHasTexture, 1)
+            gl.vertexAttribPointer(aTextureCoord, 2, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aTextureCoord)
+            offset += 2
+
             // Color RGBA
-            gl.uniform1f(shader.getUniformLocation("uHasColor"), 0)
-            gl.disableVertexAttribArray(1)
+            gl.uniform1f(uHasColor, 0)
+            gl.disableVertexAttribArray(aColor)
+
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 5, bytesPerFloat * 2)
-            gl.enableVertexAttribArray(2)
+            gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aVertexPosition)
+            offset += 3
         } else if (this.hasColor) {
+            let stride = 7
+            let offset = 0
+
             // Texture UV
-            gl.uniform1f(shader.getUniformLocation("uHasTexture"), 0)
-            gl.disableVertexAttribArray(0)
+            gl.uniform1f(uHasTexture, 0)
+            gl.disableVertexAttribArray(aTextureCoord)
+
             // Color RGBA
-            gl.uniform1f(shader.getUniformLocation("uHasColor"), 1)
-            gl.vertexAttribPointer(1, 4, gl.FLOAT, false, bytesPerFloat * 7, 0)
-            gl.enableVertexAttribArray(1)
+            gl.uniform1f(uHasColor, 1)
+            gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aColor)
+            offset += 4
+
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 7, bytesPerFloat * 4)
-            gl.enableVertexAttribArray(2)
+            gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aVertexPosition)
+            offset += 3
         } else {
+            let stride = 3
+            let offset = 0
+
             // Texture UV
-            gl.uniform1f(shader.getUniformLocation("uHasTexture"), 0)
-            gl.disableVertexAttribArray(0)
+            gl.uniform1f(uHasTexture, 0)
+            gl.disableVertexAttribArray(aTextureCoord)
             // Color RGBA
-            gl.uniform1f(shader.getUniformLocation("uHasColor"), 0)
-            gl.disableVertexAttribArray(1)
+            gl.uniform1f(uHasColor, 0)
+            gl.disableVertexAttribArray(aColor)
             // Vertex XYZ
-            gl.vertexAttribPointer(2, 3, gl.FLOAT, false, bytesPerFloat * 3, 0)
-            gl.enableVertexAttribArray(2)
+            gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, stride * bytesPerFloat, offset * bytesPerFloat)
+            gl.enableVertexAttribArray(aVertexPosition)
+            offset += 3
         }
 
         matrix.applyUniforms()
