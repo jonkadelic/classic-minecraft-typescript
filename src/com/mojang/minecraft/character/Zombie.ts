@@ -1,6 +1,6 @@
 import { Matrix } from "../../../util/Matrix";
 import { Entity } from "../Entity";
-import { gl, matrix } from "../Minecraft";
+import { gl, matrix, shader } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Textures } from "../renderer/Textures";
 import { ZombieModel } from "./ZombieModel";
@@ -53,6 +53,8 @@ export class Zombie extends Entity {
     }
 
     public override render(a: number): void {
+        if (this.isLit()) shader.setColor(1, 1, 1)
+        else shader.setColor(0.6, 0.6, 0.6)
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png", gl.NEAREST))
         matrix.push()
         let time = performance.now() / 1000 * 10 * this.speed + this.timeOffs

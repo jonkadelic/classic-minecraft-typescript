@@ -349,7 +349,7 @@ export class Minecraft {
         this.checkGlError("Rendered level")
         for (let i = 0; i < this.entities.length; i++) {
             let entity = this.entities[i]
-            if (entity.isLit() && frustum.isVisible(entity.bb)) {
+            if (frustum.isVisible(entity.bb)) {
                 entity.render(a)
             }
         }
