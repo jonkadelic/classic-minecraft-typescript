@@ -41,7 +41,8 @@ export class ParticleEngine {
         let za2 = xa * Math.sin(player.xRot * Math.PI / 180)
         let ya =  Math.cos(player.xRot * Math.PI / 180)
         let t = Tesselator.instance
-        shader.setColor(0.8, 0.8, 0.8, 1)
+        if (layer === 1) shader.setColor(0.48, 0.48, 0.48, 1)
+        else shader.setColor(0.8, 0.8, 0.8, 1)
         t.init()
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i]

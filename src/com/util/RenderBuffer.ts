@@ -25,6 +25,7 @@ export class RenderBuffer {
 
     public draw(): void {
         if (shader == null) return
+        if (this.vertices == 0) return
 
         const bytesPerFloat = 4
 

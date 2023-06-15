@@ -65,7 +65,7 @@ export class Minecraft {
         this.height = height
         this.textures = new Textures()
 
-        mouse = new Mouse()
+        mouse = new Mouse(parent)
         keyboard = new Keyboard()
     }
 
@@ -217,9 +217,7 @@ export class Minecraft {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-            return
-        }
-        if (this.mouseGrabbed) {
+        } else if (this.mouseGrabbed) {
             // Mouse
             if (mouse.buttonPressed(MouseButton.LEFT)) {
                 if (!this.mouse0) {
@@ -329,15 +327,12 @@ export class Minecraft {
     public render(a: number): void {
         if (!shader.isLoaded()) return
         gl.viewport(0, 0, this.width, this.height)
-        if (this.mouseGrabbed) {
+        if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
             let xo = 0.0
             let yo = 0.0
             xo = mouse.delta.x
             yo = mouse.delta.y
-            if (Math.abs(xo) < 100)
-            {
-                this.player.turn(xo, yo * this.yMouseAxis)
-            }
+            this.player.turn(xo, yo * this.yMouseAxis)
         }
         this.checkGlError("Set viewport")
         this.pick(a)
