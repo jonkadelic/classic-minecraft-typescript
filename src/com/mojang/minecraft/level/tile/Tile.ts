@@ -30,7 +30,7 @@ export class Tile {
     }
     
     public render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): void {
-        let c1 = 1.0
+        let c1 = 0.5
         let c2 = 0.8
         let c3 = 0.6
         if (this.shouldRenderFace(level, x, y - 1, z, layer)) {
@@ -38,7 +38,7 @@ export class Tile {
             this.renderFace(t, x, y, z, 0)
         }
         if (this.shouldRenderFace(level, x, y + 1, z, layer)) {
-            t.color_f(c1, c1, c1)
+            t.color_f(1, 1, 1)
             this.renderFace(t, x, y, z, 1)
         }
         if (this.shouldRenderFace(level, x, y, z - 1, layer)) {

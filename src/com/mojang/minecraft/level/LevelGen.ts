@@ -101,6 +101,7 @@ export class LevelGen {
                 }
             }
         }
+                
         return blocks
     }
 }

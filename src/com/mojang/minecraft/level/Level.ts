@@ -7,6 +7,7 @@ import { LevelListener } from "./LevelListener";
 import { Tile } from "./tile/Tile";
 import { Tiles } from "./tile/Tiles";
 import Base256 from "base256-encoding"
+import { NoiseMap } from "./NoiseMap";
 
 export class Level {
     private static readonly TILE_UPDATE_INTERVAL = 400
@@ -27,13 +28,29 @@ export class Level {
         this.lightDepths = new Array(w * h)
         let mapLoaded = this.load()
         if (!mapLoaded) {
-            this.blocks = new LevelGen(w, h, d).generateMap()
+            this.regenerate()
         }
         this.calcLightDepths(0, 0, w, h)
     }
 
     public regenerate(): void {
         this.blocks = new LevelGen(this.width, this.height, this.depth).generateMap()
+        let treeMap = new NoiseMap(2).read(this.width, this.height)
+        
+        // Trees
+        for (let x = 0; x < this.width; x++) {
+            for (let z = 0; z < this.height; z++) {
+                for (let y = 0; y < this.depth - 1; y++) {
+                    let i = (y * this.height + z) * this.width + x
+                    let id = this.blocks[i]
+                    if (id == Tiles.grass.id && this.random.nextInt(100) == 0 && treeMap[x + z * this.width] < 128) {
+                        this.maybeGrowTree(x, y + 1, z)
+                        break
+                    }
+                }
+            }
+        }
+
         this.calcLightDepths(0, 0, this.width, this.height)
         for (let i = 0; i < this.levelListeners.length; i++) {
             this.levelListeners[i].allChanged()
@@ -317,5 +334,54 @@ export class Level {
         }
 
         return null
+    }
+
+    public maybeGrowTree(x: number, y: number, z: number): boolean {
+        let trunkHeight = this.random.nextInt(3) + 4;
+        let canPlace = 1;
+        for (let iy = y; iy <= y + 1 + trunkHeight; ++iy) {
+            let r = 1;
+            if (iy == y) {
+                r = 0;
+            }
+            if (iy >= y + 1 + trunkHeight - 2) {
+                r = 2;
+            }
+            for (let ix = x - r; ix <= x + r && canPlace != 0; ++ix) {
+                for (let iz = z - r; iz <= z + r && canPlace != 0; ++iz) {
+                    if (ix >= 0 && iy >= 0 && iz >= 0 && ix < this.width && iy < this.depth && iz < this.height) {
+                        let id = this.blocks[(iy * this.height + iz) * this.width + ix] & 0xFF;
+                        if (id == 0) continue;
+                        canPlace = 0;
+                        continue;
+                    }
+                    canPlace = 0;
+                }
+            }
+        }
+        if (canPlace == 0) {
+            return false;
+        }
+        let id = this.blocks[((y - 1) * this.height + z) * this.width + x] & 0xFF;
+        if (id != Tiles.grass.id || y >= this.depth - trunkHeight - 1) {
+            return false;
+        }
+        this.setTile(x, y - 1, z, Tiles.dirt.id);
+        for (let iy = y - 3 + trunkHeight; iy <= y + trunkHeight; ++iy) {
+            let blockY = iy - (y + trunkHeight);
+            let r = 1 - Math.trunc(blockY / 2);
+            for (let ix = x - r; ix <= x + r; ++ix) {
+                let dx = ix - x;
+                for (let iz = z - r; iz <= z + r; ++iz) {
+                    let dz = iz - z;
+                    if (Math.abs(dx) == r && Math.abs(dz) == r && (this.random.nextInt(2) == 0 || blockY == 0)) continue;
+                    this.setTile(ix, iy, iz, Tiles.leaves.id);
+                }
+            }
+        }
+        for (let iy = 0; iy < trunkHeight; ++iy) {
+            this.setTile(x, y + iy, z, Tiles.treeTrunk.id);
+        }
+        return true;
     }
 }

@@ -268,6 +268,9 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.NUM6)) {
                 this.paintTexture = Tiles.treeTrunk.id
             }
+            if (keyboard.keyJustPressed(Keys.NUM7)) {
+                this.paintTexture = Tiles.leaves.id
+            }
             if (keyboard.keyJustPressed(Keys.Y)) {
                 this.yMouseAxis *= -1
             }
@@ -345,7 +348,7 @@ export class Minecraft {
             let yo = 0.0
             xo = mouse.delta.x
             yo = mouse.delta.y
-            if (Math.abs(xo) < this.width)
+            if (Math.abs(xo) < 500)
             {
                 this.player.turn(xo, yo * this.yMouseAxis)
             }
