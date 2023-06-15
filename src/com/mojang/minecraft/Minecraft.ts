@@ -361,11 +361,12 @@ export class Minecraft {
         this.levelRenderer.updateDirtyChunks(this.player)
         this.checkGlError("Update chunks")
         this.setupFog(0)
+        gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
         this.levelRenderer.render(this.player, 0)
         this.checkGlError("Rendered level")
         for (let i = 0; i < this.entities.length; i++) {
             let entity = this.entities[i]
-            if (frustum.isVisible(entity.bb)) {
+            if (entity.isLit() && frustum.isVisible(entity.bb)) {
                 entity.render(a)
             }
         }
@@ -373,7 +374,15 @@ export class Minecraft {
         this.particleEngine.render(this.player, a, 0)
         this.checkGlError("Rendered particles")
         this.setupFog(1)
+        this.levelRenderer.render(this.player, 1)
+        for (let i = 0; i < this.entities.length; i++) {
+            let zombie = this.entities[i]
+            if (!zombie.isLit() && frustum.isVisible(zombie.bb)) {
+                zombie.render(a)
+            }
+        }
         this.particleEngine.render(this.player, a, 1)
+        gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
         this.checkGlError("Rendered rest")
         if (this.hitResult != null) {
             this.levelRenderer.renderHit(this.hitResult, this.editMode, this.paintTexture)
@@ -446,9 +455,12 @@ export class Minecraft {
         if (i == 0) {
             gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
             gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor0)
+            shader.setColor(1, 1, 1, 1)
         } else if (i == 1) {
             gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.01)
             gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor1)
+            let br = 0.6
+            shader.setColor(br, br, br, 1)
         }
     }
 

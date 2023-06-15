@@ -56,8 +56,6 @@ export class Zombie extends Entity {
     }
 
     public override render(a: number): void {
-        if (this.isLit()) shader.setColor(1, 1, 1)
-        else shader.setColor(0.6, 0.6, 0.6)
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png", gl.NEAREST))
         matrix.push()
         let time = performance.now() / 1000 * 10 * this.speed + this.timeOffs
