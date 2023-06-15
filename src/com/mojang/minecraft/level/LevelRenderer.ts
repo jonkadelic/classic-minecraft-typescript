@@ -77,9 +77,9 @@ export class LevelRenderer implements LevelListener {
         shader.use()
 
         for (let chunk of this.chunks) {
-            // if (frustum.isVisible(chunk.aabb)) {
+            if (frustum.isVisible(chunk.aabb)) {
                 chunk.render(layer)
-            // }
+            }
         }
     }
 

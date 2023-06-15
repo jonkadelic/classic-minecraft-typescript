@@ -22,7 +22,7 @@ export class Frustum {
     private constructor() { }
 
     public static getFrustum(): Frustum {
-        if (Frustum.frustum === undefined) Frustum.frustum = new Frustum()
+        this.frustum.calculateFrustum()
         return Frustum.frustum
     }
 
