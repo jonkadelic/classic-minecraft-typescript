@@ -6,7 +6,8 @@ import { Tiles } from "./Tiles";
 export class Sapling extends Bush {
     public constructor(id: number, tex: number) {
         super(id, tex)
-        // TODO: setShape
+        let var3 = 0.4;
+        this.setShape(0.5 - var3, 0.0, 0.5 - var3, var3 + 0.5, var3 * 2.0, var3 + 0.5);
     }
 
     public override tick(level: Level, x: number, y: number, z: number, random: Random): void {

@@ -19,6 +19,8 @@ import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
 import { Font } from "./gui/Font";
 import { Zombie } from "./character/Zombie";
+import { GuiScreen } from "./gui/GuiScreen";
+import { PauseScreen } from "./gui/PauseScreen";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -50,6 +52,7 @@ export class Minecraft {
     public textures: Textures
     // @ts-ignore
     public font: Font
+    public screen: GuiScreen | null = null
     private editMode: number = 0
     private running: boolean = false
     private fpsString: string = ""
@@ -121,6 +124,25 @@ export class Minecraft {
         this.height = height
     }
 
+    public setScreen(screen: GuiScreen): void {
+        if (this.screen != null) {
+            this.screen.onClose()
+        }
+        // survival death screen would go here
+        if (screen != null) {
+            if (this.mouseGrabbed) {
+                this.mouseGrabbed = false
+                mouse.setLock(false)
+            }
+            let screenWidth = Math.trunc(this.width * 240 / this.height)
+            let screenHeight = Math.trunc(this.height * 240 / this.height)
+            screen.open(this, screenWidth, screenHeight)
+            // this.online = false;
+        } else {
+            this.grabMouse()
+        }
+    }
+
     private checkGlError(string: string): void {
         let errorCode = gl.getError()
         if (errorCode !== gl.NO_ERROR) {
@@ -180,6 +202,12 @@ export class Minecraft {
         this.parent.requestPointerLock()
     }
 
+    public pause(): void {
+        if (this.screen == null) {
+            this.setScreen(new PauseScreen())
+        }
+    }
+
     private handleMouseClick(click: number): void {
         if (click == 0) {
             if (this.hitResult != null) {
@@ -227,7 +255,7 @@ export class Minecraft {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-        } else if (this.mouseGrabbed) {
+        } else if (this.currentScreen == null || this.currentScreen.grabsMouse) {
             // Mouse
             if (mouse.buttonPressed(MouseButton.LEFT)) {
                 if (!this.mouse0) {
@@ -247,6 +275,9 @@ export class Minecraft {
             }
 
             // Keyboard
+            if (keyboard.keyJustPressed(Keys.ESC)) {
+                this.pause()
+            }
             if (keyboard.keyJustPressed(Keys.ENTER)) {
                 this.level.save()
             }
@@ -284,6 +315,9 @@ export class Minecraft {
                 this.level.regenerate()
                 this.player.resetPos()
             }
+        }
+        if(this.currentScreen != null) {
+            this.currentScreen.tick();
         }
         this.level.tick()
         this.particleEngine.tick()
@@ -412,6 +446,7 @@ export class Minecraft {
         matrix.loadIdentity()
         matrix.translate(0, 0, -200)
         this.checkGlError("GUI: Init")
+        // hud
         matrix.push()
         matrix.translate(screenWidth - 16, 16, 0)
         let t = Tesselator.instance
@@ -453,6 +488,12 @@ export class Minecraft {
         t.flush(this.guiBuffer);
         this.guiBuffer.draw();
         this.checkGlError("GUI: Draw crosshair")
+        // screen
+        let mx = Math.trunc(mouse.position.x * screenWidth / this.width)
+        let my = Math.trunc(mouse.position.y * screenHeight / this.height)
+        if (this.screen != null) {
+            this.screen.render(this.guiBuffer, mx, my)
+        }
     }
 
     private setupFog(i: number): void {

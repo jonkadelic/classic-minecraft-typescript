@@ -8,6 +8,8 @@ import { Tiles } from "./Tiles";
 export class Bush extends Tile {
     public constructor(id: number, tex: number) {
         super(id, tex)
+        let var3 = 0.2;
+        this.setShape(0.5 - var3, 0.0, 0.5 - var3, var3 + 0.5, var3 * 3.0, var3 + 0.5);
     }
     
     public override tick(level: Level, x: number, y: number, z: number, random: Random): void {
@@ -17,10 +19,7 @@ export class Bush extends Tile {
         }
     }
 
-    public override render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): void {
-        if (level.isLit(x, y, z) != (layer != 1)) {
-            return
-        }
+    public override render(t: Tesselator, level: Level, x: number, y: number, z: number): boolean {
         let tex = this.getTexture(15)
         let texX = tex % 16 << 4;
         let texY = tex / 16 << 4;
@@ -56,6 +55,7 @@ export class Bush extends Tile {
             t.vertexUV(x1, y0, z1, u1, v1);
             t.vertexUV(x1, y1, z1, u1, v0);
         }
+        return true
     }
 
     public override getAABB(x: number, y: number, z: number): AABB | null {

@@ -1,5 +1,6 @@
 import { Entity } from "../Entity";
 import { Level } from "../level/Level";
+import { Tile } from "../level/tile/Tile";
 import { Tesselator } from "../renderer/Tesselator";
 
 export class Particle extends Entity {
@@ -12,10 +13,12 @@ export class Particle extends Entity {
     public age: number
     public lifetime: number
     public size: number
+    public gravity: number
 
-    public constructor(level: Level, x: number, y: number, z: number, xa: number, ya: number, za: number, tex: number) {
+    public constructor(level: Level, x: number, y: number, z: number, xa: number, ya: number, za: number, tile: Tile) {
         super(level)
-        this.tex = tex
+        this.tex = tile.tex
+        this.gravity = tile.particleGravity
         this.setSize(0.2, 0.2)
         this.heightOffset = this.bbHeight / 2
         this.setPos(x, y, z)
@@ -41,7 +44,7 @@ export class Particle extends Entity {
         if (this.age++ >= this.lifetime) {
             this.remove()
         }
-        this._yd -= 0.04
+        this._yd -= (0.04 * this.gravity)
         this.move(this._xd, this._yd, this._zd)
         this._xd *= 0.98
         this._yd *= 0.98
