@@ -5,5 +5,5 @@ export class InputHandler {
 
     public updateMovement(): void {}
     public resetKeys(): void {}
-    public setKeyState(key: number, state: number): void {}
+    public setKeyState(key: number, state: boolean): void {}
 }

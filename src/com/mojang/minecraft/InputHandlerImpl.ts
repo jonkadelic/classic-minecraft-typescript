@@ -7,10 +7,11 @@ export class InputHandlerImpl extends InputHandler {
     // private options: Options
 
     public constructor() { // options: Options
+        super()
        // this.options = options
     }
 
-    public override setKeyState(key: number, state: boolean) {
+    public override setKeyState(key: number, state: boolean): void {
         let i: number = -1
         if (key == Keys.W) { // this.settings.keyUp.key
             i = 0
@@ -43,7 +44,7 @@ export class InputHandlerImpl extends InputHandler {
         }
     }
 
-    public updateMovement(): void {
+    public override updateMovement(): void {
         this.xxa = 0.0
         this.yya = 0.0
         if(this.keyStates[0]) {
