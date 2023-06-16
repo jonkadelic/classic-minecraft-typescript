@@ -14,6 +14,9 @@ export class Particle extends Entity {
     public lifetime: number
     public size: number
     public gravity: number
+    public rCol: number
+    public gCol: number
+    public bCol: number
 
     public constructor(level: Level, x: number, y: number, z: number, xa: number, ya: number, za: number, tile: Tile) {
         super(level)
@@ -35,6 +38,7 @@ export class Particle extends Entity {
         this.size = Math.random() * 0.5 + 0.5
         this.lifetime = Math.trunc(4 / (Math.random() * 0.9 + 0.1))
         this.age = 0
+        this.rCol = this.gCol = this.bCol = 0.6;
     }
 
     public override tick(): void {
@@ -65,7 +69,7 @@ export class Particle extends Entity {
         let y = this.yo + (this.y - this.yo) * a
         let z = this.zo + (this.z - this.zo) * a
         let brightness = this.getBrightness(a)
-        t.color_f(brightness, brightness, brightness)
+        t.color_f(brightness * this.rCol, brightness * this.gCol, brightness * this.bCol)
         t.vertexUV(x - xa * r - xa2 * r, y - ya * r, z - za * r - za2 * r, u0, v1)
         t.vertexUV(x - xa * r + xa2 * r, y + ya * r, z - za * r + za2 * r, u0, v0)
         t.vertexUV(x + xa * r + xa2 * r, y + ya * r, z + za * r + za2 * r, u1, v0)
