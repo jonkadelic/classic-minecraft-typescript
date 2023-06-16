@@ -28,8 +28,8 @@ export class ZombieModel {
     }
 
     public render(time: number): void {
-        this.head.yRot = Math.sin(time * 0.83) * 1
-        this.head.xRot = Math.sin(time) * 0.8
+        this.head.yRot = 0.0
+        this.head.xRot = 0.0
         this.arm0.xRot = Math.sin(time * 0.6662 + Math.PI) * 2
         this.arm0.zRot = (Math.sin(time * 0.2312) + 1) * 1
         this.arm1.xRot = Math.sin(time * 0.6662) * 2

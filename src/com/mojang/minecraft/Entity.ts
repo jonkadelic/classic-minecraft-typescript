@@ -20,6 +20,8 @@ export class Entity {
     protected heightOffset: number = 0
     protected bbWidth = 0.6
     protected bbHeight = 1.8
+    public ySlideOffset: number = 0.0
+    public footSize: number = 0.0
 
     public constructor(level: Level) {
         this.level = level
@@ -75,6 +77,7 @@ export class Entity {
         let xaOrg = xa
         let yaOrg = ya
         let zaOrg = za
+        let aABBOrg = this.bb.copy()
         let aABBs = this.level.getCubes(this.bb.expand(xa, ya, za))
         for (let i = 0; i < aABBs.length; i++) {
             ya = aABBs[i].clipYCollide(this.bb, ya)
@@ -83,11 +86,46 @@ export class Entity {
         for (let i = 0; i < aABBs.length; i++) {
             xa = aABBs[i].clipXCollide(this.bb, xa)
         }
+        let step = this.onGround || yaOrg != ya && yaOrg < 0.0
         this.bb.move(xa, 0, 0)
         for (let i = 0; i < aABBs.length; i++) {
             za = aABBs[i].clipZCollide(this.bb, za)
         }
         this.bb.move(0, 0, za)
+
+        if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
+            let xaLast = xa
+            let yaLast = ya
+            let zaLast = za
+            xa = xaOrg
+            ya = this.footSize
+            za = zaOrg
+            let bbCopy = this.bb.copy()
+            this.bb = aABBOrg.copy()
+            aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg))
+            for(let i = 0; i < aABBs.length; ++i) {
+                ya = aABBs[i].clipYCollide(this.bb, ya)
+            }
+            this.bb.move(0.0, ya, 0.0)
+            for(let i = 0; i < aABBs.length; ++i) {
+                xa = aABBs[i].clipXCollide(this.bb, xa)
+            }
+            this.bb.move(xa, 0.0, 0.0)
+            for(let i = 0; i < aABBs.length; ++i) {
+               za = aABBs[i].clipZCollide(this.bb, za)
+            }
+            this.bb.move(0.0, 0.0, za)
+
+            if(xaLast * xaLast + zaLast * zaLast >= xa * xa + za * za) {
+               xa = xaLast
+               ya = yaLast
+               za = zaLast
+               this.bb = bbCopy.copy()
+            } else {
+               this.ySlideOffset += 0.5
+            }
+        }
+
         let bl = this.onGround = yaOrg != ya && yaOrg < 0
         if (xaOrg != xa) {
             this.xd = 0
@@ -99,8 +137,9 @@ export class Entity {
             this.zd = 0
         }
         this.x = (this.bb.x0 + this.bb.x1) / 2
-        this.y = this.bb.y0 + this.heightOffset
+        this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset
         this.z = (this.bb.z0 + this.bb.z1) / 2
+        this.ySlideOffset *= 0.4;
     }
 
     public moveRelative(xa: number, za: number, speed: number) {

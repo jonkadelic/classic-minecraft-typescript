@@ -1,15 +1,16 @@
 import { Keys } from "syncinput";
-import { Entity } from "../Entity";
+import { Mob } from "../mob/Mob";
 import { keyboard } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Input } from "./Input";
 
-export class Player extends Entity {
+export class Player extends Mob {
     public input: Input | null = null
 
     public constructor(level: Level) {
         super(level)
         this.heightOffset = 1.62
+        this.footSize = 0.5
     }
 
     public override tick(): void {
@@ -26,18 +27,18 @@ export class Player extends Entity {
                 this.resetPos()
             }
             if (jump && this.onGround) {
-                this.yd = 0.5
+                this.yd = 0.42
             }
             this.moveRelative(xa, ya, this.onGround ? 0.1 : 0.02)
         }
-        this.yd = this.yd - 0.08
         this.move(this.xd, this.yd, this.zd)
         this.xd *= 0.91
         this.yd *= 0.98
         this.zd *= 0.91
+        this.yd -= 0.08
         if (this.onGround) {
-            this.xd *= 0.7
-            this.zd *= 0.7
+            this.xd *= 0.6
+            this.zd *= 0.6
         }
     }
 
