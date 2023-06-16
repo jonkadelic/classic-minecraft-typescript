@@ -1,59 +1,72 @@
+<!--<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">-->
+
 <html lang="en">
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link rel="SHORTCUT ICON" href="img/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+  <link rel="SHORTCUT ICON" href="/img/favicon.ico" />
   <title>Minecraft</title>
   <script type="module" src="/src/main.ts"></script>
 </head>
 
 <body>
-  <div id="top">
-    <h1><span>Minecraft</span></h1>
+  <div id="toppanel">
+    <div id="logo"><a href="javascript:;" border="0"><img src="/img/logo_small.gif" border="0"></a></div>
+    <div id="links">
+      338 players, 160 servers, 18364 registered, 553 purchases.<br>
+      <a href="javascript:;">Home</a>,
+      <a href="javascript:;">About</a>,
+      <a href="javascript:;">Dev blog</a>,
+      <a href="javascript:;">Community</a>,
+      <a href="javascript:;">Preferences</a>
+    </div>
+    <div id="loginpanel">
 
-    <ul id="navigation">
-      <li><a href="http://www.minecraft.net">Home</a></li>
-      <li><a href="http://notch.tumblr.com">Dev blog</a></li>
-    </ul>
+      Not logged in. [ <a href="javascript:;">Log in</a> | <a href="javascript:;">Register</a> ]
 
-    <ul id="additional">
-
-
-      Not logged in. <a href="login.jsp">Log in</a> or <a href="register.jsp">register</a>.
-
-      <!--     <li><a href="#about">About</a></li>
-    <li><a href="#controls">Controls</a></li> -->
-    </ul>
-
+    </div>
+    <div id="prepurchasesplash">
+      <a href="javascript:;" border="0">
+        <img src="/img/prepurchasesplash.gif" border="0">
+      </a>
+    </div>
   </div>
 
-  <center>
-    <table width="854px">
-      <tr>
-        <td width="854px">
-          <br><br><br>
-          <canvas width="854" height="480" id="canvas"></canvas>
-          <br>
-          <center>
-            <font size="-1">This game requires JavaScript and WebGL. Press escape to release the mouse.
-            <br>
-          </center>
-          <br>
-          <h2>Controls:</h2>
-          WASD to move<br>
-          Space to jump<br>
-          R to respawn above the level<br>
-          G to add a mob<br>
-          Y to swap mouse Y axis<br>
-          1-5 to change building block type<br>
-          N to generate a new level<br>
-          Left mouse button to remove or add a block<br>
-          Right mouse button to switch editing mode<br>
-        </td>
-      </tr>
-    </table>
+  <div id="content">
+    <br><br><br>
+
+    <canvas width="854" height="480" id="canvas"></canvas><br>
+
     <center>
+      <font size="-1">This game requires JavaScript and WebGL. Press escape to release the mouse.
+      </font>
+    </center>
+    <center>
+      <font size="+1">Press B!</font>
+    </center>
+    <br>
+    <h2>Controls:</h2>
+    WASD to move<br>
+    Space to jump<br>
+    R to respawn at the spawn point.<br>
+    Enter to set a new spawn point.<br>
+    B to open the inventory<br>
+    F to toggle fog distance<br>
+    Escape to release mouse and open game menu<br>
+    1-9 or scrollwheel to change building block type<br>
+    Left mouse button to add a block<br>
+    Right mouse button to remove a block<br>
+    Middle mouse button to copy block type<br>
+    F11 to play in fullscreen<br>
+    <h2>In multiplayer:</h2>
+    Tab to list players<br>
+    T to chat<br>
+  </div>
+
+  <div id="footer">Copyright 2009 Mojang Specifications. <a href="javascript:;">Terms and conditions</a>. <a
+    href="javascript:;">Credits</a>. For support, email markus at mojang dot com.</div>
+  <br>
 </body>
 
 </html>

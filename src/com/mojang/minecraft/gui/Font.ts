@@ -54,7 +54,7 @@ export class Font {
                 this.charWidths[i] = x
             }
 
-            this.fontTexture = textures.loadTexture(name, gl.NEAREST)
+            this.fontTexture = textures.loadTexture(name)
             
             console.log("Font loaded")
         })
