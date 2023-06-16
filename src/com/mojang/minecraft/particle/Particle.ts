@@ -64,6 +64,8 @@ export class Particle extends Entity {
         let x = this.xo + (this.x - this.xo) * a
         let y = this.yo + (this.y - this.yo) * a
         let z = this.zo + (this.z - this.zo) * a
+        let brightness = this.getBrightness(a)
+        t.color_f(brightness, brightness, brightness)
         t.vertexUV(x - xa * r - xa2 * r, y - ya * r, z - za * r - za2 * r, u0, v1)
         t.vertexUV(x - xa * r + xa2 * r, y + ya * r, z - za * r + za2 * r, u0, v0)
         t.vertexUV(x + xa * r + xa2 * r, y + ya * r, z + za * r + za2 * r, u1, v0)

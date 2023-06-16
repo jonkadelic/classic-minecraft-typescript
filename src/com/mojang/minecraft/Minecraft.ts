@@ -34,8 +34,7 @@ export class Minecraft {
     public static readonly VERSION_STRING = "0.0.11a"
     public width: number
     public height: number
-    private fogColor0: number[] = new Array(4)
-    private fogColor1: number[] = new Array(4)
+    private fogColor: number[] = new Array(4)
     private timer: Timer = new Timer(20)
     // @ts-ignore
     private level: Level
@@ -90,8 +89,7 @@ export class Minecraft {
                     })
             })
 
-        this.fogColor0 = [0xFE / 0xFF, 0xFB / 0xFF, 0xFA / 0xFF, 1.0]
-        this.fogColor1 = [0x0E / 0xFF, 0x0B / 0xFF, 0x0A / 0xFF, 1.0]
+        this.fogColor = [0xFF / 0xFF, 0xFF / 0xFF, 0xFF / 0xFF, 1.0]
         let fr = 0.5
         let fg = 0.8
         let fb = 1.0
@@ -430,29 +428,20 @@ export class Minecraft {
         let frustum = Frustum.getFrustum()
         this.levelRenderer.updateDirtyChunks(this.player)
         this.checkGlError("Update chunks")
-        this.setupFog(0)
+        this.setupFog()
         gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
         this.levelRenderer.render(this.player, 0)
         this.checkGlError("Rendered level")
         for (let i = 0; i < this.entities.length; i++) {
             let entity = this.entities[i]
-            if (entity.isLit() && frustum.isVisible(entity.bb)) {
+            if (frustum.isVisible(entity.bb)) {
                 entity.render(a)
             }
         }
         this.checkGlError("Rendered entities")
         this.particleEngine.render(this.player, a, 0)
         this.checkGlError("Rendered particles")
-        this.setupFog(1) // Later, this will be removed (0.30 does not use fog for lighting)
-        for (let i = 0; i < this.entities.length; i++) {
-            let zombie = this.entities[i]
-            if (!zombie.isLit() && frustum.isVisible(zombie.bb)) {
-                zombie.render(a)
-            }
-        }
-        this.particleEngine.render(this.player, a, 1)
         gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
-        this.checkGlError("Rendered rest")
         if (this.hitResult != null) {
             this.levelRenderer.renderHit(this.hitResult, this.editMode, this.paintTexture)
         }
@@ -524,19 +513,12 @@ export class Minecraft {
         }
     }
 
-    private setupFog(i: number): void {
+    private setupFog(): void {
         if (!shader.isLoaded()) return
         shader.use()
-        if (i == 0) {
-            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
-            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor0)
-            shader.setColor(1, 1, 1, 1)
-        } else if (i == 1) {
-            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.01)
-            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor1)
-            let br = 0.6
-            shader.setColor(br, br, br, 1)
-        }
+        gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
+        gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor)
+        shader.setColor(1, 1, 1, 1)
     }
 
     public static checkError(): void {
