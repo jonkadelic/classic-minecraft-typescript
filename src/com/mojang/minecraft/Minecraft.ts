@@ -22,6 +22,7 @@ import { Zombie } from "./character/Zombie";
 import { GuiScreen } from "./gui/GuiScreen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
+import { KeyboardEvents } from "./input/KeyboardEvents";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -308,7 +309,7 @@ export class Minecraft {
             }
             while (KeyboardEvents.next()) {
                 this.player.setKey(KeyboardEvents.getEventKey(), KeyboardEvents.getEventKeyState())
-                if(this.screen != null) {
+                if (this.screen != null) {
                     this.screen.keyboardEvent()
                 }
                 if (KeyboardEvents.getEventKeyState()) {

@@ -2,7 +2,7 @@ import { Keys } from "syncinput";
 import { InputHandler } from "./InputHandler";
 // import { Options } from "./Options";
 
-export class InputHandlerImpl {
+export class InputHandlerImpl extends InputHandler {
     private keyStates: boolean[] = new Array(10)
     // private options: Options
 

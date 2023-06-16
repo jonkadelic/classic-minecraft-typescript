@@ -5,7 +5,7 @@ import { Level } from "./level/Level";
 import { InputHandler } from "./InputHandler";
 
 export class Player extends Entity {
-    public input: InputHandler
+    public input: InputHandler | null
 
     public constructor(level: Level) {
         super(level)
