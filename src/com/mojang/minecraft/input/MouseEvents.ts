@@ -8,14 +8,14 @@ export class MouseEvents {
     public static update(): void {
         for (let i: number = 0; i < mouse.keys.length; ++i) {
             if (mouse.buttonJustPressed(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(true, i, mouse.position.x, mouse.position.y, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, true, mouse.wheel))
             }
             if (mouse.buttonJustReleased(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(false, i, mouse.position.x, mouse.position.y, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, false, mouse.wheel))
             }
-            if (mouse.wheelUpdated) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(false, i, mouse.position.x, mouse.position.y, mouse.wheel))
-            }
+        }
+        if (mouse.wheelUpdated) {
+            MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, -1, false, mouse.wheel))
         }
     }
 
@@ -61,7 +61,7 @@ export class MouseEvents {
     }
 
     public static getEventDWheel(): number {
-        if (!MouseEvents.currentEvent) return 0
+        if (!MouseEvents.currentEvent) return -1
         return MouseEvents.currentEvent.wheel
     }
 }
