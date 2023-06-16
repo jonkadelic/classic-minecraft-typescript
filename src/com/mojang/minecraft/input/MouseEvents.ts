@@ -56,12 +56,12 @@ export class MouseEvents {
     }
     
     public static getEventButton(): number {
-        if (!MouseEvents.currentEvent) return false
+        if (!MouseEvents.currentEvent) return -1
         return MouseEvents.currentEvent.button
     }
 
     public static getEventDWheel(): number {
-        if (!MouseEvents.currentEvent) return -1
+        if (!MouseEvents.currentEvent) return 0
         return MouseEvents.currentEvent.wheel
     }
 }
