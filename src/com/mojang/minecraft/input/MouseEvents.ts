@@ -8,14 +8,14 @@ export class MouseEvents {
     public static update(): void {
         for (let i: number = 0; i < mouse.keys.length; ++i) {
             if (mouse.buttonJustPressed(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, true, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, true, i, mouse.wheel))
             }
             if (mouse.buttonJustReleased(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, false, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, false, i, mouse.wheel))
             }
         }
         if (mouse.wheelUpdated) {
-            MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, -1, false, mouse.wheel))
+            MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, -1, mouse.wheel))
         }
     }
 
