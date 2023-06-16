@@ -129,23 +129,14 @@ export class Level {
         let y1 = Math.trunc(aABB.y1 + 1)
         let z0 = Math.trunc(aABB.z0)
         let z1 = Math.trunc(aABB.z1 + 1)
-        if (x0 < 0) {
-            x0 = 0
+        if (aABB.x0 < 0) {
+            --x0
         }
-        if (y0 < 0) {
-            y0 = 0
+        if (aABB.y0 < 0) {
+            --y0
         }
-        if (z0 < 0) {
-            z0 = 0
-        }
-        if (x1 > this.width) {
-            x1 = this.width
-        }
-        if (y1 > this.depth) {
-            y1 = this.depth
-        }
-        if (z1 > this.height) {
-            z1 = this.height
+        if (aABB.z0 < 0) {
+            --z0
         }
         let x = x0
         while (x < x1) {
@@ -156,7 +147,12 @@ export class Level {
                     let tile = Tile.tiles[this.getTile(x, y, z)]
                     if (tile != null) {
                         let aabb = tile.getAABB(x, y, z)
-                        if (aabb != null) {
+                        if (aabb != null && aABB.intersectsInner(aabb)) {
+                            aABBs.push(aabb)
+                        }
+                    } else if(x < 0 || y < 0 || z < 0 || x >= this.width || z >= this.height) {
+                        let aabb = Tiles.unbreakable.getAABB(x, y, z)
+                        if (aABB.intersectsInner(aabb)) {
                             aABBs.push(aabb)
                         }
                     }
