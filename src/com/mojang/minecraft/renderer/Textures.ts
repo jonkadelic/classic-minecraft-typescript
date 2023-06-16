@@ -7,7 +7,7 @@ export class Textures {
         this.loadTexture("./terrain.png")
         this.loadTexture("./char.png")
         this.loadTexture("./gui/gui.png")
-        this.loadTexture("./font.png")
+        this.loadTexture("./default.png")
     }
 
     public loadTexture(resourceName: string): WebGLTexture {
