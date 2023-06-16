@@ -261,16 +261,27 @@ export class Minecraft {
         keyboard.update()
         this.mouseGrabbed = document.pointerLockElement == this.parent
         //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
-        if (this.screen == null && !this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
+        /*if (this.screen == null && !this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-        } else if (this.mouseGrabbed) {
+        } else*/ if (this.mouseGrabbed) {
             if (this.screen == null || this.screen.grabsMouse) {
                 // Mouse
                 if (this.screen == null) {
-                    MouseEvents.next() // Just to make sure
-                    if (mouse.buttonPressed(MouseButton.LEFT)) {
+                    while (MouseEvents.next()) { // Just to make sure
+                        if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
+                            this.grabMouse();
+                        } else {
+                            if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
+                                this.handleMouseClick(this.editMode)
+                            }
+                            if (MouseEvents.getEventButton() == MouseButton.RIGHT && MouseEvents.getEventButtonState()) {
+                                this.editMode = (this.editMode + 1) % 2
+                            }
+                        }
+                    }
+                    /*if (mouse.buttonPressed(MouseButton.LEFT)) {
                         if (!this.mouse0) {
                             this.mouse0 = true
                             this.handleMouseClick(this.editMode)
@@ -285,7 +296,7 @@ export class Minecraft {
                         }
                     } else {
                         this.mouse1 = false
-                    }
+                    }*/
                 }
 
                 // Keyboard

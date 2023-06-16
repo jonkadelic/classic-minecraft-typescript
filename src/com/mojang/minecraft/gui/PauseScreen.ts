@@ -19,8 +19,8 @@ export class PauseScreen extends GuiScreen {
 
     public override onButtonClick(button: Button): void {
         if (button.id == 4) {
-            this.minecraft.setScreen(null);
-            this.minecraft.grabMouse();
+            this.minecraft.setScreen(null)
+            this.minecraft.grabMouse()
         }
     }
 

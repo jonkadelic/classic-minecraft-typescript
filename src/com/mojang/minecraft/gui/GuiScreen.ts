@@ -28,14 +28,14 @@ export class GuiScreen extends Gui {
     }
 
     protected onKeyPress(key: number): void { // No more character
-        if (key == 1) {
+        if (key == Keys.ESC) {
             this.minecraft.setScreen(null)
             this.minecraft.grabMouse()
         }
     }
 
     protected onMouseClick(mx: number, my: number, button: number): void {
-        if (button == 0) {
+        if (button == MouseButton.LEFT) {
             for (let i: number = 0; i < this.buttons.length; ++i) {
                 let button: Button = this.buttons[i]
                 if (button.hover(mx, my)) {
