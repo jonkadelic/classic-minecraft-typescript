@@ -31,28 +31,28 @@ export class Gui {
     }
 
     protected static fillGradient(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, color0: number, color1: number): void {
-        let n7 = (n5 >>> 24) / 255.0
-		let n8 = (n5 >> 16 & 0xFF) / 255.0
-		let n9 = (n5 >> 8 & 0xFF) / 255.0
-		let n10 = (n5 & 0xFF) / 255.0
-		let n11 = (n6 >>> 24) / 255.0
-		let n12 = (n6 >> 16 & 0xFF) / 255.0
-		let n13 = (n6 >> 8 & 0xFF) / 255.0
-		let n14 = (n6 & 0xFF) / 255.0
+        let a0 = (n5 >>> 24) / 255.0
+		let r0 = (n5 >> 16 & 0xFF) / 255.0
+		let g0 = (n5 >> 8 & 0xFF) / 255.0
+		let b0 = (n5 & 0xFF) / 255.0
+		let a1 = (n6 >>> 24) / 255.0
+		let r1 = (n6 >> 16 & 0xFF) / 255.0
+		let g1 = (n6 >> 8 & 0xFF) / 255.0
+		let b1 = (n6 & 0xFF) / 255.0
 		let t = Tesselator.instance
 		gl.enable(gl.BLEND)
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		t.init();
-		t.color_f(n8, n9, n10, n7)
-		t.vertex(n3, n2, 0)
-		t.vertex(n, n2, 0)
-		t.color_f(n12, n13, n14, n11)
-		t.vertex(n, n4, 0)
-        
-		t.vertex(n, n4, 0)
-		t.vertex(n3, n4, 0)
-		t.color_f(n8, n9, n10, n7)
-		t.vertex(n3, n2, 0)
+		t.color_f(r0, g0, b0, a0)
+		t.vertex(x1, y0, 0)
+		t.vertex(x0, y0, 0)
+		t.color_f(r1, g1, b1, a1)
+		t.vertex(x0, y1, 0)
+
+		t.vertex(x0, y1, 0)
+		t.vertex(x1, y1, 0)
+		t.color_f(r0, g0, b0, a0)
+		t.vertex(x1, y0, 0)
 		t.flush(buffer)
         buffer.draw()
 		gl.disable(gl.BLEND)
