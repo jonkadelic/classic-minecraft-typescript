@@ -20,6 +20,7 @@ export class MouseEvents {
     }
 
     public static next(): boolean {
+        console.log(MouseEvents.mouseEventQueue)
         let event = MouseEvents.mouseEventQueue.shift()
         if (event) {
             MouseEvents.currentEvent = event

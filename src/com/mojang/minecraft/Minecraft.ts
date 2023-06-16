@@ -124,7 +124,7 @@ export class Minecraft {
     public updateSize(width: number, height: number): void {
         this.width = width
         this.height = height
-        if (this.screen != null) {
+        if (this.screen !== null) {
             let screenWidth = Math.trunc(this.width * 240 / this.height)
             let screenHeight = Math.trunc(this.height * 240 / this.height)
             this.screen.open(this, screenWidth, screenHeight)
