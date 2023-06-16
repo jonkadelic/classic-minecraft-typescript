@@ -115,6 +115,13 @@ export class Entity {
         this.zd += za * cos + xa * sin
     }
 
+    public getBrightness(a: number): number {
+        let xi = Math.trunc(this.x);
+        let yi = Math.trunc(this.y + this.heightOffset / 2.0 - 0.5);
+        let zi = Math.trunc(this.z);
+        return this.level.getBrightness(xi, yi, zi);
+    }
+
     public isLit(): boolean {
         let xTile = Math.trunc(this.x)
         let yTile = Math.trunc(this.y)

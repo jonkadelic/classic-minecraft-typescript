@@ -2,7 +2,7 @@ import { Keyboard, Keys, Mouse, MouseButton } from "syncinput";
 import { Timer } from "./Timer";
 import { Level } from "./level/Level";
 import { LevelRenderer } from "./level/LevelRenderer";
-import { Player } from "./Player";
+import { Player } from "./player/Player";
 import { ParticleEngine } from "./particle/ParticleEngine";
 import { Entity } from "./Entity";
 import { Textures } from "./renderer/Textures";
@@ -19,6 +19,12 @@ import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
 import { Font } from "./gui/Font";
 import { Zombie } from "./character/Zombie";
+import { GuiScreen } from "./gui/GuiScreen";
+import { PauseScreen } from "./gui/PauseScreen";
+import { MouseEvents } from "./input/MouseEvents";
+import { KeyboardEvents } from "./input/KeyboardEvents";
+import { InputHandlerImpl } from "./player/InputHandlerImpl";
+import { BlockSelectScreen } from "./gui/BlockSelectScreen";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -28,11 +34,10 @@ export let shader: Shader = new Shader()
 export let clickedElement: HTMLElement | null = null
 
 export class Minecraft {
-    public static readonly VERSION_STRING = "0.0.11a"
-    private width: number
-    private height: number
-    private fogColor0: number[] = new Array(4)
-    private fogColor1: number[] = new Array(4)
+    public static readonly VERSION_STRING = "0.30"
+    public width: number
+    public height: number
+    private fogColor: number[] = new Array(4)
     private timer: Timer = new Timer(20)
     // @ts-ignore
     private level: Level
@@ -45,12 +50,12 @@ export class Minecraft {
     private particleEngine: ParticleEngine
     private entities: Entity[] = []
     private parent: HTMLCanvasElement
-    public pause: boolean = false
+    public paused: boolean = false
     private yMouseAxis: number = -1
     public textures: Textures
     // @ts-ignore
     public font: Font
-    private editMode: number = 0
+    public screen: GuiScreen | null = null
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
@@ -71,6 +76,7 @@ export class Minecraft {
         this.textures = new Textures()
 
         mouse = new Mouse(parent)
+        mouse.setCanvas(parent)
         keyboard = new Keyboard()
     }
 
@@ -85,8 +91,7 @@ export class Minecraft {
                     })
             })
 
-        this.fogColor0 = [0xFE / 0xFF, 0xFB / 0xFF, 0xFA / 0xFF, 1.0]
-        this.fogColor1 = [0x0E / 0xFF, 0x0B / 0xFF, 0x0A / 0xFF, 1.0]
+        this.fogColor = [0xFF / 0xFF, 0xFF / 0xFF, 0xFF / 0xFF, 1.0]
         let fr = 0.5
         let fg = 0.8
         let fb = 1.0
@@ -102,6 +107,7 @@ export class Minecraft {
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
+        this.player.input = new InputHandlerImpl() // this.options
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
         for (let i = 0; i < 10; i++) {
@@ -119,6 +125,31 @@ export class Minecraft {
     public updateSize(width: number, height: number): void {
         this.width = width
         this.height = height
+        if (this.screen !== null) {
+            let screenWidth = Math.trunc(this.width * 240 / this.height)
+            let screenHeight = Math.trunc(this.height * 240 / this.height)
+            this.screen.open(this, screenWidth, screenHeight)
+        }
+    }
+
+    public setScreen(screen: GuiScreen | null): void {
+        if (this.screen !== null) {
+            this.screen.onClose()
+        }
+        // survival death screen would go here
+        this.screen = screen
+        if (screen !== null) {
+            if (this.mouseGrabbed) {
+                this.mouseGrabbed = false
+                mouse.setLock(false)
+            }
+            let screenWidth = Math.trunc(this.width * 240 / this.height)
+            let screenHeight = Math.trunc(this.height * 240 / this.height)
+            screen.open(this, screenWidth, screenHeight)
+            // this.online = false;
+        } else {
+            this.grabMouse()
+        }
     }
 
     private checkGlError(string: string): void {
@@ -146,10 +177,14 @@ export class Minecraft {
 
     private loop(): void {
         if (this.running) {
-            if (this.pause) {
+            mouse.update()
+            keyboard.update()
+            if (this.paused) {
                 requestAnimationFrame(() => this.loop())
                 return
             }
+            MouseEvents.update() // lwjgl
+            KeyboardEvents.update() // lwjgl
             this.timer.advanceTime()
             for (let i = 0; i < this.timer.ticks; i++) {
                 this.tick()
@@ -177,7 +212,13 @@ export class Minecraft {
     public grabMouse(): void {
         if (this.mouseGrabbed) return
         this.mouseGrabbed = true
-        this.parent.requestPointerLock()
+        mouse.setLock(true)
+    }
+
+    public pause(): void {
+        if (this.screen == null) {
+            this.setScreen(new PauseScreen())
+        }
     }
 
     private handleMouseClick(click: number): void {
@@ -220,69 +261,107 @@ export class Minecraft {
     }
 
     public tick(): void {
-        keyboard.update()
+        let oldGrabbed = this.mouseGrabbed
         this.mouseGrabbed = document.pointerLockElement == this.parent
-        mouse.setLock(this.mouseGrabbed)
-        if (!this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
+        //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
+        /*if (this.screen == null && !this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
         } else if (this.mouseGrabbed) {
+            
+        }*/
+        if (this.screen == null || this.screen.grabsMouse) {
             // Mouse
-            if (mouse.buttonPressed(MouseButton.LEFT)) {
-                if (!this.mouse0) {
-                    this.mouse0 = true
-                    this.handleMouseClick(this.editMode)
+            if (this.screen == null) {
+                while (MouseEvents.next()) { // Just to make sure
+                    if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
+                        this.grabMouse();
+                    } else {
+                        if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
+                            this.handleMouseClick(0)
+                        }
+                        if (MouseEvents.getEventButton() == MouseButton.RIGHT && MouseEvents.getEventButtonState()) {
+                            this.handleMouseClick(1)
+                        }
+                    }
                 }
-            } else {
-                this.mouse0 = false
-            }
-            if (mouse.buttonPressed(MouseButton.RIGHT)) {
-                if (!this.mouse1) {
-                    this.mouse1 = true
-                    this.editMode = (this.editMode + 1) % 2
+                /*if (mouse.buttonPressed(MouseButton.LEFT)) {
+                    if (!this.mouse0) {
+                        this.mouse0 = true
+                        this.handleMouseClick(this.editMode)
+                    }
+                } else {
+                    this.mouse0 = false
                 }
-            } else {
-                this.mouse1 = false
+                if (mouse.buttonPressed(MouseButton.RIGHT)) {
+                    if (!this.mouse1) {
+                        this.mouse1 = true
+                        this.editMode = (this.editMode + 1) % 2
+                    }
+                } else {
+                    this.mouse1 = false
+                }*/
             }
 
             // Keyboard
-            if (keyboard.keyJustPressed(Keys.ENTER)) {
-                this.level.save()
+            if (!this.mouseGrabbed && this.mouseGrabbed != oldGrabbed) {
+                this.pause()
             }
-            if (keyboard.keyJustPressed(Keys.NUM1)) {
-                this.paintTexture = Tiles.rock.id
+            while (KeyboardEvents.next()) {
+                this.player.setKey(KeyboardEvents.getEventKey(), KeyboardEvents.getEventKeyState())
+                if (this.screen != null) {
+                    this.screen.keyboardEvent()
+                }
+                if (KeyboardEvents.getEventKeyState()) {
+                    if (KeyboardEvents.getEventKey() == Keys.ENTER) {
+                        this.level.save()
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM1) {
+                        this.paintTexture = Tiles.rock.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM2) {
+                        this.paintTexture = Tiles.dirt.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM3) {
+                        this.paintTexture = Tiles.stoneBrick.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM4) {
+                        this.paintTexture = Tiles.sapling.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM5) {
+                        this.paintTexture = Tiles.wood.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM6) {
+                        this.paintTexture = Tiles.treeTrunk.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM7) {
+                        this.paintTexture = Tiles.leaves.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM8) {
+                        this.paintTexture = Tiles.glass.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.Y) {
+                        this.yMouseAxis *= -1
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.G) {
+                        this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.N) {
+                        this.level.regenerate()
+                        this.player.resetPos()
+                    }
+
+                    if (KeyboardEvents.getEventKey() == Keys.B) {
+                        this.setScreen(new BlockSelectScreen())
+                    }
+                }
             }
-            if (keyboard.keyJustPressed(Keys.NUM2)) {
-                this.paintTexture = Tiles.dirt.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM3)) {
-                this.paintTexture = Tiles.stoneBrick.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM4)) {
-                this.paintTexture = Tiles.sapling.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM5)) {
-                this.paintTexture = Tiles.wood.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM6)) {
-                this.paintTexture = Tiles.treeTrunk.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM7)) {
-                this.paintTexture = Tiles.leaves.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM8)) {
-                this.paintTexture = Tiles.glass.id
-            }
-            if (keyboard.keyJustPressed(Keys.Y)) {
-                this.yMouseAxis *= -1
-            }
-            if (keyboard.keyJustPressed(Keys.G)) {
-                this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-            }
-            if (keyboard.keyJustPressed(Keys.N)) {
-                this.level.regenerate()
-                this.player.resetPos()
+        }
+        if (this.screen != null) {
+            this.screen.doInput()
+            if (this.screen != null) {
+                this.screen.tick()
             }
         }
         this.level.tick()
@@ -366,37 +445,26 @@ export class Minecraft {
         let frustum = Frustum.getFrustum()
         this.levelRenderer.updateDirtyChunks(this.player)
         this.checkGlError("Update chunks")
-        this.setupFog(0)
+        this.setupFog()
         gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
         this.levelRenderer.render(this.player, 0)
         this.checkGlError("Rendered level")
         for (let i = 0; i < this.entities.length; i++) {
             let entity = this.entities[i]
-            if (entity.isLit() && frustum.isVisible(entity.bb)) {
+            if (frustum.isVisible(entity.bb)) {
                 entity.render(a)
             }
         }
         this.checkGlError("Rendered entities")
         this.particleEngine.render(this.player, a, 0)
         this.checkGlError("Rendered particles")
-        this.setupFog(1)
-        this.levelRenderer.render(this.player, 1)
-        for (let i = 0; i < this.entities.length; i++) {
-            let zombie = this.entities[i]
-            if (!zombie.isLit() && frustum.isVisible(zombie.bb)) {
-                zombie.render(a)
-            }
-        }
-        this.particleEngine.render(this.player, a, 1)
         gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
-        this.checkGlError("Rendered rest")
         if (this.hitResult != null) {
-            this.levelRenderer.renderHit(this.hitResult, this.editMode, this.paintTexture)
+            this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
         }
         this.checkGlError("Rendered hit")
         this.drawGui(a)
         this.checkGlError("Rendered gui")
-        mouse.update()
 
     }
 
@@ -412,6 +480,7 @@ export class Minecraft {
         matrix.loadIdentity()
         matrix.translate(0, 0, -200)
         this.checkGlError("GUI: Init")
+        // hud
         matrix.push()
         matrix.translate(screenWidth - 16, 16, 0)
         let t = Tesselator.instance
@@ -423,7 +492,7 @@ export class Minecraft {
         let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
         gl.bindTexture(gl.TEXTURE_2D, id)
         t.init()
-        Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0)
+        Tile.tiles[this.paintTexture].render(t, this.level, -2, 0, 0)
         t.flush(this.guiBuffer)
         this.guiBuffer.draw()
         matrix.pop()
@@ -453,21 +522,20 @@ export class Minecraft {
         t.flush(this.guiBuffer);
         this.guiBuffer.draw();
         this.checkGlError("GUI: Draw crosshair")
+        // screen
+        let mx = Math.trunc(mouse.position.x * screenWidth / this.width)
+        let my = Math.trunc(mouse.position.y * screenHeight / this.height)
+        if (this.screen != null) {
+            this.screen.render(this.guiBuffer, mx, my)
+        }
     }
 
-    private setupFog(i: number): void {
+    private setupFog(): void {
         if (!shader.isLoaded()) return
         shader.use()
-        if (i == 0) {
-            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
-            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor0)
-            shader.setColor(1, 1, 1, 1)
-        } else if (i == 1) {
-            gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.01)
-            gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor1)
-            let br = 0.6
-            shader.setColor(br, br, br, 1)
-        }
+        gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
+        gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor)
+        shader.setColor(1, 1, 1, 1)
     }
 
     public static checkError(): void {
