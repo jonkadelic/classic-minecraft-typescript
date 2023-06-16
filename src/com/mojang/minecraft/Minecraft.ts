@@ -21,6 +21,7 @@ import { Font } from "./gui/Font";
 import { Zombie } from "./character/Zombie";
 import { GuiScreen } from "./gui/GuiScreen";
 import { PauseScreen } from "./gui/PauseScreen";
+import { MouseEvents } from "./input/MouseEvents";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -178,6 +179,8 @@ export class Minecraft {
                 requestAnimationFrame(() => this.loop())
                 return
             }
+            mouse.update()
+            MouseEvents.update()
             this.timer.advanceTime()
             for (let i = 0; i < this.timer.ticks; i++) {
                 this.tick()
@@ -261,68 +264,72 @@ export class Minecraft {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-        } else if (this.screen == null || this.screen.grabsMouse) {
-            // Mouse
-            if (mouse.buttonPressed(MouseButton.LEFT)) {
-                if (!this.mouse0) {
-                    this.mouse0 = true
-                    this.handleMouseClick(this.editMode)
+        } else if (this.mouseGrabbed) {
+            if (this.screen == null || this.screen.grabsMouse) {
+                // Mouse
+                if (mouse.buttonPressed(MouseButton.LEFT)) {
+                    if (!this.mouse0) {
+                        this.mouse0 = true
+                        this.handleMouseClick(this.editMode)
+                    }
+                } else {
+                    this.mouse0 = false
                 }
-            } else {
-                this.mouse0 = false
-            }
-            if (mouse.buttonPressed(MouseButton.RIGHT)) {
-                if (!this.mouse1) {
-                    this.mouse1 = true
-                    this.editMode = (this.editMode + 1) % 2
+                if (mouse.buttonPressed(MouseButton.RIGHT)) {
+                    if (!this.mouse1) {
+                        this.mouse1 = true
+                        this.editMode = (this.editMode + 1) % 2
+                    }
+                } else {
+                    this.mouse1 = false
                 }
-            } else {
-                this.mouse1 = false
-            }
 
-            // Keyboard
-            if (keyboard.keyJustPressed(Keys.ESC)) {
-                this.pause()
-            }
-            if (keyboard.keyJustPressed(Keys.H)) {
-                this.pause()
-            }
-            if (keyboard.keyJustPressed(Keys.ENTER)) {
-                this.level.save()
-            }
-            if (keyboard.keyJustPressed(Keys.NUM1)) {
-                this.paintTexture = Tiles.rock.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM2)) {
-                this.paintTexture = Tiles.dirt.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM3)) {
-                this.paintTexture = Tiles.stoneBrick.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM4)) {
-                this.paintTexture = Tiles.sapling.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM5)) {
-                this.paintTexture = Tiles.wood.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM6)) {
-                this.paintTexture = Tiles.treeTrunk.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM7)) {
-                this.paintTexture = Tiles.leaves.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM8)) {
-                this.paintTexture = Tiles.glass.id
-            }
-            if (keyboard.keyJustPressed(Keys.Y)) {
-                this.yMouseAxis *= -1
-            }
-            if (keyboard.keyJustPressed(Keys.G)) {
-                this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-            }
-            if (keyboard.keyJustPressed(Keys.N)) {
-                this.level.regenerate()
-                this.player.resetPos()
+                // Keyboard
+                if (keyboard.keyJustPressed(Keys.ESC)) {
+                    this.pause()
+                }
+                if (keyboard.keyJustPressed(Keys.H)) {
+                    this.pause()
+                }
+                if (keyboard.keyJustPressed(Keys.ENTER)) {
+                    this.level.save()
+                }
+                if (keyboard.keyJustPressed(Keys.NUM1)) {
+                    this.paintTexture = Tiles.rock.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM2)) {
+                    this.paintTexture = Tiles.dirt.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM3)) {
+                    this.paintTexture = Tiles.stoneBrick.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM4)) {
+                    this.paintTexture = Tiles.sapling.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM5)) {
+                    this.paintTexture = Tiles.wood.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM6)) {
+                    this.paintTexture = Tiles.treeTrunk.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM7)) {
+                    this.paintTexture = Tiles.leaves.id
+                }
+                if (keyboard.keyJustPressed(Keys.NUM8)) {
+                    this.paintTexture = Tiles.glass.id
+                }
+                if (keyboard.keyJustPressed(Keys.Y)) {
+                    this.yMouseAxis *= -1
+                }
+                if (keyboard.keyJustPressed(Keys.G)) {
+                    this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                }
+                if (keyboard.keyJustPressed(Keys.N)) {
+                    this.level.regenerate()
+                    this.player.resetPos()
+                }
+            } else if (this.screen != null) {
+                this.screen.doInput()
             }
         }
         if (this.screen != null) {
@@ -438,7 +445,6 @@ export class Minecraft {
         this.checkGlError("Rendered hit")
         this.drawGui(a)
         this.checkGlError("Rendered gui")
-        mouse.update()
 
     }
 

@@ -1,8 +1,10 @@
+import { MouseButton, Keys } from "syncinput";
 import { Gui } from "./Gui";
 import { Button } from "./Button";
 import { Font } from "./Font";
-import { Minecraft } from "../Minecraft";
+import { mouse, keyboard, Minecraft } from "../Minecraft";
 import { RenderBuffer } from "../../../util/RenderBuffer";
+import { MouseEvents } from "../input/MouseEvents";
 
 export class GuiScreen extends Gui {
     // @ts-ignore
@@ -56,15 +58,29 @@ export class GuiScreen extends Gui {
     public init(): void {}
 
     public doInput(): void {
-        // TODO
+        while (MouseEvents.next()) {
+            this.mouseEvent()
+        }
+        for (let i: number = 0; i < keyboard.keys.length; ++i) {
+            if (keyboard.keyJustPressed(i)) {
+                this.keyboardEvent(true, i)
+            }
+            // keyJustReleased is not used in 0.30
+        }
     }
 
     public mouseEvent(): void {
-        // TODO
+        if (MouseEvents.getEventButtonState()) {
+            let mx = MouseEvents.getEventX() * this.width / this.minecraft.width;
+            let my = this.height - MouseEvents.getEventY() * this.height / this.minecraft.height - 1;
+            this.onMouseClick(mx, my, MouseEvents.getEventButton());
+        }
     }
 
-    public keyboardEvent(): void {
-        // TODO
+    public keyboardEvent(state: boolean, key: number): void {
+        if (state) {
+            
+        }
     }
 
     public tick(): void {}
