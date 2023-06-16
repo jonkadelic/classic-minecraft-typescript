@@ -54,7 +54,7 @@ export class SelectBlockScreen extends Screen {
             matrix.translate(-1.5, 0.5, 0.5)
             matrix.scale(-1, -1, -1)
             t.init()
-            cTile.render2(t)
+            cTile.renderInInventory(t)
             t.flush(buffer)
             buffer.draw()
             matrix.pop()

@@ -8,8 +8,8 @@ import { Tiles } from "./Tiles";
 export class Bush extends Tile {
     public constructor(id: number, tex: number) {
         super(id, tex)
-        let var3 = 0.2;
-        this.setShape(0.5 - var3, 0.0, 0.5 - var3, var3 + 0.5, var3 * 3.0, var3 + 0.5);
+        let size = 0.2;
+        this.setShape(0.5 - size, 0.0, 0.5 - size, size + 0.5, size * 3.0, size + 0.5);
     }
     
     public override tick(level: Level, x: number, y: number, z: number, random: Random): void {
@@ -19,7 +19,7 @@ export class Bush extends Tile {
         }
     }
 
-    public override render(t: Tesselator, level: Level, x: number, y: number, z: number): boolean {
+    private renderBush(t: Tesselator, x: number, y: number, z: number): boolean {
         let tex = this.getTexture(15)
         let texX = tex % 16 << 4;
         let texY = tex / 16 << 4;
@@ -28,7 +28,6 @@ export class Bush extends Tile {
         let v0 = texY / 256.0;
         let v1 = (texY + 15.99) / 256.0;
         let rots = 2
-        t.color_f(1.0, 1.0, 1.0)
         for (let r = 0; r < rots; r++) {
             let xa = Math.sin(r * Math.PI / rots + Math.PI / 4) * 0.5
             let za = Math.cos(r * Math.PI / rots + Math.PI / 4) * 0.5
@@ -68,5 +67,21 @@ export class Bush extends Tile {
 
     public override isSolid(): boolean {
         return false
+    }
+
+    public override isCubeShaped(): boolean {
+        return false
+    }
+
+    public override render(level: Level, x: number, y: number, z: number, t: Tesselator): boolean {
+        let brightness = level.getBrightness(x, y, z)
+        t.color_f(brightness, brightness, brightness)
+        this.renderBush(t, x, y, z)
+        return true
+    }
+
+    public override renderInInventory(t: Tesselator): void {
+        t.color_f(1, 1, 1)
+        this.renderBush(t, -2, 0, 0)
     }
 }

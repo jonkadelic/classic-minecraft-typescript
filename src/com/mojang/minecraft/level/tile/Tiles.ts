@@ -4,6 +4,7 @@ import { GlassTile } from "./GlassTile";
 import { GrassTile } from "./GrassTile";
 import { LeafTile } from "./LeafTile";
 import { Sapling } from "./Sapling";
+import { StoneSlabTile } from "./StoneSlabTile";
 import { Tile } from "./Tile";
 import { TreeTile } from "./TreeTile";
 
@@ -44,15 +45,15 @@ export class Tiles {
     public static cloth_13: Tile = new Tile(34, 77).setData(1.0)
     public static cloth_14: Tile = new Tile(35, 78).setData(1.0)
     public static cloth_15: Tile = new Tile(36, 79).setData(1.0)
-    public static flower: Tile
-    public static rose: Tile
+    public static flower: Tile = new Bush(37, 13).setData(1.0)
+    public static rose: Tile = new Bush(38, 12).setData(1.0)
     public static mushroom1: Tile
     public static mushroom2: Tile
     public static goldBlock: Tile
     public static ironBlock: Tile
-    public static stoneSlab: Tile
-    public static stoneSlabHalf: Tile
-    public static redBrick: Tile
+    public static stoneSlab: Tile = new StoneSlabTile(43, true).setData(1.0)
+    public static stoneSlabHalf: Tile = new StoneSlabTile(44, false).setData(1.0)
+    public static redBrick: Tile = new Tile(45, 7).setData(1.0)
     public static tnt: Tile
     public static bookshelf: Tile
     public static mossStone: Tile = new Tile(48, 36).setData(1.0)

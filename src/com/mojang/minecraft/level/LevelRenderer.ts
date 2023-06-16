@@ -123,8 +123,15 @@ export class LevelRenderer implements LevelListener {
         //if (mode == 0) {
         
         // TODO: 0.30 line renderer
-        for (let i = 0; i < 6; i++) {
-            Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
+        let tile = Tile.tiles[this.level.getTile(h.x, h.y, h.z)]
+        if (tile != null) {
+            for (let i = 0; i < 6; i++) {
+                tile.renderFaceNoTexture(t, h.x, h.y, h.z, i)
+            }
+        } else {
+            for (let i = 0; i < 6; i++) {
+                Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
+            }
         }
         t.flush(this.hitRenderBuffer)
         this.hitRenderBuffer.draw()

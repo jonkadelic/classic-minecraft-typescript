@@ -19,6 +19,7 @@ export class Level {
     private levelListeners: LevelListener[] = []
     private random: Random = new Random()
     private unprocessed = 0
+    private networkMode = false
 
     public constructor(w: number, h: number, d: number) {
         this.width = w
@@ -165,7 +166,81 @@ export class Level {
         return aABBs
     }
 
+    public swap(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
+        if (this.networkMode) {
+            return
+        }
+        let id0 = this.getTile(x0, y0, z0)
+        let id1 = this.getTile(x1, y1, z1)
+        this.setTileNoNeighborChange(x0, y0, z0, id1)
+        this.setTileNoNeighborChange(x1, y1, z1, id0)
+        this.updateNeighborsAt(x0, y0, z0, id1)
+        this.updateNeighborsAt(x1, y1, z1, id0)
+    }
+
+    public setTileNoNeighborChange(x: number, y: number, z: number, type: number): boolean {
+        if (this.networkMode) {
+            return false
+        }
+        return this.netSetTileNoNeighborChange(x, y, z, type)
+    }
+
+    public netSetTileNoNeighborChange(x: number, y: number, z: number, type: number): boolean {
+        if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.depth || z >= this.height) {
+            return false
+        }
+        if (type == this.getTile(x, y, z)) {
+            return false
+        }
+        if (type == 0 && (x == 0 || z == 0 || x == this.width - 1 || z == this.height - 1)) {
+            // type = Tiles.water.id
+        }
+        let currentTile = this.getTile(x, y, z)
+        this.blocks[x + z * this.width + y * this.width * this.height] = type
+        if (currentTile != 0) {
+            Tile.tiles[currentTile].onRemove(this, x, y, z)
+        }
+        if (type != 0) {
+            Tile.tiles[type].onPlace(this, x, y, z)
+        }
+        this.calcLightDepths(x, z, 1, 1)
+
+        // TODO: Stopgap solution until LevelRenderer is updated
+        for (let i = 0; i < this.levelListeners.length; i++) {
+            this.levelListeners[i].tileChanged(x, y, z)
+        }
+        return true
+    }
+
     public setTile(x: number, y: number, z: number, type: number): boolean {
+        if (this.networkMode) {
+            return false
+        }
+        if (this.setTileNoNeighborChange(x, y, z, type)) {
+            this.updateNeighborsAt(x, y, z, type)
+            return true
+        }
+        return false
+    }
+
+    public netSetTile(x: number, y: number, z: number, type: number): boolean {
+        if (this.setTileNoNeighborChange(x, y, z, type)) {
+            this.updateNeighborsAt(x, y, z, type)
+            return true
+        }
+        return false
+    }
+
+    public updateNeighborsAt(x: number, y: number, z: number, type: number): void {
+        this.neighborChanged(x - 1, y, z, type)
+        this.neighborChanged(x + 1, y, z, type)
+        this.neighborChanged(x, y - 1, z, type)
+        this.neighborChanged(x, y + 1, z, type)
+        this.neighborChanged(x, y, z - 1, type)
+        this.neighborChanged(x, y, z + 1, type)
+    }
+
+    public setTileNoUpdate(x: number, y: number, z: number, type: number): boolean {
         if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.depth || z >= this.height) {
             return false
         }
@@ -173,13 +248,17 @@ export class Level {
             return false
         }
         this.blocks[x + z * this.width + y * this.width * this.height] = type
-        this.calcLightDepths(x, z, 1, 1)
-        let i = 0
-        while (i < this.levelListeners.length) {
-            this.levelListeners[i++].tileChanged(x, y, z)
-            i++
-        }
         return true
+    }
+
+    private neighborChanged(x: number, y: number, z: number, type: number): void {
+        if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.depth || z >= this.height) {
+            return
+        }
+        let tile = Tile.tiles[this.getTile(x, y, z)]
+        if (tile != null) {
+            tile.neighborChanged(this, x, y, z, type)
+        }
     }
 
     public isLit(x: number, y: number, z: number): boolean {

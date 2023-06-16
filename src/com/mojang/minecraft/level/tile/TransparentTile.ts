@@ -13,7 +13,7 @@ export class TransparentTile extends Tile {
         return false
     }
 
-    protected override shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
+    public override shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
         let id = level.getTile(x, y, z)
         if (!this.renderInside && id == this.id) {
             return false

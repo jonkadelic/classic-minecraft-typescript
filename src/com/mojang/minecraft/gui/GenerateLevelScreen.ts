@@ -29,8 +29,8 @@ export class GenerateLevelScreen extends Screen {
         this.minecraft.level.regenerate()
         this.minecraft.player.resetPos()
 
-        this.minecraft.setScreen(null)
         this.minecraft.grabMouse()
+        this.minecraft.setScreen(null)
     }
 
     public override render(buffer: RenderBuffer, mx: number, my: number): void {

@@ -13,7 +13,6 @@ import { Tile } from "./level/tile/Tile";
 import { Matrix } from "../../util/Matrix";
 import { Frustum } from "./renderer/Frustum";
 import { Shader } from "../../../shader";
-import { Tiles } from "./level/tile/Tiles";
 import { Vec3 } from "./character/Vec3";
 import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
@@ -23,7 +22,7 @@ import { Screen } from "./gui/Screen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
-import { KeyboardInput } from "./player/InputHandlerImpl";
+import { KeyboardInput } from "./player/KeyboardInput";
 import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 
 export let gl: WebGLRenderingContext
@@ -463,7 +462,7 @@ export class Minecraft {
         let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
         gl.bindTexture(gl.TEXTURE_2D, id)
         t.init()
-        Tile.tiles[this.paintTexture].render(t, this.level, -2, 0, 0)
+        Tile.tiles[this.paintTexture].render(this.level, -2, 0, 0, t)
         t.flush(this.guiBuffer)
         this.guiBuffer.draw()
         matrix.pop()
