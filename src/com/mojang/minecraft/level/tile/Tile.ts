@@ -62,31 +62,31 @@ export class Tile {
             rendered = true
         }
         if (this.shouldRenderFace(level, x, y + 1, z, 1)) {
-            brightness = this.getBrightness(level, x, y - 1, z)
+            brightness = this.getBrightness(level, x, y + 1, z)
             t.color_f(brightness, brightness, brightness)
             this.renderFace(t, x, y, z, 1)
             rendered = true
         }
         if (this.shouldRenderFace(level, x, y, z - 1, 2)) {
-            brightness = this.getBrightness(level, x, y - 1, z)
+            brightness = this.getBrightness(level, x, y, z - 1)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 2)
             rendered = true
         }
         if (this.shouldRenderFace(level, x, y, z + 1, 3)) {
-            brightness = this.getBrightness(level, x, y - 1, z)
+            brightness = this.getBrightness(level, x, y, z + 1)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 3)
             rendered = true
         }
         if (this.shouldRenderFace(level, x - 1, y, z, 4)) {
-            brightness = this.getBrightness(level, x, y - 1, z)
+            brightness = this.getBrightness(level, x - 1, y, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 4)
             rendered = true
         }
         if (this.shouldRenderFace(level, x + 1, y, z, 5)) {
-            brightness = this.getBrightness(level, x, y - 1, z)
+            brightness = this.getBrightness(level, x + 1, y, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 5)
             rendered = true
