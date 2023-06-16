@@ -75,6 +75,7 @@ export class Minecraft {
         this.textures = new Textures()
 
         mouse = new Mouse(parent)
+        mouse.setCanvas(parent)
         keyboard = new Keyboard()
     }
 
@@ -208,7 +209,7 @@ export class Minecraft {
     public grabMouse(): void {
         if (this.mouseGrabbed) return
         this.mouseGrabbed = true
-        this.parent.requestPointerLock()
+        mouse.setLock(true)
     }
 
     public pause(): void {
@@ -259,7 +260,7 @@ export class Minecraft {
     public tick(): void {
         keyboard.update()
         this.mouseGrabbed = document.pointerLockElement == this.parent
-        mouse.setLock(this.mouseGrabbed)
+        //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
         if (!this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
             this.grabMouse()
             this.mouse0 = true
