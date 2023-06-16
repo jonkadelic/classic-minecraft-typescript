@@ -15,6 +15,7 @@ export class Zombie extends Mob {
             Zombie.zombieModel = new ZombieModel()
         }
         this.textures = textures
+        this.setPos(x, y, z)
     }
 
     public override tick(): void {
