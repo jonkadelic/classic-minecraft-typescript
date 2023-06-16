@@ -278,6 +278,9 @@ export class Minecraft {
             if (keyboard.keyJustPressed(Keys.ESC)) {
                 this.pause()
             }
+            if (keyboard.keyJustPressed(Keys.H)) {
+                this.pause()
+            }
             if (keyboard.keyJustPressed(Keys.ENTER)) {
                 this.level.save()
             }
@@ -317,7 +320,7 @@ export class Minecraft {
             }
         }
         if (this.screen != null) {
-            this.screen.tick();
+            this.screen.tick()
         }
         this.level.tick()
         this.particleEngine.tick()
