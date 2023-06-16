@@ -5,12 +5,18 @@ import { Minecraft } from "../Minecraft";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 
 export class GuiScreen extends Gui {
+    // @ts-ignore
     protected minecraft: Minecraft
-    protected width: number
-    protected height: number
+    protected width: number = 0
+    protected height: number = 0
     protected buttons: Button[] = []
     public grabsMouse: boolean = false
+    // @ts-ignore
     protected font: Font
+
+    public constructor() {
+        super()
+    }
 
     public render(buffer: RenderBuffer, mx: number, my: number): void {
         for (let i: number = 0; i < this.buttons.length; ++i) {
@@ -31,7 +37,7 @@ export class GuiScreen extends Gui {
             for (let i: number = 0; i < this.buttons.length; ++i) {
                 let button: Button = this.buttons[i]
                 if (button.hover(mx, my)) {
-                    this.clickButton(button)
+                    this.onButtonClick(button)
                 }
             }
         }

@@ -14,6 +14,7 @@ export class Button extends Gui {
     public visible: boolean = true
 
     public constructor(id: number, x: number, y: number, text: string, width: number = 200, height: number = 200) {
+        super()
         this.id = id
         this.x = x
         this.y = y
@@ -25,7 +26,7 @@ export class Button extends Gui {
     public render(buffer: RenderBuffer, minecraft: Minecraft, mx: number, my: number): void {
         let font: Font = minecraft.font
         gl.bindTexture(gl.TEXTURE_2D, minecraft.textures.loadTexture("./gui/gui.png", gl.NEAREST))
-        shader.color_f(1, 1, 1, 1)
+        shader.setColor(1, 1, 1, 1)
         let hover: number = 1
         let mouseOver: boolean = mx >= this.x && my >= this.y && mx < this.x + this.width && my < this.y + this.height
         if (!this.active) {

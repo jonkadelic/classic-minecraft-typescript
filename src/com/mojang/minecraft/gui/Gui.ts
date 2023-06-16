@@ -3,7 +3,9 @@ import { Tesselator } from "../renderer/Tesselator";
 import { Font } from "./Font";
 
 export class Gui {
-    protected imgZ: number
+    protected imgZ: number = 0
+
+    public constructor() {}
 
     protected static drawBox(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, color: number): void {
         // TODO

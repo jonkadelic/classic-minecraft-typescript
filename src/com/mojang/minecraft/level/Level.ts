@@ -205,6 +205,10 @@ export class Level {
         return tile != null && tile.isSolid()
     }
 
+    public getBrightness(x: number, y: number, z: number): number {
+        return this.isLit(x, y, z) ? 1.0 : 0.6
+    }
+
     public tick(): void {
         this.unprocessed += this.width * this.height * this.depth
         let ticks = this.unprocessed / Level.TILE_UPDATE_INTERVAL

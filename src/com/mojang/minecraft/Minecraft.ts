@@ -47,7 +47,7 @@ export class Minecraft {
     private particleEngine: ParticleEngine
     private entities: Entity[] = []
     private parent: HTMLCanvasElement
-    public pause: boolean = false
+    public paused: boolean = false
     private yMouseAxis: number = -1
     public textures: Textures
     // @ts-ignore
@@ -168,7 +168,7 @@ export class Minecraft {
 
     private loop(): void {
         if (this.running) {
-            if (this.pause) {
+            if (this.paused) {
                 requestAnimationFrame(() => this.loop())
                 return
             }
@@ -255,7 +255,7 @@ export class Minecraft {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-        } else if (this.currentScreen == null || this.currentScreen.grabsMouse) {
+        } else if (this.screen == null || this.screen.grabsMouse) {
             // Mouse
             if (mouse.buttonPressed(MouseButton.LEFT)) {
                 if (!this.mouse0) {
@@ -413,8 +413,7 @@ export class Minecraft {
         this.checkGlError("Rendered entities")
         this.particleEngine.render(this.player, a, 0)
         this.checkGlError("Rendered particles")
-        this.setupFog(1)
-        this.levelRenderer.render(this.player, 1)
+        this.setupFog(1) // Later, this will be removed (0.30 does not use fog for lighting)
         for (let i = 0; i < this.entities.length; i++) {
             let zombie = this.entities[i]
             if (!zombie.isLit() && frustum.isVisible(zombie.bb)) {

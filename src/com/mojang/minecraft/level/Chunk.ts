@@ -53,7 +53,7 @@ export class Chunk {
                 for (let z = this.z0; z < this.z1; z++) {
                     let tileId = this.level.getTile(x, y, z)
                     if (tileId > 0) {
-                        Tile.tiles[tileId].render(Chunk.t, this.level, layer, x, y, z)
+                        Tile.tiles[tileId].render(Chunk.t, this.level, x, y, z)
                         tiles++
                     }
                 }

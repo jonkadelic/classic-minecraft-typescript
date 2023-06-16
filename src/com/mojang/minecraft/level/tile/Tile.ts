@@ -25,7 +25,8 @@ export class Tile {
     public particleGravity: number
 
     public constructor(id: number, tex: number = 0) {
-        this.id = id;
+        this.id = id
+        this.setShape(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         Tile.tiles[id] = this
         this.tex = tex
     }
@@ -44,47 +45,47 @@ export class Tile {
         this.z1 = z1
     }
 
-    protected getBrightness(level: Level, layer: number, x: number, y: number, z: number): number {
+    protected getBrightness(level: Level, x: number, y: number, z: number): number {
         return level.getBrightness(x, y, z)
     }
     
-    public render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): boolean {
+    public render(t: Tesselator, level: Level, x: number, y: number, z: number): boolean {
         let rendered = false
         let c1 = 0.5
         let c2 = 0.8
         let c3 = 0.6
         let brightness: number
-        if (this.shouldRenderFace(level, x, y - 1, z, layer)) {
+        if (this.shouldRenderFace(level, x, y - 1, z, 0)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c1 * brightness, c1 * brightness, c1 * brightness)
             this.renderFace(t, x, y, z, 0)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y + 1, z, layer)) {
+        if (this.shouldRenderFace(level, x, y + 1, z, 1)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(brightness, brightness, brightness)
             this.renderFace(t, x, y, z, 1)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z - 1, layer)) {
+        if (this.shouldRenderFace(level, x, y, z - 1, 2)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 2)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z + 1, layer)) {
+        if (this.shouldRenderFace(level, x, y, z + 1, 3)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 3)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x - 1, y, z, layer)) {
+        if (this.shouldRenderFace(level, x - 1, y, z, 4)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 4)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x + 1, y, z, layer)) {
+        if (this.shouldRenderFace(level, x + 1, y, z, 5)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 5)
@@ -113,11 +114,8 @@ export class Tile {
         let v1 = v0 + (1 / 16.0)
         if (face >= 2 && tex < 240) {
             if (this.y0 >= 0.0 && this.y1 <= 1.0) {
-                v0 = (var8 + this.y0 * 15.99) / 256.0;
-                v1 = (var8 + this.y1 * 15.99) / 256.0;
-            } else {
-                v0 = var8 / 256.0;
-                v1 = (var8 + 15.99) / 256.0;
+                v0 = (Math.trunc(tex / 16) + this.y0) / 16.0;
+                v1 = (Math.trunc(tex / 16) + this.y1) / 16.0;
             }
         }
         let x0 = x + this.x0
