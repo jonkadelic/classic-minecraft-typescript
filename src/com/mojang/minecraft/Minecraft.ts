@@ -303,7 +303,7 @@ export class Minecraft {
             }
 
             // Keyboard
-            if (keyboard.keyJustPressed(Keys.ESC) || (!this.mouseGrabbed && this.mouseGrabbed !== oldGrabbed)) {
+            if (!this.mouseGrabbed && this.mouseGrabbed !== oldGrabbed) {
                 this.pause()
             }
             if (keyboard.keyJustPressed(Keys.ENTER)) {
