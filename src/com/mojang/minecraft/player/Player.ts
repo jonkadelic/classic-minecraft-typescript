@@ -1,10 +1,10 @@
 import { Keys } from "syncinput";
-import { Entity } from "../Entity";
+import { Mob } from "../mob/Mob";
 import { keyboard } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Input } from "./Input";
 
-export class Player extends Entity {
+export class Player extends Mob {
     public input: Input | null = null
 
     public constructor(level: Level) {

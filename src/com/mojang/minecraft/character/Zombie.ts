@@ -1,15 +1,11 @@
 import { Matrix } from "../../../util/Matrix";
-import { Entity } from "../Entity";
+import { Mob } from "../mob/Mob";
 import { gl, matrix, shader } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Textures } from "../renderer/Textures";
 import { ZombieModel } from "./ZombieModel";
 
-export class Zombie extends Entity {
-    public rot: number = 0
-    public timeOffs: number = 0
-    public speed: number = 0
-    public rotA: number = 0
+export class Zombie extends Mob {
     private static zombieModel: ZombieModel | null = null
     private textures: Textures
 
@@ -19,18 +15,10 @@ export class Zombie extends Entity {
             Zombie.zombieModel = new ZombieModel()
         }
         this.textures = textures
-        this.rotA = (Math.random() + 1.0) * 0.01
-        this.setPos(x, y, z)
-        this.timeOffs = Math.random() * 1239813
-        this.rot = Math.random() * Math.PI * 2
-        this.speed = 1.0
-        this.footSize = 0.5
     }
 
     public override tick(): void {
-        this.xo = this.x
-        this.yo = this.y
-        this.zo = this.z
+        super.tick()
         let xa = 0.0
         let ya = 0.0
         if (this.y < -100) {
