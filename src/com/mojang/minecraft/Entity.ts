@@ -77,6 +77,7 @@ export class Entity {
         let xaOrg = xa
         let yaOrg = ya
         let zaOrg = za
+        let aABBOrg = this.bb.copy()
         let aABBs = this.level.getCubes(this.bb.expand(xa, ya, za))
         for (let i = 0; i < aABBs.length; i++) {
             ya = aABBs[i].clipYCollide(this.bb, ya)
@@ -100,24 +101,24 @@ export class Entity {
             ya = this.footSize;
             za = zaOrg;
             let var14 = this.bb.copy();
-            this.bb = var9.copy();
+            this.bb = aABBOrg.copy()
             aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
 
             let var15 = 0;
             for(; var15 < aABBs.length; ++var15) {
-                ya = aABBs.get(var15).clipYCollide(this.bb, ya);
+                ya = aABBs[var15].clipYCollide(this.bb, ya);
             }
 
             this.bb.move(0.0, ya, 0.0);
 
             for(var15 = 0; var15 < aABBs.length; ++var15) {
-                xa = aABBs.get(var15).clipXCollide(this.bb, xa);
+                xa = aABBs[var15].clipXCollide(this.bb, xa);
             }
 
             this.bb.move(xa, 0.0, 0.0);
 
             for(var15 = 0; var15 < aABBs.length; ++var15) {
-               za = aABBs.get(var15).clipZCollide(this.bb, za);
+               za = aABBs[var15].clipZCollide(this.bb, za);
             }
 
             this.bb.move(0.0, 0.0, za);

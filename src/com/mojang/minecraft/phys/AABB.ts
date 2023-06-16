@@ -54,6 +54,10 @@ export class AABB {
         return new AABB(_x0, _y0, _z0, _x1, _y1, _z1)
     }
 
+    public copy(): AABB {
+       return new AABB(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1)
+    }
+
     public clipXCollide(c: AABB, xa: number): number {
         let max: number
         if (c.y1 <= this.y0 || c.y0 >= this.y1) {
