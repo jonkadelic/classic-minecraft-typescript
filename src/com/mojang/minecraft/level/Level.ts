@@ -152,7 +152,7 @@ export class Level {
                         }
                     } else if(x < 0 || y < 0 || z < 0 || x >= this.width || z >= this.height) {
                         let aabb = Tiles.unbreakable.getAABB(x, y, z)
-                        if (aABB.intersectsInner(aabb)) {
+                        if (aabb != null && aABB.intersectsInner(aabb)) {
                             aABBs.push(aabb)
                         }
                     }
