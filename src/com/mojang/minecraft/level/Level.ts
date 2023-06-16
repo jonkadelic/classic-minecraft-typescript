@@ -323,7 +323,7 @@ export class Level {
 
             let tileId = this.getTile(xa, ya, za)
             let tile = Tile.tiles[tileId]
-            if (tileId <= 0) {
+            if (tileId <= 0 || tile == null) {
                 continue
             }
 
