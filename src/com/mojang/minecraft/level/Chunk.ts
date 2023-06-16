@@ -1,6 +1,6 @@
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft";
-import { Player } from "../Player";
+import { Player } from "../player/Player";
 import { AABB } from "../phys/AABB";
 import { Tesselator } from "../renderer/Tesselator";
 import { Level } from "./Level";

@@ -1,7 +1,7 @@
 import { Keys } from "syncinput";
-import { Entity } from "./Entity";
-import { keyboard } from "./Minecraft";
-import { Level } from "./level/Level";
+import { Entity } from "../Entity";
+import { keyboard } from "../Minecraft";
+import { Level } from "../level/Level";
 import { InputHandler } from "./InputHandler";
 
 export class Player extends Entity {

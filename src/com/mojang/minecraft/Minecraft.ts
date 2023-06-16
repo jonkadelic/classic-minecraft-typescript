@@ -2,7 +2,7 @@ import { Keyboard, Keys, Mouse, MouseButton } from "syncinput";
 import { Timer } from "./Timer";
 import { Level } from "./level/Level";
 import { LevelRenderer } from "./level/LevelRenderer";
-import { Player } from "./Player";
+import { Player } from "./player/Player";
 import { ParticleEngine } from "./particle/ParticleEngine";
 import { Entity } from "./Entity";
 import { Textures } from "./renderer/Textures";
@@ -23,6 +23,7 @@ import { GuiScreen } from "./gui/GuiScreen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
+import { InputHandlerImpl } from "./player/InputHandlerImpl";
 
 export let gl: WebGLRenderingContext
 export let mouse: any

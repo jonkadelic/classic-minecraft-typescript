@@ -2,7 +2,7 @@ import { mat4 } from "gl-matrix";
 import { Matrix } from "../../../util/Matrix";
 import { HitResult } from "../HitResult";
 import { gl, matrix, shader } from "../Minecraft";
-import { Player } from "../Player";
+import { Player } from "../player/Player";
 import { Frustum } from "../renderer/Frustum";
 import { Textures } from "../renderer/Textures";
 import { Chunk } from "./Chunk";
