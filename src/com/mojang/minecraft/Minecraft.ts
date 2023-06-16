@@ -134,6 +134,7 @@ export class Minecraft {
             this.screen.onClose()
         }
         // survival death screen would go here
+        this.screen = screen
         if (screen !== null) {
             if (this.mouseGrabbed) {
                 this.mouseGrabbed = false
