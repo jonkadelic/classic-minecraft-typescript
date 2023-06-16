@@ -24,6 +24,7 @@ import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
 import { InputHandlerImpl } from "./player/InputHandlerImpl";
+import { BlockSelectScreen } from "./gui/BlockSelectScreen";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -349,6 +350,10 @@ export class Minecraft {
                     if (KeyboardEvents.getEventKey() == Keys.N) {
                         this.level.regenerate()
                         this.player.resetPos()
+                    }
+
+                    if (KeyboardEvents.getEventKey() == Keys.B) {
+                        this.setScreen(new BlockSelectScreen())
                     }
                 }
             }
