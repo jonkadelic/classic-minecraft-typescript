@@ -11,7 +11,7 @@ export class MouseEvents {
                 MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, true, i, mouse.wheel))
             }
             if (mouse.buttonJustReleased(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, i, false, i, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, i, mouse.wheel))
             }
         }
         if (mouse.wheelUpdated) {

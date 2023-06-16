@@ -27,7 +27,7 @@ export class GuiScreen extends Gui {
         }
     }
 
-    protected onKeyPress(char: string, key: number): void {
+    protected onKeyPress(key: number): void { // No more character
         if (key == 1) {
             this.minecraft.setScreen(null)
             this.minecraft.grabMouse()
@@ -79,7 +79,7 @@ export class GuiScreen extends Gui {
 
     public keyboardEvent(state: boolean, key: number): void {
         if (state) {
-            
+            this.onKeyPress(key);
         }
     }
 
