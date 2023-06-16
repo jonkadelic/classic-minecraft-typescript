@@ -94,42 +94,35 @@ export class Entity {
         this.bb.move(0, 0, za)
 
         if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
-            let var18 = xa;
-            let var17 = ya;
-            let var13 = za;
+            let xaLast = xa;
+            let yaLast = ya;
+            let zaLast = za;
             xa = xaOrg;
             ya = this.footSize;
             za = zaOrg;
-            let var14 = this.bb.copy();
+            let bbCopy = this.bb.copy()
             this.bb = aABBOrg.copy()
             aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
-
-            let var15 = 0;
-            for(; var15 < aABBs.length; ++var15) {
-                ya = aABBs[var15].clipYCollide(this.bb, ya);
+            for(let i = 0; i < aABBs.length; ++i) {
+                ya = aABBs[i].clipYCollide(this.bb, ya)
             }
-
             this.bb.move(0.0, ya, 0.0);
-
-            for(var15 = 0; var15 < aABBs.length; ++var15) {
-                xa = aABBs[var15].clipXCollide(this.bb, xa);
+            for(let i = 0; i < aABBs.length; ++i) {
+                xa = aABBs[i].clipXCollide(this.bb, xa)
             }
-
-            this.bb.move(xa, 0.0, 0.0);
-
-            for(var15 = 0; var15 < aABBs.length; ++var15) {
-               za = aABBs[var15].clipZCollide(this.bb, za);
+            this.bb.move(xa, 0.0, 0.0)
+            for(let i = 0; i < aABBs.length; ++i) {
+               za = aABBs[i].clipZCollide(this.bb, za)
             }
-
             this.bb.move(0.0, 0.0, za);
 
-            if(var18 * var18 + var13 * var13 >= xa * xa + za * za) {
-               xa = var18;
-               ya = var17;
-               za = var13;
-               this.bb = var14.copy();
+            if(xaLast * xaLast + zaLast * zaLast >= xa * xa + za * za) {
+               xa = xaLast;
+               ya = yaLast;
+               za = zaLast;
+               this.bb = bbCopy.copy()
             } else {
-               this.ySlideOffset += 0.5;
+               this.ySlideOffset += 0.5
             }
         }
 
