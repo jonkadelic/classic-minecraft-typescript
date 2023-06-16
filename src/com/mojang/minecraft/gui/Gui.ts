@@ -8,7 +8,7 @@ export class Gui {
 
     public constructor() {}
 
-    protected static fill(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, color: number): void {
+    protected static fill(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, col: number): void {
         let a = (col >> 24 & 0xFF) / 255.0
 		let r = (col >> 16 & 0xFF) / 255.0
 		let g = (col >> 8 & 0xFF) / 255.0
@@ -30,15 +30,15 @@ export class Gui {
 		gl.disable(gl.BLEND)
     }
 
-    protected static fillGradient(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, color0: number, color1: number): void {
-        let a0 = (n5 >>> 24) / 255.0
-		let r0 = (n5 >> 16 & 0xFF) / 255.0
-		let g0 = (n5 >> 8 & 0xFF) / 255.0
-		let b0 = (n5 & 0xFF) / 255.0
-		let a1 = (n6 >>> 24) / 255.0
-		let r1 = (n6 >> 16 & 0xFF) / 255.0
-		let g1 = (n6 >> 8 & 0xFF) / 255.0
-		let b1 = (n6 & 0xFF) / 255.0
+    protected static fillGradient(buffer: RenderBuffer, x0: number, y0: number, x1: number, y1: number, col0: number, col1: number): void {
+        let a0 = (col0 >>> 24) / 255.0
+		let r0 = (col0 >> 16 & 0xFF) / 255.0
+		let g0 = (col0 >> 8 & 0xFF) / 255.0
+		let b0 = (col0 & 0xFF) / 255.0
+		let a1 = (col1 >>> 24) / 255.0
+		let r1 = (col1 >> 16 & 0xFF) / 255.0
+		let g1 = (col1 >> 8 & 0xFF) / 255.0
+		let b1 = (col1 & 0xFF) / 255.0
 		let t = Tesselator.instance
 		gl.enable(gl.BLEND)
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
