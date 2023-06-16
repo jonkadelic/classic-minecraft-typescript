@@ -28,6 +28,9 @@ export class GuiScreen extends Gui {
     }
 
     protected onKeyPress(key: number): void { // No more character
+    }
+
+    protected onKeyUp(key: number): void { // No more character
         if (key == Keys.ESC) {
             this.minecraft.setScreen(null)
             this.minecraft.grabMouse()
@@ -65,21 +68,28 @@ export class GuiScreen extends Gui {
             if (keyboard.keyJustPressed(i)) {
                 this.keyboardEvent(true, i)
             }
+            if (keyboard.keyJustReleased(i)) {
+                this.keyboardEvent(false, i)
+            }
             // keyJustReleased is not used in 0.30
         }
     }
 
     public mouseEvent(): void {
+        console.log("Yes mouse")
         if (MouseEvents.getEventButtonState()) {
-            let mx = MouseEvents.getEventX() * this.width / this.minecraft.width;
-            let my = this.height - MouseEvents.getEventY() * this.height / this.minecraft.height - 1;
-            this.onMouseClick(mx, my, MouseEvents.getEventButton());
+            let mx = MouseEvents.getEventX() * this.width / this.minecraft.width
+            let my = this.height - MouseEvents.getEventY() * this.height / this.minecraft.height - 1
+            console.log(mx, my)
+            this.onMouseClick(mx, my, MouseEvents.getEventButton())
         }
     }
 
     public keyboardEvent(state: boolean, key: number): void {
         if (state) {
-            this.onKeyPress(key);
+            this.onKeyPress(key)
+        } else if (key >= 0) {
+            this.onKeyUp(key)
         }
     }
 
