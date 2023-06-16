@@ -259,6 +259,7 @@ export class Minecraft {
 
     public tick(): void {
         keyboard.update()
+        let oldGrabbed = this.mouseGrabbed
         this.mouseGrabbed = document.pointerLockElement == this.parent
         //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
         /*if (this.screen == null && !this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
@@ -302,10 +303,7 @@ export class Minecraft {
             }
 
             // Keyboard
-            if (keyboard.keyJustPressed(Keys.ESC)) {
-                this.pause()
-            }
-            if (keyboard.keyJustPressed(Keys.H)) {
+            if (this.mouseGrabbed !== oldGrabbed && oldGrabbed) {
                 this.pause()
             }
             if (keyboard.keyJustPressed(Keys.ENTER)) {
