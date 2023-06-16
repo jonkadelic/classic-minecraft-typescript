@@ -32,8 +32,8 @@ export let clickedElement: HTMLElement | null = null
 
 export class Minecraft {
     public static readonly VERSION_STRING = "0.0.11a"
-    private width: number
-    private height: number
+    public width: number
+    public height: number
     private fogColor0: number[] = new Array(4)
     private fogColor1: number[] = new Array(4)
     private timer: Timer = new Timer(20)
