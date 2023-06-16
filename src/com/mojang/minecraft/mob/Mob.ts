@@ -22,5 +22,6 @@ export class Mob extends Entity {
     }
 
     public override render(a: number): void {
+        // TODO?: default Mob render from 0.30
     }
 }

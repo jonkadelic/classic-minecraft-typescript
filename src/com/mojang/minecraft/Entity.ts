@@ -94,19 +94,19 @@ export class Entity {
         this.bb.move(0, 0, za)
 
         if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
-            let xaLast = xa;
-            let yaLast = ya;
-            let zaLast = za;
-            xa = xaOrg;
-            ya = this.footSize;
-            za = zaOrg;
+            let xaLast = xa
+            let yaLast = ya
+            let zaLast = za
+            xa = xaOrg
+            ya = this.footSize
+            za = zaOrg
             let bbCopy = this.bb.copy()
             this.bb = aABBOrg.copy()
-            aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
+            aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg))
             for(let i = 0; i < aABBs.length; ++i) {
                 ya = aABBs[i].clipYCollide(this.bb, ya)
             }
-            this.bb.move(0.0, ya, 0.0);
+            this.bb.move(0.0, ya, 0.0)
             for(let i = 0; i < aABBs.length; ++i) {
                 xa = aABBs[i].clipXCollide(this.bb, xa)
             }
@@ -114,12 +114,12 @@ export class Entity {
             for(let i = 0; i < aABBs.length; ++i) {
                za = aABBs[i].clipZCollide(this.bb, za)
             }
-            this.bb.move(0.0, 0.0, za);
+            this.bb.move(0.0, 0.0, za)
 
             if(xaLast * xaLast + zaLast * zaLast >= xa * xa + za * za) {
-               xa = xaLast;
-               ya = yaLast;
-               za = zaLast;
+               xa = xaLast
+               ya = yaLast
+               za = zaLast
                this.bb = bbCopy.copy()
             } else {
                this.ySlideOffset += 0.5
