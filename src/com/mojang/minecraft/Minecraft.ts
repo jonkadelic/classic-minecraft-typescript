@@ -55,7 +55,6 @@ export class Minecraft {
     // @ts-ignore
     public font: Font
     public screen: GuiScreen | null = null
-    private editMode: number = 0
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
@@ -279,10 +278,10 @@ export class Minecraft {
                         this.grabMouse();
                     } else {
                         if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
-                            this.handleMouseClick(this.editMode)
+                            this.handleMouseClick(0)
                         }
                         if (MouseEvents.getEventButton() == MouseButton.RIGHT && MouseEvents.getEventButtonState()) {
-                            this.editMode = (this.editMode + 1) % 2
+                            this.handleMouseClick(1)
                         }
                     }
                 }
@@ -456,7 +455,7 @@ export class Minecraft {
         this.checkGlError("Rendered particles")
         gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
         if (this.hitResult != null) {
-            this.levelRenderer.renderHit(this.hitResult, this.editMode, this.paintTexture)
+            this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
         }
         this.checkGlError("Rendered hit")
         this.drawGui(a)

@@ -114,19 +114,22 @@ export class LevelRenderer implements LevelListener {
         }
     }
 
-    public renderHit(h: HitResult, mode: number, tileType: number): void {
+    public renderHit(h: HitResult, tileType: number): void {
         let t = Tesselator.instance
         gl.enable(gl.BLEND)
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
         t.init()
         shader.setColor(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
-        if (mode == 0) {
-            for (let i = 0; i < 6; i++) {
-                Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
-            }
-            t.flush(this.hitRenderBuffer)
-            this.hitRenderBuffer.draw()
-        } else {
+        //if (mode == 0) {
+        
+        // TODO: 0.30 line renderer
+        for (let i = 0; i < 6; i++) {
+            Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
+        }
+        t.flush(this.hitRenderBuffer)
+        this.hitRenderBuffer.draw()
+        
+        /*} else {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
             let br = Math.sin(Date.now() / 100) * 0.2 + 0.8
             shader.setColor(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
@@ -156,7 +159,7 @@ export class LevelRenderer implements LevelListener {
             Tile.tiles[tileType].render(t, this.level, x, y, z)
             t.flush(this.hitRenderBuffer)
             this.hitRenderBuffer.draw()
-        }
+        }*/
         gl.disable(gl.BLEND)
     }
 
