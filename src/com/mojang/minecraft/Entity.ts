@@ -93,31 +93,31 @@ export class Entity {
         this.bb.move(0, 0, za)
 
         if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
-            let var18 = var1;
-            let var17 = var2;
-            let var13 = var3;
+            let var18 = xa;
+            let var17 = ya;
+            let var13 = za;
             xa = xaOrg;
             ya = this.footSize;
             za = zaOrg;
             let var14 = this.bb.copy();
             this.bb = var9.copy();
-            var10 = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
+            aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
 
             let var15 = 0;
-            for(; var15 < var10.size(); ++var15) {
-                ya = var10.get(var15).clipYCollide(this.bb, ya);
+            for(; var15 < aABBs.length; ++var15) {
+                ya = aABBs.get(var15).clipYCollide(this.bb, ya);
             }
 
-            this.bb.move(0.0, var2, 0.0);
+            this.bb.move(0.0, ya, 0.0);
 
-            for(var15 = 0; var15 < var10.size(); ++var15) {
-                xa = var10.get(var15).clipXCollide(this.bb, xa);
+            for(var15 = 0; var15 < aABBs.length; ++var15) {
+                xa = aABBs.get(var15).clipXCollide(this.bb, xa);
             }
 
             this.bb.move(xa, 0.0, 0.0);
 
-            for(var15 = 0; var15 < var10.size(); ++var15) {
-               za = var10.get(var15).clipZCollide(this.bb, za);
+            for(var15 = 0; var15 < aABBs.length; ++var15) {
+               za = aABBs.get(var15).clipZCollide(this.bb, za);
             }
 
             this.bb.move(0.0, 0.0, za);
