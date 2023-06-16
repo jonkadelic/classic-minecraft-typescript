@@ -76,11 +76,9 @@ export class GuiScreen extends Gui {
     }
 
     public mouseEvent(): void {
-        console.log("Yes mouse")
         if (MouseEvents.getEventButtonState()) {
-            let mx = MouseEvents.getEventX() * this.width / this.minecraft.width
-            let my = this.height - MouseEvents.getEventY() * this.height / this.minecraft.height - 1
-            console.log(mx, my)
+            let mx = Math.trunc(MouseEvents.getEventX() * this.width / this.minecraft.width)
+            let my = Math.trunc(MouseEvents.getEventY() * this.height / this.minecraft.height)
             this.onMouseClick(mx, my, MouseEvents.getEventButton())
         }
     }
