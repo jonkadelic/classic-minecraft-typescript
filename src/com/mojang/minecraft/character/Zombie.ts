@@ -24,6 +24,7 @@ export class Zombie extends Entity {
         this.timeOffs = Math.random() * 1239813
         this.rot = Math.random() * Math.PI * 2
         this.speed = 1.0
+        this.footSize = 0.5
     }
 
     public override tick(): void {

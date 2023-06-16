@@ -10,6 +10,7 @@ export class Player extends Entity {
     public constructor(level: Level) {
         super(level)
         this.heightOffset = 1.62
+        this.footSize = 0.5
     }
 
     public override tick(): void {
