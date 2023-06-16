@@ -269,6 +269,7 @@ export class Minecraft {
             if (this.screen == null || this.screen.grabsMouse) {
                 // Mouse
                 if (this.screen == null) {
+                    MouseEvents.next() // Just to make sure
                     if (mouse.buttonPressed(MouseButton.LEFT)) {
                         if (!this.mouse0) {
                             this.mouse0 = true
