@@ -13,7 +13,7 @@ export class Button extends Gui {
     public active: boolean = true
     public visible: boolean = true
 
-    public constructor(id: number, x: number, y: number, text: string, width: number = 200, height: number = 200) {
+    public constructor(id: number, x: number, y: number, text: string, width: number = 200, height: number = 20) {
         super()
         this.id = id
         this.x = x
