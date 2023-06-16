@@ -1,6 +1,7 @@
-import { Level } from "./GuiComponent";
+import { GuiComponent } from "./GuiComponent";
 import { Font } from "./Font";
 import { Tesselator } from "../renderer/Tesselator";
+import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl, Minecraft } from "../Minecraft";
 
 export class Gui extends GuiComponent {
@@ -11,6 +12,7 @@ export class Gui extends GuiComponent {
     public ticks: number = 0
 
     public constructor(minecraft: Minecraft, w: number, h: number) {
+        super()
         this.minecraft = minecraft;
         this.width = w * 240 / h;
         this.height = h * 240 / h;
