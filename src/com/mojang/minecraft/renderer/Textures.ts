@@ -3,7 +3,14 @@ import { gl } from "../Minecraft";
 export class Textures {
     private idMap: Map<string, WebGLTexture> = new Map();
 
-    public loadTexture(resourceName: string, mode: number): WebGLTexture {
+    public preloadTextures(): void {
+        this.loadTexture("./terrain.png")
+        this.loadTexture("./char.png")
+        this.loadTexture("./gui/gui.png")
+        this.loadTexture("./font.png")
+    }
+
+    public loadTexture(resourceName: string): WebGLTexture {
         if (this.idMap.has(resourceName)) {
             return this.idMap.get(resourceName) as WebGLTexture;
         }

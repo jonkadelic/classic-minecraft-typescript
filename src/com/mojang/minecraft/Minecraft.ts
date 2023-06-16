@@ -63,9 +63,6 @@ export class Minecraft {
     private frames: number = 0
     private lastTime: number = 0
 
-    private mouse0: boolean = false
-    private mouse1: boolean = false
-
     private guiBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
 
     public constructor(parent: HTMLCanvasElement, width: number, height: number) {
@@ -73,6 +70,7 @@ export class Minecraft {
         this.width = width
         this.height = height
         this.textures = new Textures()
+        this.textures.preloadTextures()
 
         mouse = new Mouse(parent)
         mouse.setCanvas(parent)
