@@ -45,7 +45,7 @@ export class Minecraft {
     private levelRenderer: LevelRenderer
     // @ts-ignore
     private player: Player
-    private paintTexture: number = 1
+    public paintTexture: number = 1
     // @ts-ignore
     private particleEngine: ParticleEngine
     private entities: Entity[] = []

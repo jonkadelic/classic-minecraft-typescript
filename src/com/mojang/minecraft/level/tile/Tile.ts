@@ -45,6 +45,24 @@ export class Tile {
         this.z1 = z1
     }
 
+    public render2(t: Tesselator) {
+        let c1 = 0.5
+        let c2 = 0.8
+        let c3 = 0.6
+        t.color_f(c1, c1, c1)
+        this.renderFace(t, -2, 0, 0, 0)
+        t.color_f(1, 1, 1)
+        this.renderFace(t, -2, 0, 0, 1)
+        t.color_f(c2, c2, c2)
+        this.renderFace(t, -2, 0, 0, 2)
+        t.color_f(c2, c2, c2)
+        this.renderFace(t, -2, 0, 0, 3)
+        t.color_f(c3, c3, c3)
+        this.renderFace(t, -2, 0, 0, 4)
+        t.color_f(c3, c3, c3)
+        this.renderFace(t, -2, 0, 0, 5)
+    }
+
     protected getBrightness(level: Level, x: number, y: number, z: number): number {
         return level.getBrightness(x, y, z)
     }
