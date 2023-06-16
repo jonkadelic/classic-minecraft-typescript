@@ -265,87 +265,88 @@ export class Minecraft {
             this.grabMouse()
             this.mouse0 = true
             this.mouse1 = true
-        } else*/ if (this.mouseGrabbed) {
-            if (this.screen == null || this.screen.grabsMouse) {
-                // Mouse
-                if (this.screen == null) {
-                    while (MouseEvents.next()) { // Just to make sure
-                        if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
-                            this.grabMouse();
-                        } else {
-                            if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
-                                this.handleMouseClick(this.editMode)
-                            }
-                            if (MouseEvents.getEventButton() == MouseButton.RIGHT && MouseEvents.getEventButtonState()) {
-                                this.editMode = (this.editMode + 1) % 2
-                            }
-                        }
-                    }
-                    /*if (mouse.buttonPressed(MouseButton.LEFT)) {
-                        if (!this.mouse0) {
-                            this.mouse0 = true
+        } else if (this.mouseGrabbed) {
+            
+        }*/
+        if (this.screen == null || this.screen.grabsMouse) {
+            // Mouse
+            if (this.screen == null) {
+                while (MouseEvents.next()) { // Just to make sure
+                    if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
+                        this.grabMouse();
+                    } else {
+                        if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
                             this.handleMouseClick(this.editMode)
                         }
-                    } else {
-                        this.mouse0 = false
-                    }
-                    if (mouse.buttonPressed(MouseButton.RIGHT)) {
-                        if (!this.mouse1) {
-                            this.mouse1 = true
+                        if (MouseEvents.getEventButton() == MouseButton.RIGHT && MouseEvents.getEventButtonState()) {
                             this.editMode = (this.editMode + 1) % 2
                         }
-                    } else {
-                        this.mouse1 = false
-                    }*/
+                    }
                 }
-
-                // Keyboard
-                if (keyboard.keyJustPressed(Keys.ESC)) {
-                    this.pause()
+                /*if (mouse.buttonPressed(MouseButton.LEFT)) {
+                    if (!this.mouse0) {
+                        this.mouse0 = true
+                        this.handleMouseClick(this.editMode)
+                    }
+                } else {
+                    this.mouse0 = false
                 }
-                if (keyboard.keyJustPressed(Keys.H)) {
-                    this.pause()
-                }
-                if (keyboard.keyJustPressed(Keys.ENTER)) {
-                    this.level.save()
-                }
-                if (keyboard.keyJustPressed(Keys.NUM1)) {
-                    this.paintTexture = Tiles.rock.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM2)) {
-                    this.paintTexture = Tiles.dirt.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM3)) {
-                    this.paintTexture = Tiles.stoneBrick.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM4)) {
-                    this.paintTexture = Tiles.sapling.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM5)) {
-                    this.paintTexture = Tiles.wood.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM6)) {
-                    this.paintTexture = Tiles.treeTrunk.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM7)) {
-                    this.paintTexture = Tiles.leaves.id
-                }
-                if (keyboard.keyJustPressed(Keys.NUM8)) {
-                    this.paintTexture = Tiles.glass.id
-                }
-                if (keyboard.keyJustPressed(Keys.Y)) {
-                    this.yMouseAxis *= -1
-                }
-                if (keyboard.keyJustPressed(Keys.G)) {
-                    this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-                }
-                if (keyboard.keyJustPressed(Keys.N)) {
-                    this.level.regenerate()
-                    this.player.resetPos()
-                }
-            } else if (this.screen != null) {
-                this.screen.doInput()
+                if (mouse.buttonPressed(MouseButton.RIGHT)) {
+                    if (!this.mouse1) {
+                        this.mouse1 = true
+                        this.editMode = (this.editMode + 1) % 2
+                    }
+                } else {
+                    this.mouse1 = false
+                }*/
             }
+
+            // Keyboard
+            if (keyboard.keyJustPressed(Keys.ESC)) {
+                this.pause()
+            }
+            if (keyboard.keyJustPressed(Keys.H)) {
+                this.pause()
+            }
+            if (keyboard.keyJustPressed(Keys.ENTER)) {
+                this.level.save()
+            }
+            if (keyboard.keyJustPressed(Keys.NUM1)) {
+                this.paintTexture = Tiles.rock.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM2)) {
+                this.paintTexture = Tiles.dirt.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM3)) {
+                this.paintTexture = Tiles.stoneBrick.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM4)) {
+                this.paintTexture = Tiles.sapling.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM5)) {
+                this.paintTexture = Tiles.wood.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM6)) {
+                this.paintTexture = Tiles.treeTrunk.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM7)) {
+                this.paintTexture = Tiles.leaves.id
+            }
+            if (keyboard.keyJustPressed(Keys.NUM8)) {
+                this.paintTexture = Tiles.glass.id
+            }
+            if (keyboard.keyJustPressed(Keys.Y)) {
+                this.yMouseAxis *= -1
+            }
+            if (keyboard.keyJustPressed(Keys.G)) {
+                this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+            }
+            if (keyboard.keyJustPressed(Keys.N)) {
+                this.level.regenerate()
+                this.player.resetPos()
+            }
+        } else if (this.screen != null) {
+            this.screen.doInput()
         }
         if (this.screen != null) {
             this.screen.tick()
