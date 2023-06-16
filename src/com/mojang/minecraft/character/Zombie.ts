@@ -44,11 +44,11 @@ export class Zombie extends Entity {
             this.yd = 0.42
         }
         this.moveRelative(xa, ya, this.onGround ? 0.1 : 0.02)
-        this.yd -= 0.08
         this.move(this.xd, this.yd, this.zd)
         this.xd *= 0.91
         this.yd *= 0.98
         this.zd *= 0.91
+        this.yd -= 0.08
         if (this.onGround) {
             this.xd *= 0.6
             this.zd *= 0.6
