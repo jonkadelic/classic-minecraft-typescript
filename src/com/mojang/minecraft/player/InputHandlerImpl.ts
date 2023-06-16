@@ -1,9 +1,9 @@
 import { Keys } from "syncinput";
-import { InputHandler } from "./InputHandler";
+import { Input } from "./Input";
 // import { Options } from "./Options";
 
-export class InputHandlerImpl extends InputHandler {
-    private keyStates: boolean[] = new Array(10)
+export class KeyboardInput extends Input {
+    private keys: boolean[] = new Array(10)
     // private options: Options
 
     public constructor() { // options: Options
@@ -34,35 +34,35 @@ export class InputHandlerImpl extends InputHandler {
         }
 
         if (i >= 0) {
-            this.keyStates[i] = state;
+            this.keys[i] = state;
         }
     }
 
-    public override resetKeys(): void {
+    public override releaseAllKeys(): void {
         for(let i: number = 0; i < 10; ++i) {
-            this.keyStates[i] = false
+            this.keys[i] = false
         }
     }
 
-    public override updateMovement(): void {
+    public override tick(): void {
         this.xxa = 0.0
         this.yya = 0.0
-        if(this.keyStates[0]) {
+        if(this.keys[0]) {
             --this.yya
         }
   
-        if(this.keyStates[1]) {
+        if(this.keys[1]) {
             ++this.yya
         }
   
-        if(this.keyStates[2]) {
+        if(this.keys[2]) {
             --this.xxa
         }
   
-        if(this.keyStates[3]) {
+        if(this.keys[3]) {
             ++this.xxa
         }
   
-        this.jumping = this.keyStates[4]
+        this.jumping = this.keys[4]
     }
 }

@@ -19,12 +19,12 @@ import { RenderBuffer } from "../../util/RenderBuffer";
 import { Tesselator } from "./renderer/Tesselator";
 import { Font } from "./gui/Font";
 import { Zombie } from "./character/Zombie";
-import { GuiScreen } from "./gui/GuiScreen";
+import { Screen } from "./gui/Screen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
-import { InputHandlerImpl } from "./player/InputHandlerImpl";
-import { BlockSelectScreen } from "./gui/BlockSelectScreen";
+import { KeyboardInput } from "./player/InputHandlerImpl";
+import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -55,7 +55,7 @@ export class Minecraft {
     public textures: Textures
     // @ts-ignore
     public font: Font
-    public screen: GuiScreen | null = null
+    public screen: Screen | null = null
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
@@ -107,7 +107,7 @@ export class Minecraft {
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
-        this.player.input = new InputHandlerImpl() // this.options
+        this.player.input = new KeyboardInput() // this.options
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
         for (let i = 0; i < 10; i++) {
@@ -128,13 +128,13 @@ export class Minecraft {
         if (this.screen !== null) {
             let screenWidth = Math.trunc(this.width * 240 / this.height)
             let screenHeight = Math.trunc(this.height * 240 / this.height)
-            this.screen.open(this, screenWidth, screenHeight)
+            this.screen.init(this, screenWidth, screenHeight)
         }
     }
 
-    public setScreen(screen: GuiScreen | null): void {
+    public setScreen(screen: Screen | null): void {
         if (this.screen !== null) {
-            this.screen.onClose()
+            this.screen.removed()
         }
         // survival death screen would go here
         this.screen = screen
@@ -145,7 +145,7 @@ export class Minecraft {
             }
             let screenWidth = Math.trunc(this.width * 240 / this.height)
             let screenHeight = Math.trunc(this.height * 240 / this.height)
-            screen.open(this, screenWidth, screenHeight)
+            screen.init(this, screenWidth, screenHeight)
             // this.online = false;
         } else {
             this.grabMouse()
@@ -271,7 +271,7 @@ export class Minecraft {
         } else if (this.mouseGrabbed) {
             
         }*/
-        if (this.screen == null || this.screen.grabsMouse) {
+        if (this.screen == null || this.screen.passEvents) {
             // Mouse
             if (this.screen == null) {
                 while (MouseEvents.next()) { // Just to make sure
@@ -353,13 +353,13 @@ export class Minecraft {
                     }
 
                     if (KeyboardEvents.getEventKey() == Keys.B) {
-                        this.setScreen(new BlockSelectScreen())
+                        this.setScreen(new SelectBlockScreen())
                     }
                 }
             }
         }
         if (this.screen != null) {
-            this.screen.doInput()
+            this.screen.updateEvents()
             if (this.screen != null) {
                 this.screen.tick()
             }

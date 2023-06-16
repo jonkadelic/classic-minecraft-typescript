@@ -2,10 +2,10 @@ import { Keys } from "syncinput";
 import { Entity } from "../Entity";
 import { keyboard } from "../Minecraft";
 import { Level } from "../level/Level";
-import { InputHandler } from "./InputHandler";
+import { Input } from "./Input";
 
 export class Player extends Entity {
-    public input: InputHandler | null = null
+    public input: Input | null = null
 
     public constructor(level: Level) {
         super(level)
@@ -17,7 +17,7 @@ export class Player extends Entity {
         this.yo = this.y
         this.zo = this.z
         if (this.input != null) {
-            this.input.updateMovement()
+            this.input.tick()
             let xa = this.input.xxa
             let ya = this.input.yya
             let jump = this.input.jumping
@@ -43,7 +43,7 @@ export class Player extends Entity {
 
     public releaseAllKeys(): void {
         if (this.input == null) return
-        this.input.resetKeys()
+        this.input.releaseAllKeys()
     }
 
     public setKey(key: number, state: boolean): void {

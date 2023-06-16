@@ -1,5 +1,5 @@
 import { MouseButton, Keys } from "syncinput";
-import { Gui } from "./Gui";
+import { GuiComponent } from "./GuiComponent";
 import { Button } from "./Button";
 import { Font } from "./Font";
 import { mouse, keyboard, Minecraft } from "../Minecraft";
@@ -7,13 +7,13 @@ import { RenderBuffer } from "../../../util/RenderBuffer";
 import { MouseEvents } from "../input/MouseEvents";
 import { KeyboardEvents } from "../input/KeyboardEvents";
 
-export class GuiScreen extends Gui {
+export class Screen extends GuiComponent {
     // @ts-ignore
     protected minecraft: Minecraft
     protected width: number = 0
     protected height: number = 0
     protected buttons: Button[] = []
-    public grabsMouse: boolean = false
+    public passEvents: boolean = false
     // @ts-ignore
     protected font: Font
 
@@ -38,30 +38,30 @@ export class GuiScreen extends Gui {
         }
     }
 
-    protected onMouseClick(mx: number, my: number, button: number): void {
-        if (button == MouseButton.LEFT) {
+    protected mouseClicked(mx: number, my: number, eventButton: number): void {
+        if (eventButton == MouseButton.LEFT) {
             for (let i: number = 0; i < this.buttons.length; ++i) {
                 let button: Button = this.buttons[i]
                 if (button.hover(mx, my)) {
-                    this.onButtonClick(button)
+                    this.buttonClicked(button)
                 }
             }
         }
     }
 
-    protected onButtonClick(button: Button): void {}
+    protected buttonClicked(button: Button): void {}
 
-    public open(minecraft: Minecraft, w: number, h: number): void {
+    public init(minecraft: Minecraft, width: number, height: number): void {
         this.minecraft = minecraft
         this.font = minecraft.font
-        this.width = w
-        this.height = h
-        this.init()
+        this.width = width
+        this.height = height
+        this.init2()
     }
 
-    public init(): void {}
+    public init2(): void {}
 
-    public doInput(): void {
+    public updateEvents(): void {
         while (MouseEvents.next()) {
             this.mouseEvent()
         }
@@ -74,7 +74,7 @@ export class GuiScreen extends Gui {
         if (MouseEvents.getEventButtonState()) {
             let mx = Math.trunc(MouseEvents.getEventX() * this.width / this.minecraft.width)
             let my = Math.trunc(MouseEvents.getEventY() * this.height / this.minecraft.height)
-            this.onMouseClick(mx, my, MouseEvents.getEventButton())
+            this.mouseClicked(mx, my, MouseEvents.getEventButton())
         }
     }
 
@@ -88,5 +88,5 @@ export class GuiScreen extends Gui {
 
     public tick(): void {}
 
-    public onClose(): void {}
+    public removed(): void {}
 }
