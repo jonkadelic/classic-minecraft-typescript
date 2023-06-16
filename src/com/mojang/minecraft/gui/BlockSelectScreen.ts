@@ -22,7 +22,7 @@ export class BlockSelectScreen extends GuiScreen {
         if (block >= 0) {
             let x = Math.trunc(this.width / 2) + block % 9 * 24 + -108
             let y = Math.trunc(this.height / 2) + Math.trunc(block / 9) * 24 + -60
-            BlockSelectScreen.fillGradient(x - 3, y - 8, z + 23, y + 24 - 6, 0x90FFFFFF, 0xC0FFFFFF)
+            BlockSelectScreen.fillGradient(x - 3, y - 8, x + 23, y + 24 - 6, 0x90FFFFFF, 0xC0FFFFFF)
         }
         BlockSelectScreen.textCentered(this.minecraft.font, "Select block", Math.trunc(this.width / 2), 40, 0xFFFFFF)
         let textures = this.minecraft.textures
