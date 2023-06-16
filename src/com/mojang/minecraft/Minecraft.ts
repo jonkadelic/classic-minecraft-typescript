@@ -33,7 +33,7 @@ export let shader: Shader = new Shader()
 export let clickedElement: HTMLElement | null = null
 
 export class Minecraft {
-    public static readonly VERSION_STRING = "0.0.11a"
+    public static readonly VERSION_STRING = "0.30"
     public width: number
     public height: number
     private fogColor: number[] = new Array(4)
