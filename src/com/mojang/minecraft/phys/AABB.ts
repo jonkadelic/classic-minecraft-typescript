@@ -115,6 +115,16 @@ export class AABB {
         return !(c.z1 <= this.z0 || c.z0 >= this.z1)
     }
 
+    public intersectsInner(c: AABB): boolean {
+        if (c.x1 < this.x0 || c.x0 > this.x1) {
+            return false
+        }
+        if (c.y1 < this.y0 || c.y0 > this.y1) {
+            return false
+        }
+        return !(c.z1 < this.z0 || c.z0 > this.z1)
+    }
+
     public move(xa: number, ya: number, za: number): void {
         this.x0 += xa
         this.y0 += ya

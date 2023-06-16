@@ -58,6 +58,8 @@ export class Zombie extends Entity {
     public override render(a: number): void {
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png", gl.NEAREST))
         matrix.push()
+        let brightness = this.getBrightness(a)
+        shader.setColor(brightness, brightness, brightness)
         let time = performance.now() / 1000 * 10 * this.speed + this.timeOffs
         let size = 0.058333334
         let yy = (-Math.abs(Math.sin(time * 0.6662)) * 5 - 23)
@@ -68,6 +70,7 @@ export class Zombie extends Entity {
         let c = 57.29578
         matrix.rotate(this.rot * c + 180, 0, 1, 0)
         Zombie.zombieModel?.render(time)
+        shader.setColor(1, 1, 1)
         matrix.pop()
     }
 }

@@ -19,48 +19,87 @@ export class Tile {
     public x0: number = 0
     public y0: number = 0
     public z0: number = 0
-    public x1: number = 1
-    public y1: number = 1
-    public z1: number = 1
+    public x1: number = 0
+    public y1: number = 0
+    public z1: number = 0
+    public particleGravity: number = 0
 
     public constructor(id: number, tex: number = 0) {
-        this.id = id;
+        this.id = id
+        this.setShape(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         Tile.tiles[id] = this
         this.tex = tex
     }
+
+    public setData(particleGravity: number): Tile {
+        this.particleGravity = particleGravity
+        return this
+    }
+
+    protected setShape(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
+        this.x0 = x0
+        this.y0 = y0
+        this.z0 = z0
+        this.x1 = x1
+        this.y1 = y1
+        this.z1 = z1
+    }
+
+    protected getBrightness(level: Level, x: number, y: number, z: number): number {
+        return level.getBrightness(x, y, z)
+    }
     
-    public render(t: Tesselator, level: Level, layer: number, x: number, y: number, z: number): void {
+    public render(t: Tesselator, level: Level, x: number, y: number, z: number): boolean {
+        let rendered = false
         let c1 = 0.5
         let c2 = 0.8
         let c3 = 0.6
-        if (this.shouldRenderFace(level, x, y - 1, z, layer)) {
-            t.color_f(c1, c1, c1)
+        let brightness: number
+        if (this.shouldRenderFace(level, x, y - 1, z, 0)) {
+            brightness = this.getBrightness(level, x, y - 1, z)
+            t.color_f(c1 * brightness, c1 * brightness, c1 * brightness)
             this.renderFace(t, x, y, z, 0)
+            rendered = true
         }
-        if (this.shouldRenderFace(level, x, y + 1, z, layer)) {
-            t.color_f(1, 1, 1)
+        if (this.shouldRenderFace(level, x, y + 1, z, 1)) {
+            brightness = this.getBrightness(level, x, y + 1, z)
+            t.color_f(brightness, brightness, brightness)
             this.renderFace(t, x, y, z, 1)
+            rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z - 1, layer)) {
-            t.color_f(c2, c2, c2)
+        if (this.shouldRenderFace(level, x, y, z - 1, 2)) {
+            brightness = this.getBrightness(level, x, y, z - 1)
+            t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 2)
+            rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z + 1, layer)) {
-            t.color_f(c2, c2, c2)
+        if (this.shouldRenderFace(level, x, y, z + 1, 3)) {
+            brightness = this.getBrightness(level, x, y, z + 1)
+            t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 3)
+            rendered = true
         }
-        if (this.shouldRenderFace(level, x - 1, y, z, layer)) {
-            t.color_f(c3, c3, c3)
+        if (this.shouldRenderFace(level, x - 1, y, z, 4)) {
+            brightness = this.getBrightness(level, x - 1, y, z)
+            t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 4)
+            rendered = true
         }
-        if (this.shouldRenderFace(level, x + 1, y, z, layer)) {
-            t.color_f(c3, c3, c3)
+        if (this.shouldRenderFace(level, x + 1, y, z, 5)) {
+            brightness = this.getBrightness(level, x + 1, y, z)
+            t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 5)
+            rendered = true
         }
+        return rendered
+    }
+
+    public getRenderPass(): number {
+        return 0
     }
 
     protected shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
-        return !level.isSolidTile(x, y, z) && (level.isLit(x, y, z) != (layer == 1));
+        return !level.isSolidTile(x, y, z);
     }
 
     protected getTexture(face: number): number {
@@ -73,6 +112,12 @@ export class Tile {
         let u1 = u0 + (1 / 16.0)
         let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
+        if (face >= 2 && tex < 240) {
+            if (this.y0 >= 0.0 && this.y1 <= 1.0) {
+                v0 = (Math.trunc(tex / 16) + this.y0) / 16.0;
+                v1 = (Math.trunc(tex / 16) + this.y1) / 16.0;
+            }
+        }
         let x0 = x + this.x0
         let x1 = x + this.x1
         let y0 = y + this.y0
@@ -228,7 +273,7 @@ export class Tile {
                     const xp: number = x + (xx + 0.5) / SD
                     const yp: number = y + (yy + 0.5) / SD
                     const zp: number = z + (zz + 0.5) / SD
-                    particleEngine.add(new Particle(level, xp, yp, zp, xp - x - 0.5, yp - y - 0.5, zp - z - 0.5, this.tex))
+                    particleEngine.add(new Particle(level, xp, yp, zp, xp - x - 0.5, yp - y - 0.5, zp - z - 0.5, this))
                     zz++
                 }
                 yy++
