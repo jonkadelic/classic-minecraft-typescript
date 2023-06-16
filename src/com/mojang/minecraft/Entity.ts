@@ -20,6 +20,8 @@ export class Entity {
     protected heightOffset: number = 0
     protected bbWidth = 0.6
     protected bbHeight = 1.8
+    public ySlideOffset: number = 0.0
+    public footSize: number = 0.0
 
     public constructor(level: Level) {
         this.level = level
@@ -83,11 +85,53 @@ export class Entity {
         for (let i = 0; i < aABBs.length; i++) {
             xa = aABBs[i].clipXCollide(this.bb, xa)
         }
+        let step = this.onGround || yaOrg != ya && yaOrg < 0.0
         this.bb.move(xa, 0, 0)
         for (let i = 0; i < aABBs.length; i++) {
             za = aABBs[i].clipZCollide(this.bb, za)
         }
         this.bb.move(0, 0, za)
+
+        if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
+            let var18 = var1;
+            let var17 = var2;
+            let var13 = var3;
+            xa = xaOrg;
+            ya = this.footSize;
+            za = zaOrg;
+            let var14 = this.bb.copy();
+            this.bb = var9.copy();
+            var10 = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg));
+
+            let var15 = 0;
+            for(; var15 < var10.size(); ++var15) {
+                ya = var10.get(var15).clipYCollide(this.bb, ya);
+            }
+
+            this.bb.move(0.0, var2, 0.0);
+
+            for(var15 = 0; var15 < var10.size(); ++var15) {
+                xa = var10.get(var15).clipXCollide(this.bb, xa);
+            }
+
+            this.bb.move(xa, 0.0, 0.0);
+
+            for(var15 = 0; var15 < var10.size(); ++var15) {
+               za = var10.get(var15).clipZCollide(this.bb, za);
+            }
+
+            this.bb.move(0.0, 0.0, za);
+
+            if(var18 * var18 + var13 * var13 >= xa * xa + za * za) {
+               xa = var18;
+               ya = var17;
+               za = var13;
+               this.bb = var14.copy();
+            } else {
+               this.ySlideOffset += 0.5;
+            }
+        }
+
         let bl = this.onGround = yaOrg != ya && yaOrg < 0
         if (xaOrg != xa) {
             this.xd = 0
@@ -99,8 +143,9 @@ export class Entity {
             this.zd = 0
         }
         this.x = (this.bb.x0 + this.bb.x1) / 2
-        this.y = this.bb.y0 + this.heightOffset
+        this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset
         this.z = (this.bb.z0 + this.bb.z1) / 2
+        this.ySlideOffset *= 0.4;
     }
 
     public moveRelative(xa: number, za: number, speed: number) {
