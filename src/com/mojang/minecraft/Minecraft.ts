@@ -40,11 +40,11 @@ export class Minecraft {
     private fogColor: number[] = new Array(4)
     private timer: Timer = new Timer(20)
     // @ts-ignore
-    private level: Level
+    public level: Level
     // @ts-ignore
     private levelRenderer: LevelRenderer
     // @ts-ignore
-    private player: Player
+    public player: Player
     public paintTexture: number = 1
     // @ts-ignore
     private particleEngine: ParticleEngine
@@ -317,41 +317,12 @@ export class Minecraft {
                     if (KeyboardEvents.getEventKey() == Keys.ENTER) {
                         this.level.save()
                     }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM1) {
-                        this.paintTexture = Tiles.rock.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM2) {
-                        this.paintTexture = Tiles.dirt.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM3) {
-                        this.paintTexture = Tiles.stoneBrick.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM4) {
-                        this.paintTexture = Tiles.sapling.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM5) {
-                        this.paintTexture = Tiles.wood.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM6) {
-                        this.paintTexture = Tiles.treeTrunk.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM7) {
-                        this.paintTexture = Tiles.leaves.id
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.NUM8) {
-                        this.paintTexture = Tiles.glass.id
-                    }
                     if (KeyboardEvents.getEventKey() == Keys.Y) {
                         this.yMouseAxis *= -1
                     }
                     if (KeyboardEvents.getEventKey() == Keys.G) {
                         this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
                     }
-                    if (KeyboardEvents.getEventKey() == Keys.N) {
-                        this.level.regenerate()
-                        this.player.resetPos()
-                    }
-
                     if (KeyboardEvents.getEventKey() == Keys.B) {
                         this.setScreen(new SelectBlockScreen())
                     }

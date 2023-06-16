@@ -1,6 +1,7 @@
 import { Screen } from "./Screen";
 import { Button } from "./Button";
 import { RenderBuffer } from "../../../util/RenderBuffer";
+import { GenerateLevelScreen } from "./GenerateLevelScreen";
 
 export class PauseScreen extends Screen {
 
@@ -18,6 +19,14 @@ export class PauseScreen extends Screen {
     }
 
     public override buttonClicked(button: Button): void {
+        if (button.id == 0) {
+
+        }
+        if (button.id == 1) {
+            this.minecraft.setScreen(new GenerateLevelScreen(this))
+        }
+        // if (this.minecraft.user != null) {
+        // }
         if (button.id == 4) {
             this.minecraft.setScreen(null)
             this.minecraft.grabMouse()
