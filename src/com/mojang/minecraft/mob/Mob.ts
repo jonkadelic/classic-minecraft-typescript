@@ -1,4 +1,5 @@
 import { Entity } from "../Entity";
+import { Level } from "../level/Level";
 
 export class Mob extends Entity {
     public rot: number = 0
@@ -9,7 +10,7 @@ export class Mob extends Entity {
     public constructor(level: Level) {
         super(level)
         this.rotA = (Math.random() + 1.0) * 0.01
-        this.setPos(x, y, z)
+        this.setPos(this.x, this.y, this.z)
         this.timeOffs = Math.random() * 1239813
         this.rot = Math.random() * Math.PI * 2
         this.speed = 1.0
@@ -21,6 +22,5 @@ export class Mob extends Entity {
     }
 
     public override render(a: number): void {
-
     }
 }
