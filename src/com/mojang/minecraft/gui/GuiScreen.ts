@@ -66,7 +66,7 @@ export class GuiScreen extends Gui {
             this.mouseEvent()
         }
         while (KeyboardEvents.next()) {
-            this.mouseEvent()
+            this.keyboardEvent()
         }
     }
 
@@ -78,7 +78,7 @@ export class GuiScreen extends Gui {
         }
     }
 
-    public keyboardEvent(state: boolean, key: number): void {
+    public keyboardEvent(): void {
         if (KeyboardEvents.getEventKeyState()) {
             this.onKeyPress(KeyboardEvents.getEventKey())
         } else {
