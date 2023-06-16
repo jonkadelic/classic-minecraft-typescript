@@ -71,7 +71,7 @@ export class LevelRenderer implements LevelListener {
 
     public render(player: Player, layer: number): void {
         if (!shader.isLoaded()) return
-        let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
+        let id = this.textures.loadTexture("./terrain.png")
         gl.bindTexture(gl.TEXTURE_2D, id)
         let frustum = Frustum.getFrustum()
         shader.use()
@@ -140,7 +140,7 @@ export class LevelRenderer implements LevelListener {
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
             let br = Math.sin(Date.now() / 100) * 0.2 + 0.8
             shader.setColor(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
-            let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
+            let id = this.textures.loadTexture("./terrain.png")
             gl.bindTexture(gl.TEXTURE_2D, id)
             let x = h.x
             let y = h.y

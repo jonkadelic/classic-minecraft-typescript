@@ -37,7 +37,7 @@ export class SelectBlockScreen extends Screen {
         SelectBlockScreen.drawCenteredString(this.minecraft.font, "Select block", Math.trunc(this.width / 2), 40, 0xFFFFFF)
         let textures = this.minecraft.textures
         let t = Tesselator.instance
-        let tex = textures.loadTexture("./terrain.png", gl.NEAREST)
+        let tex = textures.loadTexture("./terrain.png")
         gl.bindTexture(gl.TEXTURE_2D, tex)
         for (let i = 0; i < User.tiles.length; i++) {
             let cTile = User.tiles[i]

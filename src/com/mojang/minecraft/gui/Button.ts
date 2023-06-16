@@ -25,7 +25,7 @@ export class Button extends GuiComponent {
 
     public render(buffer: RenderBuffer, minecraft: Minecraft, mx: number, my: number): void {
         let font: Font = minecraft.font
-        gl.bindTexture(gl.TEXTURE_2D, minecraft.textures.loadTexture("./gui/gui.png", gl.NEAREST))
+        gl.bindTexture(gl.TEXTURE_2D, minecraft.textures.loadTexture("./gui/gui.png"))
         shader.setColor(1, 1, 1, 1)
         let hover: number = 1
         let mouseOver: boolean = mx >= this.x && my >= this.y && mx < this.x + this.width && my < this.y + this.height

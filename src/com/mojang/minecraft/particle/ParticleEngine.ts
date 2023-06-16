@@ -34,7 +34,7 @@ export class ParticleEngine {
 
     public render(player: Player, a: number, layer: number): void {
         if (this.particles.length === 0) return
-        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./terrain.png", gl.NEAREST))
+        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./terrain.png"))
         let xa = -(Math.cos(player.yRot * Math.PI / 180))
         let za = -Math.sin(player.yRot * Math.PI / 180)
         let xa2 = -za * Math.sin(player.xRot * Math.PI / 180)

@@ -457,7 +457,7 @@ export class Minecraft {
         matrix.rotate(45, 0, 1, 0)
         matrix.translate(-1.5, 0.5, -0.5)
         matrix.scale(-1.0, -1.0, 1.0)
-        let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
+        let id = this.textures.loadTexture("./terrain.png")
         gl.bindTexture(gl.TEXTURE_2D, id)
         t.init()
         Tile.tiles[this.paintTexture].render(this.level, -2, 0, 0, t)

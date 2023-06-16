@@ -56,7 +56,7 @@ export class Zombie extends Entity {
     }
 
     public override render(a: number): void {
-        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png", gl.NEAREST))
+        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png"))
         matrix.push()
         let brightness = this.getBrightness(a)
         shader.setColor(brightness, brightness, brightness)
