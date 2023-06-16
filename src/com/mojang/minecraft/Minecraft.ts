@@ -124,7 +124,7 @@ export class Minecraft {
         this.height = height
     }
 
-    public setScreen(screen: GuiScreen): void {
+    public setScreen(screen: GuiScreen | null): void {
         if (this.screen != null) {
             this.screen.onClose()
         }
@@ -316,8 +316,8 @@ export class Minecraft {
                 this.player.resetPos()
             }
         }
-        if(this.currentScreen != null) {
-            this.currentScreen.tick();
+        if (this.screen != null) {
+            this.screen.tick();
         }
         this.level.tick()
         this.particleEngine.tick()
@@ -457,7 +457,7 @@ export class Minecraft {
         let id = this.textures.loadTexture("./terrain.png", gl.NEAREST)
         gl.bindTexture(gl.TEXTURE_2D, id)
         t.init()
-        Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0)
+        Tile.tiles[this.paintTexture].render(t, this.level, -2, 0, 0)
         t.flush(this.guiBuffer)
         this.guiBuffer.draw()
         matrix.pop()

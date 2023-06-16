@@ -153,8 +153,7 @@ export class LevelRenderer implements LevelListener {
             if (h.f == 5) {
                 x++
             }
-            Tile.tiles[tileType].render(t, this.level, 0, x, y, z)
-            Tile.tiles[tileType].render(t, this.level, 1, x, y, z)
+            Tile.tiles[tileType].render(t, this.level, x, y, z)
             t.flush(this.hitRenderBuffer)
             this.hitRenderBuffer.draw()
         }

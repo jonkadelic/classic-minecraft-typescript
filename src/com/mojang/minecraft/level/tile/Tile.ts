@@ -16,13 +16,13 @@ export class Tile {
     public static tiles: Tile[] = new Array(256)
     public tex: number
     public id: number
-    public x0: number
-    public y0: number
-    public z0: number
-    public x1: number
-    public y1: number
-    public z1: number
-    public particleGravity: number
+    public x0: number = 0
+    public y0: number = 0
+    public z0: number = 0
+    public x1: number = 0
+    public y1: number = 0
+    public z1: number = 0
+    public particleGravity: number = 0
 
     public constructor(id: number, tex: number = 0) {
         this.id = id
