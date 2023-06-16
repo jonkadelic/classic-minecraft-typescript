@@ -105,6 +105,7 @@ export class Minecraft {
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
+        this.player.input = new InputHandlerImpl() // this.options
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
         for (let i = 0; i < 10; i++) {
@@ -174,12 +175,14 @@ export class Minecraft {
 
     private loop(): void {
         if (this.running) {
+            mouse.update()
+            keyboard.update()
             if (this.paused) {
                 requestAnimationFrame(() => this.loop())
                 return
             }
-            mouse.update()
-            MouseEvents.update()
+            MouseEvents.update() // lwjgl
+            KeyboardEvents.update() // lwjgl
             this.timer.advanceTime()
             for (let i = 0; i < this.timer.ticks; i++) {
                 this.tick()
@@ -256,7 +259,6 @@ export class Minecraft {
     }
 
     public tick(): void {
-        keyboard.update()
         let oldGrabbed = this.mouseGrabbed
         this.mouseGrabbed = document.pointerLockElement == this.parent
         //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
@@ -301,51 +303,60 @@ export class Minecraft {
             }
 
             // Keyboard
-            if (!this.mouseGrabbed && this.mouseGrabbed !== oldGrabbed) {
+            if (!this.mouseGrabbed && this.mouseGrabbed != oldGrabbed) {
                 this.pause()
             }
-            if (keyboard.keyJustPressed(Keys.ENTER)) {
-                this.level.save()
+            while (KeyboardEvents.next()) {
+                this.player.setKey(KeyboardEvents.getEventKey(), KeyboardEvents.getEventKeyState())
+                if(this.screen != null) {
+                    this.screen.keyboardEvent()
+                }
+                if (KeyboardEvents.getEventKeyState()) {
+                    if (KeyboardEvents.getEventKey() == Keys.ENTER) {
+                        this.level.save()
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM1) {
+                        this.paintTexture = Tiles.rock.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM2) {
+                        this.paintTexture = Tiles.dirt.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM3) {
+                        this.paintTexture = Tiles.stoneBrick.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM4) {
+                        this.paintTexture = Tiles.sapling.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM5) {
+                        this.paintTexture = Tiles.wood.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM6) {
+                        this.paintTexture = Tiles.treeTrunk.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM7) {
+                        this.paintTexture = Tiles.leaves.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.NUM8) {
+                        this.paintTexture = Tiles.glass.id
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.Y) {
+                        this.yMouseAxis *= -1
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.G) {
+                        this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                    }
+                    if (KeyboardEvents.getEventKey() == Keys.N) {
+                        this.level.regenerate()
+                        this.player.resetPos()
+                    }
+                }
             }
-            if (keyboard.keyJustPressed(Keys.NUM1)) {
-                this.paintTexture = Tiles.rock.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM2)) {
-                this.paintTexture = Tiles.dirt.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM3)) {
-                this.paintTexture = Tiles.stoneBrick.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM4)) {
-                this.paintTexture = Tiles.sapling.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM5)) {
-                this.paintTexture = Tiles.wood.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM6)) {
-                this.paintTexture = Tiles.treeTrunk.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM7)) {
-                this.paintTexture = Tiles.leaves.id
-            }
-            if (keyboard.keyJustPressed(Keys.NUM8)) {
-                this.paintTexture = Tiles.glass.id
-            }
-            if (keyboard.keyJustPressed(Keys.Y)) {
-                this.yMouseAxis *= -1
-            }
-            if (keyboard.keyJustPressed(Keys.G)) {
-                this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-            }
-            if (keyboard.keyJustPressed(Keys.N)) {
-                this.level.regenerate()
-                this.player.resetPos()
-            }
-        } else if (this.screen != null) {
-            this.screen.doInput()
         }
         if (this.screen != null) {
-            this.screen.tick()
+            this.screen.doInput()
+            if (this.screen != null) {
+                this.screen.tick()
+            }
         }
         this.level.tick()
         this.particleEngine.tick()

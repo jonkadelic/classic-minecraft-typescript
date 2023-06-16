@@ -2,8 +2,11 @@ import { Keys } from "syncinput";
 import { Entity } from "./Entity";
 import { keyboard } from "./Minecraft";
 import { Level } from "./level/Level";
+import { InputHandler } from "./InputHandler";
 
 export class Player extends Entity {
+    public input: InputHandler
+
     public constructor(level: Level) {
         super(level)
         this.heightOffset = 1.62
@@ -13,25 +16,15 @@ export class Player extends Entity {
         this.xo = this.x
         this.yo = this.y
         this.zo = this.z
-        let xa = 0.0
-        let ya = 0.0
+        this.input.updateMovement()
+        let xa = this.input.xxa
+        let ya = this.input.yya
+        let jump = this.input.jumping
 
         if (keyboard.keyPressed(Keys.R)) {
             this.resetPos()
         }
-        if (keyboard.keyPressed(Keys.W) || keyboard.keyPressed(Keys.UP)) {
-            ya--
-        }
-        if (keyboard.keyPressed(Keys.S) || keyboard.keyPressed(Keys.DOWN)) {
-            ya++
-        }
-        if (keyboard.keyPressed(Keys.A) || keyboard.keyPressed(Keys.LEFT)) {
-            xa--
-        }
-        if (keyboard.keyPressed(Keys.D) || keyboard.keyPressed(Keys.RIGHT)) {
-            xa++
-        }
-        if (keyboard.keyPressed(Keys.SPACEBAR) && this.onGround) {
+        if (jump && this.onGround) {
             this.yd = 0.5
         }
         this.moveRelative(xa, ya, this.onGround ? 0.1 : 0.02)
@@ -44,5 +37,13 @@ export class Player extends Entity {
             this.xd *= 0.7
             this.zd *= 0.7
         }
+    }
+
+    public releaseAllKeys(): void {
+        this.input.resetKeys()
+    }
+
+    public setKey(key: number, state: boolean): void {
+        this.input.setKeyState(key, state)
     }
 }

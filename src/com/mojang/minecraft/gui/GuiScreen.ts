@@ -5,6 +5,7 @@ import { Font } from "./Font";
 import { mouse, keyboard, Minecraft } from "../Minecraft";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { MouseEvents } from "../input/MouseEvents";
+import { KeyboardEvents } from "../input/KeyboardEvents";
 
 export class GuiScreen extends Gui {
     // @ts-ignore
@@ -64,14 +65,8 @@ export class GuiScreen extends Gui {
         while (MouseEvents.next()) {
             this.mouseEvent()
         }
-        for (let i: number = 0; i < keyboard.keys.length; ++i) {
-            if (keyboard.keyJustPressed(i)) {
-                this.keyboardEvent(true, i)
-            }
-            if (keyboard.keyJustReleased(i)) {
-                this.keyboardEvent(false, i)
-            }
-            // keyJustReleased is not used in 0.30
+        while (KeyboardEvents.next()) {
+            this.mouseEvent()
         }
     }
 
@@ -84,10 +79,10 @@ export class GuiScreen extends Gui {
     }
 
     public keyboardEvent(state: boolean, key: number): void {
-        if (state) {
-            this.onKeyPress(key)
-        } else if (key >= 0) {
-            this.onKeyUp(key)
+        if (KeyboardEvents.getEventKeyState()) {
+            this.onKeyPress(KeyboardEvents.getEventKey())
+        } else {
+            this.onKeyUp(KeyboardEvents.getEventKey())
         }
     }
 
