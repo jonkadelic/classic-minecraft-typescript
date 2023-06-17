@@ -328,7 +328,7 @@ export class Minecraft {
                     this.screen.keyboardEvent()
                 }
                 if (KeyboardEvents.getEventKeyState()) {
-                    if (this.screen != null) {
+                    if (this.screen == null) {
                         if (KeyboardEvents.getEventKey() == Keys.ENTER) {
                             this.level.save()
                         }
