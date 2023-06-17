@@ -1,4 +1,5 @@
 import { gl, matrix, Minecraft } from "../Minecraft";
+import { Matrix } from "../../../util/Matrix";
 
 export class GameRenderer {
     private minecraft: Minecraft
@@ -16,7 +17,7 @@ export class GameRenderer {
         matrix.ortho(0, screenWidth, screenHeight, 0, 100, 300)
         matrix.setActive(Matrix.MODELVIEW)
         matrix.loadIdentity()
-        matrix.translatef(0, 0, -200)
+        matrix.translate(0, 0, -200)
     }
 
     // TODO

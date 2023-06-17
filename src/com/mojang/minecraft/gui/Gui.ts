@@ -1,4 +1,5 @@
 import { Random } from "../../../util/Random";
+import { Mth } from "../../../util/Mth";
 import { GuiComponent } from "./GuiComponent";
 import { Font } from "./Font";
 import { Tesselator } from "../renderer/Tesselator";
@@ -29,9 +30,9 @@ export class Gui extends GuiComponent {
         shader.setColor(1, 1, 1, 1)
         gl.enable(gl.BLEND)
         let inv = this.minecraft.player.inventory
-        this.imgZ = -90
+        this.blitOffset = -90
         this.blit(buffer, Math.trunc(this.width / 2) - 91, this.height - 22, 0, 0, 182, 22)
-        this.blit(buffer, Math.trunc(this.width / 2) - 91 - 1 + var8.selected * 20, this.height - 22 - 1, 0, 22, 24, 22)
+        this.blit(buffer, Math.trunc(this.width / 2) - 91 - 1 + inv.selected * 20, this.height - 22 - 1, 0, 22, 24, 22)
         // gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/icons.png"))
         // let var9 = this.minecraft.player.invulnerableTime / 3 % 2 == 1
         // if (this.minecraft.player.invulnerableTime < 10) {
@@ -50,7 +51,7 @@ export class Gui extends GuiComponent {
 
         gl.disable(gl.BLEND)
         for (let i: number = 0; i < inv.slots.length; ++i) {
-            let x = Math.trunc(this.width / 2) - 90 + var12 * 20
+            let x = Math.trunc(this.width / 2) - 90 + i * 20
             let y = this.height - 16
             let id = inv.slots[i]
             if (id > 0) {
@@ -58,9 +59,9 @@ export class Gui extends GuiComponent {
                 matrix.translate(x, y, -50)
                 if (inv.popTime[i] > 0) {
                     let time = (inv.popTime[i] - a) / 5.0
-                    let yt = -MathHelper.sin(time * time * Math.PI) * 8.0
-                    let scX = MathHelper.sin(var18 * var18 * Math.PI) + 1.0
-                    let scY = MathHelper.sin(var18 * Math.PI) + 1.0
+                    let yt = -Mth.sin(time * time * Math.PI) * 8.0
+                    let scX = Mth.sin(time * time * Math.PI) + 1.0
+                    let scY = Mth.sin(time * Math.PI) + 1.0
                     matrix.translate(10, yt + 10, 0)
                     matrix.scale(scX, scY, 1)
                     matrix.translate(-10, -10, 0)
@@ -78,8 +79,8 @@ export class Gui extends GuiComponent {
                 t.flush(buffer)
                 buffer.draw()
                 matrix.pop()
-                if (inv.count[var12] > 1) {
-                    let count = "" + inv.count[var12]
+                if (inv.count[i] > 1) {
+                    let count = "" + inv.count[i]
                     font.drawShadow(count, x + 19 - font.getWidth(count), y + 6, 0xFFFFFF)
                 }
             }

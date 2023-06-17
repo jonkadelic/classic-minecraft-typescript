@@ -58,6 +58,7 @@ export class Minecraft {
     public font: Font
     public screen: Screen | null = null
     public gameRenderer: GameRenderer = new GameRenderer(this)
+    // @ts-ignore
     public gui: Gui
     private running: boolean = false
     private fpsString: string = ""
@@ -397,46 +398,57 @@ export class Minecraft {
 
     public render(a: number): void {
         if (!shader.isLoaded()) return
-        gl.viewport(0, 0, this.width, this.height)
-        if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
-            let xo = 0.0
-            let yo = 0.0
-            xo = mouse.delta.x
-            yo = mouse.delta.y
-            if (Math.abs(xo) < 500)
-            {
-                this.player.turn(xo, yo * this.yMouseAxis)
+        if (this.level != null) {
+            gl.viewport(0, 0, this.width, this.height)
+            if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
+                let xo = 0.0
+                let yo = 0.0
+                xo = mouse.delta.x
+                yo = mouse.delta.y
+                if (Math.abs(xo) < 500)
+                {
+                    this.player.turn(xo, yo * this.yMouseAxis)
+                }
             }
-        }
-        this.checkGlError("Set viewport")
-        this.pick(a)
-        this.checkGlError("Picked")
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        this.setupCamera(a)
-        this.checkGlError("Set up camera")
-        gl.enable(gl.CULL_FACE)
-        let frustum = Frustum.getFrustum()
-        this.levelRenderer.updateDirtyChunks(this.player)
-        this.checkGlError("Update chunks")
-        this.setupFog()
-        gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
-        this.levelRenderer.render(this.player, 0)
-        this.checkGlError("Rendered level")
-        for (let i = 0; i < this.entities.length; i++) {
-            let entity = this.entities[i]
-            if (frustum.isVisible(entity.bb)) {
-                entity.render(a)
+            this.checkGlError("Set viewport")
+            this.pick(a)
+            this.checkGlError("Picked")
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            this.setupCamera(a)
+            this.checkGlError("Set up camera")
+            gl.enable(gl.CULL_FACE)
+            let frustum = Frustum.getFrustum()
+            this.levelRenderer.updateDirtyChunks(this.player)
+            this.checkGlError("Update chunks")
+            this.setupFog()
+            gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
+            this.levelRenderer.render(this.player, 0)
+            this.checkGlError("Rendered level")
+            for (let i = 0; i < this.entities.length; i++) {
+                let entity = this.entities[i]
+                if (frustum.isVisible(entity.bb)) {
+                    entity.render(a)
+                }
             }
+            this.checkGlError("Rendered entities")
+            this.particleEngine.render(this.player, a, 0)
+            this.checkGlError("Rendered particles")
+            gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
+            if (this.hitResult != null) {
+                this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
+            }
+            this.checkGlError("Rendered hit")
+            this.gui.render(this.guiBuffer, a)
+        } else {
+            gl.viewport(0, 0, this.width, this.height)
+            gl.clearColor(0.0, 0.0, 0.0, 0.0)
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            matrix.setActive(Matrix.PROJECTION)
+            matrix.loadIdentity()
+            matrix.setActive(Matrix.MODELVIEW)
+            matrix.loadIdentity()
+            this.gameRenderer.setupGuiCamera()
         }
-        this.checkGlError("Rendered entities")
-        this.particleEngine.render(this.player, a, 0)
-        this.checkGlError("Rendered particles")
-        gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
-        if (this.hitResult != null) {
-            this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
-        }
-        this.checkGlError("Rendered hit")
-        this.gui.render(this.guiBuffer, a)
         if (this.screen != null) {
             this.screen.render(this.guiBuffer, mx, my)
         }
@@ -498,8 +510,6 @@ export class Minecraft {
         this.guiBuffer.draw();
         this.checkGlError("GUI: Draw crosshair")
         // screen
-        let mx = Math.trunc(mouse.position.x * screenWidth / this.width)
-        let my = Math.trunc(mouse.position.y * screenHeight / this.height)
     }*/
 
     private setupFog(): void {

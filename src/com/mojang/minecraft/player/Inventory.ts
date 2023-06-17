@@ -6,7 +6,7 @@ export class Inventory {
     public slots: number[] = new Array(9)
     public count: number[] = new Array(9)
     public popTime: number[] = new Array(9)
-    public selected: number
+    public selected: number = 0
 
     public constructor() {
         for (let i: number = 0; i < 9; ++i) {
@@ -34,8 +34,8 @@ export class Inventory {
         if (var3 >= 0) {
             this.selected = var3
         } else {
-            if (replace && id > 0 && User.tiles.contains(Tile.byId[id])) {
-                this.replaceSlot(Tile.byId[id])
+            if (replace && id > 0 && User.tiles.includes(Tile.tiles[id])) {
+                this.replaceSlot(Tile.tiles[id])
             }
         }
     }
