@@ -144,7 +144,7 @@ export class Minecraft {
         if (screen !== null) {
             if (this.mouseGrabbed) {
                 this.mouseGrabbed = false
-                mouse.setLock(false)
+                MouseEvents.setGrabbed(false)
             }
             let screenWidth = Math.trunc(this.width * 240 / this.height)
             let screenHeight = Math.trunc(this.height * 240 / this.height)
@@ -215,7 +215,7 @@ export class Minecraft {
     public grabMouse(): void {
         if (this.mouseGrabbed) return
         this.mouseGrabbed = true
-        mouse.setLock(true)
+        MouseEvents.setGrabbed(true)
     }
 
     public pause(): void {
@@ -400,15 +400,15 @@ export class Minecraft {
         if (!shader.isLoaded()) return
         let screenWidth = Math.trunc(this.width * 240 / this.height)
         let screenHeight = Math.trunc(this.height * 240 / this.height)
-        let mx = Mouse.getX() * screenWidth / this.width
-        let my = Mouse.getY() * screenHeight / this.height
+        let mx = MouseEvents.getX() * screenWidth / this.width
+        let my = MouseEvents.getY() * screenHeight / this.height
         if (this.level != null) {
             gl.viewport(0, 0, this.width, this.height)
             if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
                 let xo = 0.0
                 let yo = 0.0
-                xo = mouse.delta.x
-                yo = mouse.delta.y
+                xo = MouseEvents.getDX()
+                yo = MouseEvents.getDY()
                 if (Math.abs(xo) < 500)
                 {
                     this.player.turn(xo, yo * this.yMouseAxis)
