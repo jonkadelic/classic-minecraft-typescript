@@ -25,6 +25,7 @@ import { KeyboardEvents } from "./input/KeyboardEvents";
 import { KeyboardInput } from "./player/KeyboardInput";
 import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 import { GameRenderer } from "./renderer/GameRenderer";
+import { User } from "./User";
 import { Gui } from "./gui/Gui";
 
 export let gl: WebGLRenderingContext
@@ -110,10 +111,11 @@ export class Minecraft {
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
         this.player.input = new KeyboardInput() // this.options
+        // TODO make GameMode classes and move this to the creative gamemode apply(Player)
         for (let i: number = 0; i < 9; ++i) {
             this.player.inventory.count[i] = 1
             if (this.player.inventory.slots[i] <= 0) {
-                this.player.inventory.slots[i] = User.tiles[var2].id
+                this.player.inventory.slots[i] = User.tiles[i].id
             }
         }
         this.particleEngine = new ParticleEngine(this.level, this.textures)
