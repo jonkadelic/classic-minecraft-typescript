@@ -33,7 +33,8 @@ export class Gui extends GuiComponent {
         this.blitOffset = -90
         this.blit(buffer, Math.trunc(this.width / 2) - 91, this.height - 22, 0, 0, 182, 22)
         this.blit(buffer, Math.trunc(this.width / 2) - 91 - 1 + inv.selected * 20, this.height - 22 - 1, 0, 22, 24, 22)
-        // gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/icons.png"))
+        gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/icons.png"))
+        this.blit(buffer, Math.trunc(this.width / 2) - 7, Math.trunc(this.height / 2) - 7, 0, 0, 16, 16)
         // let var9 = this.minecraft.player.invulnerableTime / 3 % 2 == 1
         // if (this.minecraft.player.invulnerableTime < 10) {
         //     var9 = false

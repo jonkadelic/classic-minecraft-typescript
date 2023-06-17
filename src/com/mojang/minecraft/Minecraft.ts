@@ -458,7 +458,7 @@ export class Minecraft {
             this.checkGlError("Rendered particles")
             gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
             if (this.hitResult != null) {
-                this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
+                this.levelRenderer.renderHit(this.hitResult)
             }
             this.checkGlError("Rendered hit")
             this.gui.render(this.guiBuffer, a, this.screen != null, mx, my)
