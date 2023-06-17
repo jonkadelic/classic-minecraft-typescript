@@ -110,6 +110,12 @@ export class Minecraft {
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
         this.player.input = new KeyboardInput() // this.options
+        for (let i: number = 0; i < 9; ++i) {
+            this.player.inventory.count[i] = 1
+            if (this.player.inventory.slots[i] <= 0) {
+                this.player.inventory.slots[i] = User.tiles[var2].id
+            }
+        }
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
         for (let i = 0; i < 10; i++) {
@@ -277,8 +283,11 @@ export class Minecraft {
         if (this.screen == null || this.screen.passEvents) {
             // Mouse
             if (this.screen == null) {
-                while (MouseEvents.next()) { // Just to make sure
-                    if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
+                while (MouseEvents.next()) {
+                    if (Mouse.getEventDWheel() != 0) {
+                        this.player.inventory.swapPaint(Mouse.getEventDWheel())
+                    }
+                    if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
                         this.grabMouse();
                     } else {
                         if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
@@ -317,19 +326,27 @@ export class Minecraft {
                     this.screen.keyboardEvent()
                 }
                 if (KeyboardEvents.getEventKeyState()) {
-                    if (KeyboardEvents.getEventKey() == Keys.ENTER) {
-                        this.level.save()
+                    if (this.screen != null) {
+                        if (KeyboardEvents.getEventKey() == Keys.ENTER) {
+                            this.level.save()
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.Y) {
+                            this.yMouseAxis *= -1
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.G) {
+                            this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.B) {
+                            this.setScreen(new SelectBlockScreen())
+                        }
                     }
-                    if (KeyboardEvents.getEventKey() == Keys.Y) {
-                        this.yMouseAxis *= -1
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.G) {
-                        this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.B) {
-                        this.setScreen(new SelectBlockScreen())
+                    for (let i: number = 0; i < 9; ++i) {
+                        if (KeyboardEvents.getEventKey() == i + 49) {
+                            this.player.inventory.selected = i
+                        }
                     }
                 }
+                // toggle fog key here
             }
         }
         if (this.screen != null) {
