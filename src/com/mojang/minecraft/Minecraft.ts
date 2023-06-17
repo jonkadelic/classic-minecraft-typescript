@@ -264,9 +264,9 @@ export class Minecraft {
             if (this.hitResult.f == 5) {
                 x++
             }
-            aabb = Tile.tiles[this.player.inventory.getSelected()].getAABB(x, y, z)
+            aabb = Tile.tiles[selected].getAABB(x, y, z)
             if (aabb == null || this.isFree(aabb)) {
-                this.level.setTile(x, y, z, this.player.inventory.getSelected())
+                this.level.setTile(x, y, z, selected)
             }
         }
     }
