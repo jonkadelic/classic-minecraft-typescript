@@ -565,6 +565,13 @@ export function main() {
         clickedElement = e.target as HTMLElement
     })
 
+    window.addEventListener("wheel", (e) => {
+        if (e.deltaY == 0) return
+        MouseEvents.wheelUpdated = true
+        MouseEvents.wheel += (e.deltaY > 0 ? 1 : -1)
+        MouseEvents.dWheel += (e.deltaY > 0 ? 1 : -1)
+    })
+
     window.addEventListener("resize", () => {
         if (window.innerHeight == screen.height) {
             canvas.width = window.innerWidth
