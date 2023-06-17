@@ -398,6 +398,10 @@ export class Minecraft {
 
     public render(a: number): void {
         if (!shader.isLoaded()) return
+        let screenWidth = Math.trunc(this.width * 240 / this.height)
+        let screenHeight = Math.trunc(this.height * 240 / this.height)
+        let mx = Mouse.getX() * screenWidth / this.width
+        let my = Mouse.getY() * screenHeight / this.height
         if (this.level != null) {
             gl.viewport(0, 0, this.width, this.height)
             if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
@@ -438,7 +442,7 @@ export class Minecraft {
                 this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
             }
             this.checkGlError("Rendered hit")
-            this.gui.render(this.guiBuffer, a)
+            this.gui.render(this.guiBuffer, a, this.screen != null, mx, my)
         } else {
             gl.viewport(0, 0, this.width, this.height)
             gl.clearColor(0.0, 0.0, 0.0, 0.0)

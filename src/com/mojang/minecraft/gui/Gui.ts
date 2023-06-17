@@ -75,13 +75,13 @@ export class Gui extends GuiComponent {
                 let tex = this.minecraft.textures.loadTexture("./terrain.png")
                 gl.bindTexture(gl.TEXTURE_2D, tex)
                 t.init()
-                Tile.render2(t)
+                Tile.renderInInventory(t)
                 t.flush(buffer)
                 buffer.draw()
                 matrix.pop()
                 if (inv.count[i] > 1) {
                     let count = "" + inv.count[i]
-                    font.drawShadow(count, x + 19 - font.getWidth(count), y + 6, 0xFFFFFF)
+                    font.drawShadow(count, x + 19 - font.width(count), y + 6, 0xFFFFFF)
                 }
             }
         }
@@ -93,7 +93,7 @@ export class Gui extends GuiComponent {
 
         // if(this.minecraft.gamemode instanceof SurvivalGameMode) {
         //     String var24 = "Score: &e" + this.minecraft.player.getScore()
-        //     font.drawShadow(var24, this.width - font.getWidth(var24) - 2, 2, 0xFFFFFF)
+        //     font.drawShadow(var24, this.width - font.width(var24) - 2, 2, 0xFFFFFF)
         //     font.drawShadow("Arrows: " + this.minecraft.player.arrows, Math.trunc(this.width / 2) + 8, this.height - 33, 0xFFFFFF)
         // }
 
