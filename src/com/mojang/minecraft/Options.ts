@@ -1,5 +1,6 @@
 import { KeyMapping } from "./KeyMapping";
 import { Minecraft } from "./Minecraft";
+import { Keys } from "syncinput"
 
 export class Options {
     private static readonly renderDistanceNames: string[] = ["FAR", "NORMAL", "SHORT", "TINY"]
@@ -10,16 +11,16 @@ export class Options {
     public viewDistance: number = 0
     public bobView: boolean = true
     public limitFramerate: boolean = false
-    public keyUp: KeyMapping = new KeyMapping("Forward", "")
-    public keyLeft: KeyMapping = new KeyMapping("Left", "")
-    public keyDown: KeyMapping = new KeyMapping("Back", "")
-    public keyRight: KeyMapping = new KeyMapping("Right", "")
-    public keyJump: KeyMapping = new KeyMapping("Jump", "")
-    public keyBuild: KeyMapping = new KeyMapping("Build", "")
-    public keyChat: KeyMapping = new KeyMapping("Chat", "")
-    public keyToggleFog: KeyMapping = new KeyMapping("Toggle fog", "")
-    public keySaveLocation: KeyMapping = new KeyMapping("Save location", "")
-    public keyLoadLocation: KeyMapping = new KeyMapping("Load location", "")
+    public keyUp: KeyMapping = new KeyMapping("Forward", Keys.W)
+    public keyLeft: KeyMapping = new KeyMapping("Left", Keys.A)
+    public keyDown: KeyMapping = new KeyMapping("Back", Keys.S)
+    public keyRight: KeyMapping = new KeyMapping("Right", Keys.D)
+    public keyJump: KeyMapping = new KeyMapping("Jump", Keys.SPACEBAR)
+    public keyBuild: KeyMapping = new KeyMapping("Build", Keys.B)
+    public keyChat: KeyMapping = new KeyMapping("Chat", Keys.T)
+    public keyToggleFog: KeyMapping = new KeyMapping("Toggle fog", Keys.F)
+    public keySaveLocation: KeyMapping = new KeyMapping("Save location", Keys.ENTER)
+    public keyLoadLocation: KeyMapping = new KeyMapping("Load location", Keys.R)
     public keyMappings: KeyMapping[] = [
         this.keyUp, 
         this.keyLeft, 
@@ -44,7 +45,7 @@ export class Options {
         return this.keyMappings[key].name + ": " + this.keyMappings[key].defaultKey
     }
 
-    public setKey(key: number, value: string): void {
+    public setKey(key: number, value: number): void {
         this.keyMappings[key].defaultKey = value
         this.save()
     }

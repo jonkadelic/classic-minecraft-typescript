@@ -1,35 +1,35 @@
 import { Keys } from "syncinput";
 import { Input } from "./Input";
-// import { Options } from "./Options";
+import { Options } from "../Options";
 
 export class KeyboardInput extends Input {
     private keys: boolean[] = new Array(10)
-    // private options: Options
+    private options: Options
 
-    public constructor() { // options: Options
+    public constructor(options: Options) {
         super()
-       // this.options = options
+        this.options = options
     }
 
     public override setKeyState(key: number, state: boolean): void {
         let i: number = -1
-        if (key == Keys.W) { // this.settings.keyUp.key
+        if (key == this.options.keyUp.defaultKey) {
             i = 0
         }
 
-        if (key == Keys.S) { // this.settings.keyDown.key
+        if (key == this.options.keyDown.defaultKey) {
             i = 1
         }
 
-        if (key == Keys.A) { // this.settings.keyLeft.key
+        if (key == this.options.keyLeft.defaultKey) {
             i = 2
         }
 
-        if (key == Keys.D) { // this.settings.keyRight.key
+        if (key == this.options.keyRight.defaultKey) {
             i = 3
         }
 
-        if (key == Keys.SPACEBAR) { // this.settings.keyJump.key
+        if (key == this.options.keyJump.defaultKey) {
             i = 4
         }
 

@@ -27,6 +27,7 @@ import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 import { GameRenderer } from "./renderer/GameRenderer";
 import { User } from "./User";
 import { Gui } from "./gui/Gui";
+import { Options } from "./Options";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -64,6 +65,8 @@ export class Minecraft {
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
     private hitResult: HitResult | null = null
+    // @ts-ignore
+    private options: Options
 
     private frames: number = 0
     private lastTime: number = 0
@@ -106,10 +109,11 @@ export class Minecraft {
         matrix.loadIdentity()
         matrix.setActive(Matrix.MODELVIEW)
         this.checkGlError("Startup")
+        this.options = new Options(this)
         this.level = new Level(256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
-        this.player.input = new KeyboardInput() // this.options
+        this.player.input = new KeyboardInput(this.options)
         // TODO make GameMode classes and move this to the creative gamemode apply(Player)
         for (let i: number = 0; i < 9; ++i) {
             this.player.inventory.count[i] = 1
