@@ -7,6 +7,7 @@ export class Textures {
         this.loadTexture("./terrain.png")
         this.loadTexture("./char.png")
         this.loadTexture("./gui/gui.png")
+        this.loadTexture("./gui/icons.png")
         this.loadTexture("./default.png")
     }
 
