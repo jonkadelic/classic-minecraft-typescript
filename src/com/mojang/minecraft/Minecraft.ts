@@ -24,6 +24,8 @@ import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
 import { KeyboardInput } from "./player/KeyboardInput";
 import { SelectBlockScreen } from "./gui/BlockSelectScreen";
+import { GameRenderer } from "./renderer/GameRenderer";
+import { Gui } from "./gui/Gui";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -55,6 +57,8 @@ export class Minecraft {
     // @ts-ignore
     public font: Font
     public screen: Screen | null = null
+    public gameRenderer: GameRenderer = new GameRenderer(this)
+    public gui: Gui
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
@@ -113,6 +117,7 @@ export class Minecraft {
             this.entities.push(zombie)
         }
         this.checkGlError("Post startup")
+        this.gui = new Gui(this, this.width, this.height)
 
         window.onunload = () => {
             this.destroy()
@@ -431,12 +436,14 @@ export class Minecraft {
             this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
         }
         this.checkGlError("Rendered hit")
-        this.drawGui(a)
+        this.gui.render(this.guiBuffer, a)
+        if (this.screen != null) {
+            this.screen.render(this.guiBuffer, mx, my)
+        }
         this.checkGlError("Rendered gui")
-
     }
 
-    private drawGui(a: number): void {
+    /*private drawGui(a: number): void {
         let screenWidth = Math.trunc(this.width * 240 / this.height)
         let screenHeight = Math.trunc(this.height * 240 / this.height)
         gl.clear(gl.DEPTH_BUFFER_BIT)
@@ -493,10 +500,7 @@ export class Minecraft {
         // screen
         let mx = Math.trunc(mouse.position.x * screenWidth / this.width)
         let my = Math.trunc(mouse.position.y * screenHeight / this.height)
-        if (this.screen != null) {
-            this.screen.render(this.guiBuffer, mx, my)
-        }
-    }
+    }*/
 
     private setupFog(): void {
         if (!shader.isLoaded()) return
