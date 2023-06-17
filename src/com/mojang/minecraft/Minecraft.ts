@@ -286,8 +286,8 @@ export class Minecraft {
             // Mouse
             if (this.screen == null) {
                 while (MouseEvents.next()) {
-                    if (Mouse.getEventDWheel() != 0) {
-                        this.player.inventory.swapPaint(Mouse.getEventDWheel())
+                    if (MouseEvents.getEventDWheel() != 0) {
+                        this.player.inventory.swapPaint(MouseEvents.getEventDWheel())
                     }
                     if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
                         this.grabMouse();
