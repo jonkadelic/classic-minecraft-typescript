@@ -4,18 +4,23 @@ import { MouseEvent } from "./MouseEvent";
 export class MouseEvents {
     private static mouseEventQueue: MouseEvent[] = []
     private static currentEvent: MouseEvent | null = null
+    public static wheelUpdated: boolean = false
+    public static dWheel: number = 0
+    public static wheel: number = 0
 
     public static update(): void {
         for (let i: number = 0; i < mouse.keys.length; ++i) {
             if (mouse.buttonJustPressed(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, true, i, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, true, i, 0))
             }
             if (mouse.buttonJustReleased(i)) {
-                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, i, mouse.wheel))
+                MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, i, 0))
             }
         }
-        if (mouse.wheelUpdated) {
-            MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, -1, mouse.wheel))
+        if (MouseEvents.wheelUpdated) {
+            MouseEvents.mouseEventQueue.push(new MouseEvent(mouse.position.x, mouse.position.y, false, -1, MouseEvents.wheel))
+            MouseEvents.wheelUpdated = false
+            MouseEvents.wheel = 0
         }
     }
 
@@ -49,7 +54,9 @@ export class MouseEvents {
     }
 
     public static getDWheel(): number {
-        return mouse.wheel
+        let w = MouseEvents.dWheel
+        MouseEvents.dWheel = 0
+        return w
     }
     
     public static getEventX(): number {

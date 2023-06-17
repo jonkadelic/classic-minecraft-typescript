@@ -125,7 +125,7 @@ export class Minecraft {
             this.entities.push(zombie)
         }
         this.checkGlError("Post startup")
-        this.gui = new Gui(this, this.width, this.height)
+        this.gui = new Gui(this)
 
         window.onunload = () => {
             this.destroy()
@@ -563,6 +563,13 @@ export function main() {
 
     window.addEventListener("mousedown", (e) => {
         clickedElement = e.target as HTMLElement
+    })
+
+    window.addEventListener("wheel", (e) => {
+        if (e.deltaY == 0) return
+        MouseEvents.wheelUpdated = true
+        MouseEvents.wheel -= (e.deltaY > 0 ? 1 : -1)
+        MouseEvents.dWheel -= (e.deltaY > 0 ? 1 : -1)
     })
 
     window.addEventListener("resize", () => {
