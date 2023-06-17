@@ -287,6 +287,7 @@ export class Minecraft {
             if (this.screen == null) {
                 while (MouseEvents.next()) {
                     if (MouseEvents.getEventDWheel() != 0) {
+                        console.log(MouseEvents.getEventDWheel())
                         this.player.inventory.swapPaint(MouseEvents.getEventDWheel())
                     }
                     if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
