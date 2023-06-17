@@ -125,7 +125,7 @@ export class Minecraft {
             this.entities.push(zombie)
         }
         this.checkGlError("Post startup")
-        this.gui = new Gui(this, this.width, this.height)
+        this.gui = new Gui(this)
 
         window.onunload = () => {
             this.destroy()

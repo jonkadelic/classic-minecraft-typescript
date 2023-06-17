@@ -10,19 +10,17 @@ import { gl, matrix, shader, Minecraft } from "../Minecraft";
 export class Gui extends GuiComponent {
     private minecraft: Minecraft
     private random: Random = new Random()
-    private width: number
-    private height: number
     public hoveredPlayer: string | null = null
     public ticks: number = 0
 
-    public constructor(minecraft: Minecraft, w: number, h: number) {
+    public constructor(minecraft: Minecraft) {
         super()
         this.minecraft = minecraft
-        this.width = w * 240 / h
-        this.height = h * 240 / h
     }
 
     public render(buffer: RenderBuffer, a: number, var2: boolean, mx: number, my: number) {
+        let width = this.minecraft.width * 240 / this.minecraft.height
+        let height = this.minecraft.height * 240 / this.minecraft.height
         let font = this.minecraft.font
         this.minecraft.gameRenderer.setupGuiCamera()
         gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/gui.png"))
@@ -31,10 +29,10 @@ export class Gui extends GuiComponent {
         gl.enable(gl.BLEND)
         let inv = this.minecraft.player.inventory
         this.blitOffset = -90
-        this.blit(buffer, Math.trunc(this.width / 2) - 91, this.height - 22, 0, 0, 182, 22)
-        this.blit(buffer, Math.trunc(this.width / 2) - 91 - 1 + inv.selected * 20, this.height - 22 - 1, 0, 22, 24, 22)
+        this.blit(buffer, Math.trunc(width / 2) - 91, height - 22, 0, 0, 182, 22)
+        this.blit(buffer, Math.trunc(width / 2) - 91 - 1 + inv.selected * 20, height - 22 - 1, 0, 22, 24, 22)
         gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/icons.png"))
-        this.blit(buffer, Math.trunc(this.width / 2) - 7, Math.trunc(this.height / 2) - 7, 0, 0, 16, 16)
+        this.blit(buffer, Math.trunc(width / 2) - 7, Math.trunc(height / 2) - 7, 0, 0, 16, 16)
         // let var9 = this.minecraft.player.invulnerableTime / 3 % 2 == 1
         // if (this.minecraft.player.invulnerableTime < 10) {
         //     var9 = false
@@ -52,8 +50,8 @@ export class Gui extends GuiComponent {
 
         gl.disable(gl.BLEND)
         for (let i: number = 0; i < inv.slots.length; ++i) {
-            let x = Math.trunc(this.width / 2) - 90 + i * 20
-            let y = this.height - 16
+            let x = Math.trunc(width / 2) - 90 + i * 20
+            let y = height - 16
             let id = inv.slots[i]
             if (id > 0) {
                 matrix.push()
@@ -94,8 +92,8 @@ export class Gui extends GuiComponent {
 
         // if(this.minecraft.gamemode instanceof SurvivalGameMode) {
         //     String var24 = "Score: &e" + this.minecraft.player.getScore()
-        //     font.drawShadow(var24, this.width - font.width(var24) - 2, 2, 0xFFFFFF)
-        //     font.drawShadow("Arrows: " + this.minecraft.player.arrows, Math.trunc(this.width / 2) + 8, this.height - 33, 0xFFFFFF)
+        //     font.drawShadow(var24, width - font.width(var24) - 2, 2, 0xFFFFFF)
+        //     font.drawShadow("Arrows: " + this.minecraft.player.arrows, Math.trunc(width / 2) + 8, height - 33, 0xFFFFFF)
         // }
 
         // let var26 = 10
@@ -107,12 +105,12 @@ export class Gui extends GuiComponent {
         // 
         // for(let i: number = 0; i < this.chat.length && i < var26; ++i) {
         //     if(this.chat.get(i).time < 200 || var27) {
-        //         font.drawShadow(this.chat.get(i).message, 2, this.height - 8 - i * 9 - 20, 0xFFFFFF)
+        //         font.drawShadow(this.chat.get(i).message, 2, height - 8 - i * 9 - 20, 0xFFFFFF)
         //     }
         // }
 
-        // let w = Math.trunc(this.width / 2)
-        // let h = Math.trunc(this.height / 2)
+        // let w = Math.trunc(width / 2)
+        // let h = Math.trunc(height / 2)
         // this.hoveredPlayer = null
         // tab list code
     }
