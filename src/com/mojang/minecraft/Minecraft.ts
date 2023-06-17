@@ -47,7 +47,6 @@ export class Minecraft {
     private levelRenderer: LevelRenderer
     // @ts-ignore
     public player: Player
-    public paintTexture: number = 1
     // @ts-ignore
     private particleEngine: ParticleEngine
     private entities: Entity[] = []
@@ -233,6 +232,7 @@ export class Minecraft {
     }
 
     private handleMouseClick(click: number): void {
+        let selected = this.player.inventory.getSelected()
         if (click == 0) {
             if (this.hitResult != null) {
                 let oldTile: Tile = Tile.tiles[this.level.getTile(this.hitResult.x, this.hitResult.y, this.hitResult.z)]
@@ -241,8 +241,8 @@ export class Minecraft {
                     oldTile.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine)
                 }
             }
-        } else if (click == 1 && this.hitResult != null) {
-            let aabb: AABB | null;
+        } else if (click == 1 && this.hitResult != null && selected > 0) {
+            let aabb: AABB | null
             let x = this.hitResult.x
             let y = this.hitResult.y
             let z = this.hitResult.z
@@ -264,9 +264,9 @@ export class Minecraft {
             if (this.hitResult.f == 5) {
                 x++
             }
-            aabb = Tile.tiles[this.paintTexture].getAABB(x, y, z)
+            aabb = Tile.tiles[this.player.inventory.getSelected()].getAABB(x, y, z)
             if (aabb == null || this.isFree(aabb)) {
-                this.level.setTile(x, y, z, this.paintTexture)
+                this.level.setTile(x, y, z, this.player.inventory.getSelected())
             }
         }
     }
@@ -287,7 +287,6 @@ export class Minecraft {
             if (this.screen == null) {
                 while (MouseEvents.next()) {
                     if (MouseEvents.getEventDWheel() != 0) {
-                        console.log(MouseEvents.getEventDWheel())
                         this.player.inventory.swapPaint(MouseEvents.getEventDWheel())
                     }
                     if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
