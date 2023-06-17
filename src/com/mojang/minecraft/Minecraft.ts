@@ -568,8 +568,8 @@ export function main() {
     window.addEventListener("wheel", (e) => {
         if (e.deltaY == 0) return
         MouseEvents.wheelUpdated = true
-        MouseEvents.wheel += (e.deltaY > 0 ? 1 : -1)
-        MouseEvents.dWheel += (e.deltaY > 0 ? 1 : -1)
+        MouseEvents.wheel -= (e.deltaY > 0 ? 1 : -1)
+        MouseEvents.dWheel -= (e.deltaY > 0 ? 1 : -1)
     })
 
     window.addEventListener("resize", () => {
