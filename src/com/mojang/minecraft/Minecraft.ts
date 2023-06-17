@@ -1,4 +1,4 @@
-import { Keyboard, Keys, Mouse, MouseButton } from "syncinput";
+import { Mouse, MouseButton } from "syncinput";
 import { Timer } from "./Timer";
 import { Level } from "./level/Level";
 import { LevelRenderer } from "./level/LevelRenderer";
@@ -21,17 +21,17 @@ import { Zombie } from "./character/Zombie";
 import { Screen } from "./gui/Screen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
-import { KeyboardEvents } from "./input/KeyboardEvents";
 import { KeyboardInput } from "./player/KeyboardInput";
 import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 import { GameRenderer } from "./renderer/GameRenderer";
 import { User } from "./User";
 import { Gui } from "./gui/Gui";
 import { Options } from "./Options";
+import { Key, Keyboard } from "../../util/input/Keyboard";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
-export let keyboard: any
+export let keyboard: Keyboard
 export let matrix = new Matrix()
 export let shader: Shader = new Shader()
 export let clickedElement: HTMLElement | null = null
@@ -192,13 +192,11 @@ export class Minecraft {
     private loop(): void {
         if (this.running) {
             mouse.update()
-            keyboard.update()
             if (this.paused) {
                 requestAnimationFrame(() => this.loop())
                 return
             }
             MouseEvents.update() // lwjgl
-            KeyboardEvents.update() // lwjgl
             this.timer.advanceTime()
             for (let i = 0; i < this.timer.ticks; i++) {
                 this.tick()
@@ -326,28 +324,28 @@ export class Minecraft {
             if (!this.mouseGrabbed && this.mouseGrabbed != oldGrabbed) {
                 this.pause()
             }
-            while (KeyboardEvents.next()) {
-                this.player.setKey(KeyboardEvents.getEventKey(), KeyboardEvents.getEventKeyState())
+            while (keyboard.next()) {
+                this.player.setKey(keyboard.getEventKey() as Key, keyboard.getEventKeyState() as boolean)
                 if (this.screen != null) {
                     this.screen.keyboardEvent()
                 }
-                if (KeyboardEvents.getEventKeyState()) {
+                if (keyboard.getEventKeyState()) {
                     if (this.screen == null) {
-                        if (KeyboardEvents.getEventKey() == Keys.ENTER) {
+                        if (keyboard.getEventKey() == Keyboard.KEY_RETURN) {
                             this.level.save()
                         }
-                        if (KeyboardEvents.getEventKey() == Keys.Y) {
+                        if (keyboard.getEventKey() == Keyboard.KEY_Y) {
                             this.yMouseAxis *= -1
                         }
-                        if (KeyboardEvents.getEventKey() == Keys.G) {
+                        if (keyboard.getEventKey() == Keyboard.KEY_G) {
                             this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
                         }
-                        if (KeyboardEvents.getEventKey() == Keys.B) {
+                        if (keyboard.getEventKey() == Keyboard.KEY_B) {
                             this.setScreen(new SelectBlockScreen())
                         }
                     }
                     for (let i: number = 0; i < 9; ++i) {
-                        if (KeyboardEvents.getEventKey() == i + 49) {
+                        if (keyboard.getEventKey() == (i + 1).toString()) {
                             this.player.inventory.selected = i
                         }
                     }

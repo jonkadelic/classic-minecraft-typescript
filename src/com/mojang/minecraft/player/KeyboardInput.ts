@@ -11,7 +11,7 @@ export class KeyboardInput extends Input {
         this.options = options
     }
 
-    public override setKeyState(key: number, state: boolean): void {
+    public override setKeyState(key: string, state: boolean): void {
         let i: number = -1
         if (key == this.options.keyUp.defaultKey) {
             i = 0

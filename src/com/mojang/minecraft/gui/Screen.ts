@@ -1,11 +1,11 @@
-import { MouseButton, Keys } from "syncinput";
+import { MouseButton } from "syncinput";
 import { GuiComponent } from "./GuiComponent";
 import { Button } from "./Button";
 import { Font } from "./Font";
 import { mouse, keyboard, Minecraft } from "../Minecraft";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { MouseEvents } from "../input/MouseEvents";
-import { KeyboardEvents } from "../input/KeyboardEvents";
+import { Key } from "../../../util/input/Keyboard";
 
 export class Screen extends GuiComponent {
     // @ts-ignore
@@ -28,11 +28,11 @@ export class Screen extends GuiComponent {
         }
     }
 
-    protected onKeyPress(key: number): void { // No more character
+    protected onKeyPress(key: string): void { // No more character
     }
 
-    protected onKeyUp(key: number): void { // No more character
-        if (key == Keys.ESC) {
+    protected onKeyUp(key: string): void { // No more character
+        if (key == "Escape") {
             this.minecraft.setScreen(null)
             this.minecraft.grabMouse()
         }
@@ -65,7 +65,7 @@ export class Screen extends GuiComponent {
         while (MouseEvents.next()) {
             this.mouseEvent()
         }
-        while (KeyboardEvents.next()) {
+        while (keyboard.next()) {
             this.keyboardEvent()
         }
     }
@@ -79,10 +79,10 @@ export class Screen extends GuiComponent {
     }
 
     public keyboardEvent(): void {
-        if (KeyboardEvents.getEventKeyState()) {
-            this.onKeyPress(KeyboardEvents.getEventKey())
+        if (keyboard.getEventKeyState()) {
+            this.onKeyPress(keyboard.getEventKey() as Key)
         } else {
-            this.onKeyUp(KeyboardEvents.getEventKey())
+            this.onKeyUp(keyboard.getEventKey() as Key)
         }
     }
 

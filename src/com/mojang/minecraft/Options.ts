@@ -1,6 +1,6 @@
+import { Keyboard } from "../../util/input/Keyboard";
 import { KeyMapping } from "./KeyMapping";
 import { Minecraft } from "./Minecraft";
-import { Keys } from "syncinput"
 
 export class Options {
     private static readonly renderDistanceNames: string[] = ["FAR", "NORMAL", "SHORT", "TINY"]
@@ -11,16 +11,16 @@ export class Options {
     public viewDistance: number = 0
     public bobView: boolean = true
     public limitFramerate: boolean = false
-    public keyUp: KeyMapping = new KeyMapping("Forward", Keys.W)
-    public keyLeft: KeyMapping = new KeyMapping("Left", Keys.A)
-    public keyDown: KeyMapping = new KeyMapping("Back", Keys.S)
-    public keyRight: KeyMapping = new KeyMapping("Right", Keys.D)
-    public keyJump: KeyMapping = new KeyMapping("Jump", Keys.SPACEBAR)
-    public keyBuild: KeyMapping = new KeyMapping("Build", Keys.B)
-    public keyChat: KeyMapping = new KeyMapping("Chat", Keys.T)
-    public keyToggleFog: KeyMapping = new KeyMapping("Toggle fog", Keys.F)
-    public keySaveLocation: KeyMapping = new KeyMapping("Save location", Keys.ENTER)
-    public keyLoadLocation: KeyMapping = new KeyMapping("Load location", Keys.R)
+    public keyUp: KeyMapping = new KeyMapping("Forward", Keyboard.KEY_W)
+    public keyLeft: KeyMapping = new KeyMapping("Left", Keyboard.KEY_A)
+    public keyDown: KeyMapping = new KeyMapping("Back", Keyboard.KEY_S)
+    public keyRight: KeyMapping = new KeyMapping("Right", Keyboard.KEY_D)
+    public keyJump: KeyMapping = new KeyMapping("Jump", Keyboard.KEY_SPACE)
+    public keyBuild: KeyMapping = new KeyMapping("Build", Keyboard.KEY_B)
+    public keyChat: KeyMapping = new KeyMapping("Chat", Keyboard.KEY_T)
+    public keyToggleFog: KeyMapping = new KeyMapping("Toggle fog", Keyboard.KEY_F)
+    public keySaveLocation: KeyMapping = new KeyMapping("Save location", Keyboard.KEY_RETURN)
+    public keyLoadLocation: KeyMapping = new KeyMapping("Load location", Keyboard.KEY_R)
     public keyMappings: KeyMapping[] = [
         this.keyUp, 
         this.keyLeft, 
@@ -45,7 +45,7 @@ export class Options {
         return this.keyMappings[key].name + ": " + this.keyMappings[key].defaultKey
     }
 
-    public setKey(key: number, value: number): void {
+    public setKey(key: number, value: string): void {
         this.keyMappings[key].defaultKey = value
         this.save()
     }

@@ -1,8 +1,8 @@
 export class KeyMapping {
     public name: string
-    public defaultKey: number
+    public defaultKey: string
 
-    constructor(name: string, defaultKey: number) {
+    constructor(name: string, defaultKey: string) {
         this.name = name
         this.defaultKey = defaultKey
     }

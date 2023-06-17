@@ -5,5 +5,5 @@ export class Input {
 
     public tick(): void {}
     public releaseAllKeys(): void {}
-    public setKeyState(key: number, state: boolean): void {}
+    public setKeyState(key: string, state: boolean): void {}
 }

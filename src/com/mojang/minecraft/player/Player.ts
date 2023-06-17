@@ -4,6 +4,7 @@ import { keyboard } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Input } from "./Input";
 import { Inventory } from "./Inventory";
+import { Keyboard } from "../../../util/input/Keyboard";
 
 export class Player extends Mob {
     public input: Input | null = null
@@ -26,7 +27,7 @@ export class Player extends Mob {
             let ya = this.input.yya
             let jump = this.input.jumping
 
-            if (keyboard.keyPressed(Keys.R)) {
+            if (keyboard.isKeyDown(Keyboard.KEY_R)) {
                 this.resetPos()
             }
             if (jump && this.onGround) {
@@ -50,7 +51,7 @@ export class Player extends Mob {
         this.input.releaseAllKeys()
     }
 
-    public setKey(key: number, state: boolean): void {
+    public setKey(key: string, state: boolean): void {
         if (this.input == null) return
         this.input.setKeyState(key, state)
     }
