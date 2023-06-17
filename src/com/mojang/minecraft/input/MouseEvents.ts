@@ -35,6 +35,18 @@ export class MouseEvents {
     public static getY(): number {
         return mouse.position.y
     }
+    
+    public static getDX(): number {
+        return mouse.delta.x
+    }
+    
+    public static getDY(): number {
+        return mouse.delta.y
+    }
+    
+    public static setGrabbed(grab: boolean): void {
+        return mouse.setLock(grab)
+    }
 
     public static getDWheel(): number {
         return mouse.wheel

@@ -114,7 +114,7 @@ export class LevelRenderer implements LevelListener {
         }
     }
 
-    public renderHit(h: HitResult, tileType: number): void {
+    public renderHit(h: HitResult): void {
         let t = Tesselator.instance
         gl.enable(gl.BLEND)
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)

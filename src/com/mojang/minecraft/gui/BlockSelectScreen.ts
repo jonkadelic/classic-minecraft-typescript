@@ -63,11 +63,7 @@ export class SelectBlockScreen extends Screen {
 
     protected override mouseClicked(mx: number, my: number, eventButton: number): void {
         if (eventButton == MouseButton.LEFT) {
-            // TODO: inventory
-            let tile = User.tiles[this.getTileAt(mx, my)]
-            if (tile != null) {
-                this.minecraft.paintTexture = tile.id
-            }
+            this.minecraft.player.inventory.replaceSlot(this.getTileAt(mx, my))
             this.minecraft.setScreen(null)
         }
     }

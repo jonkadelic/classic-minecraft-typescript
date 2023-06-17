@@ -24,6 +24,9 @@ import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardEvents } from "./input/KeyboardEvents";
 import { KeyboardInput } from "./player/KeyboardInput";
 import { SelectBlockScreen } from "./gui/BlockSelectScreen";
+import { GameRenderer } from "./renderer/GameRenderer";
+import { User } from "./User";
+import { Gui } from "./gui/Gui";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -44,7 +47,6 @@ export class Minecraft {
     private levelRenderer: LevelRenderer
     // @ts-ignore
     public player: Player
-    public paintTexture: number = 1
     // @ts-ignore
     private particleEngine: ParticleEngine
     private entities: Entity[] = []
@@ -55,6 +57,9 @@ export class Minecraft {
     // @ts-ignore
     public font: Font
     public screen: Screen | null = null
+    public gameRenderer: GameRenderer = new GameRenderer(this)
+    // @ts-ignore
+    public gui: Gui
     private running: boolean = false
     private fpsString: string = ""
     private mouseGrabbed: boolean = false
@@ -105,6 +110,13 @@ export class Minecraft {
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
         this.player.input = new KeyboardInput() // this.options
+        // TODO make GameMode classes and move this to the creative gamemode apply(Player)
+        for (let i: number = 0; i < 9; ++i) {
+            this.player.inventory.count[i] = 1
+            if (this.player.inventory.slots[i] <= 0) {
+                this.player.inventory.slots[i] = User.tiles[i].id
+            }
+        }
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
         for (let i = 0; i < 10; i++) {
@@ -113,6 +125,7 @@ export class Minecraft {
             this.entities.push(zombie)
         }
         this.checkGlError("Post startup")
+        this.gui = new Gui(this, this.width, this.height)
 
         window.onunload = () => {
             this.destroy()
@@ -138,7 +151,7 @@ export class Minecraft {
         if (screen !== null) {
             if (this.mouseGrabbed) {
                 this.mouseGrabbed = false
-                mouse.setLock(false)
+                MouseEvents.setGrabbed(false)
             }
             let screenWidth = Math.trunc(this.width * 240 / this.height)
             let screenHeight = Math.trunc(this.height * 240 / this.height)
@@ -209,7 +222,7 @@ export class Minecraft {
     public grabMouse(): void {
         if (this.mouseGrabbed) return
         this.mouseGrabbed = true
-        mouse.setLock(true)
+        MouseEvents.setGrabbed(true)
     }
 
     public pause(): void {
@@ -219,6 +232,7 @@ export class Minecraft {
     }
 
     private handleMouseClick(click: number): void {
+        let selected = this.player.inventory.getSelected()
         if (click == 0) {
             if (this.hitResult != null) {
                 let oldTile: Tile = Tile.tiles[this.level.getTile(this.hitResult.x, this.hitResult.y, this.hitResult.z)]
@@ -227,8 +241,8 @@ export class Minecraft {
                     oldTile.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine)
                 }
             }
-        } else if (click == 1 && this.hitResult != null) {
-            let aabb: AABB | null;
+        } else if (click == 1 && this.hitResult != null && selected > 0) {
+            let aabb: AABB | null
             let x = this.hitResult.x
             let y = this.hitResult.y
             let z = this.hitResult.z
@@ -250,9 +264,9 @@ export class Minecraft {
             if (this.hitResult.f == 5) {
                 x++
             }
-            aabb = Tile.tiles[this.paintTexture].getAABB(x, y, z)
+            aabb = Tile.tiles[selected].getAABB(x, y, z)
             if (aabb == null || this.isFree(aabb)) {
-                this.level.setTile(x, y, z, this.paintTexture)
+                this.level.setTile(x, y, z, selected)
             }
         }
     }
@@ -271,8 +285,11 @@ export class Minecraft {
         if (this.screen == null || this.screen.passEvents) {
             // Mouse
             if (this.screen == null) {
-                while (MouseEvents.next()) { // Just to make sure
-                    if(!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
+                while (MouseEvents.next()) {
+                    if (MouseEvents.getEventDWheel() != 0) {
+                        this.player.inventory.swapPaint(MouseEvents.getEventDWheel())
+                    }
+                    if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
                         this.grabMouse();
                     } else {
                         if (MouseEvents.getEventButton() == MouseButton.LEFT && MouseEvents.getEventButtonState()) {
@@ -311,19 +328,27 @@ export class Minecraft {
                     this.screen.keyboardEvent()
                 }
                 if (KeyboardEvents.getEventKeyState()) {
-                    if (KeyboardEvents.getEventKey() == Keys.ENTER) {
-                        this.level.save()
+                    if (this.screen == null) {
+                        if (KeyboardEvents.getEventKey() == Keys.ENTER) {
+                            this.level.save()
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.Y) {
+                            this.yMouseAxis *= -1
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.G) {
+                            this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                        }
+                        if (KeyboardEvents.getEventKey() == Keys.B) {
+                            this.setScreen(new SelectBlockScreen())
+                        }
                     }
-                    if (KeyboardEvents.getEventKey() == Keys.Y) {
-                        this.yMouseAxis *= -1
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.G) {
-                        this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
-                    }
-                    if (KeyboardEvents.getEventKey() == Keys.B) {
-                        this.setScreen(new SelectBlockScreen())
+                    for (let i: number = 0; i < 9; ++i) {
+                        if (KeyboardEvents.getEventKey() == i + 49) {
+                            this.player.inventory.selected = i
+                        }
                     }
                 }
+                // toggle fog key here
             }
         }
         if (this.screen != null) {
@@ -392,51 +417,68 @@ export class Minecraft {
 
     public render(a: number): void {
         if (!shader.isLoaded()) return
-        gl.viewport(0, 0, this.width, this.height)
-        if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
-            let xo = 0.0
-            let yo = 0.0
-            xo = mouse.delta.x
-            yo = mouse.delta.y
-            if (Math.abs(xo) < 500)
-            {
-                this.player.turn(xo, yo * this.yMouseAxis)
+        let screenWidth = Math.trunc(this.width * 240 / this.height)
+        let screenHeight = Math.trunc(this.height * 240 / this.height)
+        let mx = MouseEvents.getX() * screenWidth / this.width
+        let my = MouseEvents.getY() * screenHeight / this.height
+        if (this.level != null) {
+            gl.viewport(0, 0, this.width, this.height)
+            if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
+                let xo = 0.0
+                let yo = 0.0
+                xo = MouseEvents.getDX()
+                yo = MouseEvents.getDY()
+                if (Math.abs(xo) < 500)
+                {
+                    this.player.turn(xo, yo * this.yMouseAxis)
+                }
             }
-        }
-        this.checkGlError("Set viewport")
-        this.pick(a)
-        this.checkGlError("Picked")
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        this.setupCamera(a)
-        this.checkGlError("Set up camera")
-        gl.enable(gl.CULL_FACE)
-        let frustum = Frustum.getFrustum()
-        this.levelRenderer.updateDirtyChunks(this.player)
-        this.checkGlError("Update chunks")
-        this.setupFog()
-        gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
-        this.levelRenderer.render(this.player, 0)
-        this.checkGlError("Rendered level")
-        for (let i = 0; i < this.entities.length; i++) {
-            let entity = this.entities[i]
-            if (frustum.isVisible(entity.bb)) {
-                entity.render(a)
+            this.checkGlError("Set viewport")
+            this.pick(a)
+            this.checkGlError("Picked")
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            this.setupCamera(a)
+            this.checkGlError("Set up camera")
+            gl.enable(gl.CULL_FACE)
+            let frustum = Frustum.getFrustum()
+            this.levelRenderer.updateDirtyChunks(this.player)
+            this.checkGlError("Update chunks")
+            this.setupFog()
+            gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
+            this.levelRenderer.render(this.player, 0)
+            this.checkGlError("Rendered level")
+            for (let i = 0; i < this.entities.length; i++) {
+                let entity = this.entities[i]
+                if (frustum.isVisible(entity.bb)) {
+                    entity.render(a)
+                }
             }
+            this.checkGlError("Rendered entities")
+            this.particleEngine.render(this.player, a, 0)
+            this.checkGlError("Rendered particles")
+            gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
+            if (this.hitResult != null) {
+                this.levelRenderer.renderHit(this.hitResult)
+            }
+            this.checkGlError("Rendered hit")
+            this.gui.render(this.guiBuffer, a, this.screen != null, mx, my)
+        } else {
+            gl.viewport(0, 0, this.width, this.height)
+            gl.clearColor(0.0, 0.0, 0.0, 0.0)
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+            matrix.setActive(Matrix.PROJECTION)
+            matrix.loadIdentity()
+            matrix.setActive(Matrix.MODELVIEW)
+            matrix.loadIdentity()
+            this.gameRenderer.setupGuiCamera()
         }
-        this.checkGlError("Rendered entities")
-        this.particleEngine.render(this.player, a, 0)
-        this.checkGlError("Rendered particles")
-        gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
-        if (this.hitResult != null) {
-            this.levelRenderer.renderHit(this.hitResult, this.paintTexture)
+        if (this.screen != null) {
+            this.screen.render(this.guiBuffer, mx, my)
         }
-        this.checkGlError("Rendered hit")
-        this.drawGui(a)
         this.checkGlError("Rendered gui")
-
     }
 
-    private drawGui(a: number): void {
+    /*private drawGui(a: number): void {
         let screenWidth = Math.trunc(this.width * 240 / this.height)
         let screenHeight = Math.trunc(this.height * 240 / this.height)
         gl.clear(gl.DEPTH_BUFFER_BIT)
@@ -491,12 +533,7 @@ export class Minecraft {
         this.guiBuffer.draw();
         this.checkGlError("GUI: Draw crosshair")
         // screen
-        let mx = Math.trunc(mouse.position.x * screenWidth / this.width)
-        let my = Math.trunc(mouse.position.y * screenHeight / this.height)
-        if (this.screen != null) {
-            this.screen.render(this.guiBuffer, mx, my)
-        }
-    }
+    }*/
 
     private setupFog(): void {
         if (!shader.isLoaded()) return

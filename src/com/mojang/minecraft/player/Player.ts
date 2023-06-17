@@ -3,9 +3,11 @@ import { Mob } from "../mob/Mob";
 import { keyboard } from "../Minecraft";
 import { Level } from "../level/Level";
 import { Input } from "./Input";
+import { Inventory } from "./Inventory";
 
 export class Player extends Mob {
     public input: Input | null = null
+    public inventory: Inventory = new Inventory()
 
     public constructor(level: Level) {
         super(level)
@@ -17,6 +19,7 @@ export class Player extends Mob {
         this.xo = this.x
         this.yo = this.y
         this.zo = this.z
+        this.inventory.tick()
         if (this.input != null) {
             this.input.tick()
             let xa = this.input.xxa
@@ -50,5 +53,9 @@ export class Player extends Mob {
     public setKey(key: number, state: boolean): void {
         if (this.input == null) return
         this.input.setKeyState(key, state)
+    }
+
+    public addResource(id: number): boolean {
+        return this.inventory.addResource(id)
     }
 }
