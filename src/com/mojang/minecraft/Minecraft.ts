@@ -66,8 +66,8 @@ export class Minecraft {
     private mouseGrabbed: boolean = false
     private hitResult: HitResult | null = null
     // @ts-ignore
-    private options: Options
-
+    public options: Options
+    
     private frames: number = 0
     private lastTime: number = 0
 
@@ -479,63 +479,6 @@ export class Minecraft {
         }
         this.checkGlError("Rendered gui")
     }
-
-    /*private drawGui(a: number): void {
-        let screenWidth = Math.trunc(this.width * 240 / this.height)
-        let screenHeight = Math.trunc(this.height * 240 / this.height)
-        gl.clear(gl.DEPTH_BUFFER_BIT)
-        shader.setColor(1, 1, 1, 1)
-        matrix.setActive(Matrix.PROJECTION)
-        matrix.loadIdentity()
-        matrix.ortho(0, screenWidth, screenHeight, 0, 100, 300)
-        matrix.setActive(Matrix.MODELVIEW)
-        matrix.loadIdentity()
-        matrix.translate(0, 0, -200)
-        this.checkGlError("GUI: Init")
-        // hud
-        matrix.push()
-        matrix.translate(screenWidth - 16, 16, 0)
-        let t = Tesselator.instance
-        matrix.scale(16, 16, 16)
-        matrix.rotate(30, 1, 0, 0)
-        matrix.rotate(45, 0, 1, 0)
-        matrix.translate(-1.5, 0.5, -0.5)
-        matrix.scale(-1.0, -1.0, 1.0)
-        let id = this.textures.loadTexture("./terrain.png")
-        gl.bindTexture(gl.TEXTURE_2D, id)
-        t.init()
-        Tile.tiles[this.paintTexture].render(this.level, -2, 0, 0, t)
-        t.flush(this.guiBuffer)
-        this.guiBuffer.draw()
-        matrix.pop()
-        this.checkGlError("GUI: Draw selected")
-        this.font.drawShadow(Minecraft.VERSION_STRING, 2, 2, 0xFFFFFF)
-        this.font.drawShadow(this.fpsString, 2, 12, 0xFFFFFF)
-        this.checkGlError("GUI: Draw text")
-        let wc = Math.trunc(screenWidth / 2)
-        let hc = Math.trunc(screenHeight / 2)
-        shader.setColor(1, 1, 1, 1)
-        t.init()
-        t.vertex(wc + 1, hc - 4, 0.0);
-        t.vertex(wc - 0, hc - 4, 0.0);
-        t.vertex(wc - 0, hc + 5, 0.0);
-        
-        t.vertex(wc - 0, hc + 5, 0.0);
-        t.vertex(wc + 1, hc + 5, 0.0);
-        t.vertex(wc + 1, hc - 4, 0.0);
-        
-        t.vertex(wc + 5, hc - 0, 0.0);
-        t.vertex(wc - 4, hc - 0, 0.0);
-        t.vertex(wc - 4, hc + 1, 0.0);
-        
-        t.vertex(wc - 4, hc + 1, 0.0);
-        t.vertex(wc + 5, hc + 1, 0.0);
-        t.vertex(wc + 5, hc - 0, 0.0);
-        t.flush(this.guiBuffer);
-        this.guiBuffer.draw();
-        this.checkGlError("GUI: Draw crosshair")
-        // screen
-    }*/
 
     private setupFog(): void {
         if (!shader.isLoaded()) return

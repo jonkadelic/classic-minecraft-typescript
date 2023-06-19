@@ -2,6 +2,7 @@ import { Screen } from "./Screen";
 import { Button } from "./Button";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { GenerateLevelScreen } from "./GenerateLevelScreen";
+import { OptionsScreen } from "./OptionsScreen";
 
 export class PauseScreen extends Screen {
 
@@ -20,7 +21,7 @@ export class PauseScreen extends Screen {
 
     public override buttonClicked(button: Button): void {
         if (button.id == 0) {
-
+            this.minecraft.setScreen(new OptionsScreen(this, this.minecraft.options))
         }
         if (button.id == 1) {
             this.minecraft.setScreen(new GenerateLevelScreen(this))

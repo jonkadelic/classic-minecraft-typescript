@@ -41,16 +41,16 @@ export class Options {
         this.load()
     }
 
-    public getKeyString(key: number): string {
+    public getKeyBinding(key: number): string {
         return this.keyMappings[key].name + ": " + this.keyMappings[key].defaultKey
     }
 
-    public setKey(key: number, value: string): void {
+    public setKeyBinding(key: number, value: string): void {
         this.keyMappings[key].defaultKey = value
         this.save()
     }
 
-    public setValue(i: number, value: number): void {
+    public setOption(i: number, value: number): void {
         switch (i) {
             case 0:
                 this.music = !this.music
@@ -77,7 +77,7 @@ export class Options {
         this.save()
     }
 
-    public getMessage(i: number): string {
+    public getOption(i: number): string {
         switch (i) {
             case 0:
                 return "Music: " + (this.music ? "ON" : "OFF")
