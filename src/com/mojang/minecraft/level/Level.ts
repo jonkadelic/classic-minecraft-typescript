@@ -8,6 +8,8 @@ import { Tile } from "./tile/Tile";
 import { Tiles } from "./tile/Tiles";
 import Base256 from "base256-encoding"
 import { NoiseMap } from "./NoiseMap";
+import { Material } from "./material/Material";
+import { Entity } from "../Entity";
 
 export class Level {
     private static readonly TILE_UPDATE_INTERVAL = 400
@@ -299,6 +301,22 @@ export class Level {
         }
     }
 
+    public getLiquid(x: number, y: number, z: number): Material {
+        let tile = this.getTile(x, y, z)
+        if (tile == 0) {
+            return Material.none
+        }
+        return Tile.tiles[tile].getMaterial()
+    }
+
+    public isWater(x: number, y: number, z: number): boolean {
+        let tile = this.getTile(x, y, z)
+        if (tile == 0) {
+            return false
+        }
+        return Tile.tiles[tile].getMaterial() == Material.water
+    }
+
     public clip(a: Vec3, b: Vec3): HitResult | null {
         if (Number.isNaN(a.x) || Number.isNaN(a.y) || Number.isNaN(a.z)) {
             return null
@@ -462,5 +480,36 @@ export class Level {
             this.setTile(x, y + iy, z, Tiles.treeTrunk.id);
         }
         return true;
+    }
+
+    public explode(entity: Entity, x: number, y: number, z: number, radius: number): void {
+        let x0 = Math.trunc(x - radius - 1)
+        let x1 = Math.trunc(x + radius + 1)
+        let y0 = Math.trunc(y - radius - 1)
+        let y1 = Math.trunc(y + radius + 1)
+        let z0 = Math.trunc(z - radius - 1)
+        let z1 = Math.trunc(z + radius + 1)
+        for (let xx = x0; xx < x1; xx++) {
+            for (let yy = y1 - 1; yy >= y0; yy--) {
+                for (let zz = z0; zz < z1; zz++) {
+                    let xd = xx + 0.5 - x
+                    let yd = yy + 0.5 - y
+                    let zd = zz + 0.5 - z
+                    let dist = xd * xd + yd * yd + zd * zd
+                    if (dist >= radius * radius) {
+                        continue
+                    }
+                    let id = this.getTile(xx, yy, zz)
+                    if (id > 0) {
+                        let tile = Tile.tiles[id]
+                        if (!tile.isExplodable()) continue
+                        // tile.dropItems(this, xx, yy, zz, 0.3)
+                        this.setTile(xx, yy, zz, 0)
+                        Tile.tiles[id].explode(this, xx, yy, zz)
+                    }
+                }
+            }
+        }
+        // TODO
     }
 }

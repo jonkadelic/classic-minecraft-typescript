@@ -4,13 +4,19 @@ import { DirtTile } from "./DirtTile";
 import { GlassTile } from "./GlassTile";
 import { GrassTile } from "./GrassTile";
 import { LeafTile } from "./LeafTile";
+import { MetalTile } from "./MetalTile";
+import { Mushroom } from "./Mushroom";
+import { OreTile } from "./OreTile";
 import { Sapling } from "./Sapling";
+import { SpongeTile } from "./SpongeTile";
 import { StoneSlabTile } from "./StoneSlabTile";
+import { StoneTile } from "./StoneTile";
 import { Tile } from "./Tile";
+import { TntTile } from "./TntTile";
 import { TreeTile } from "./TreeTile";
 
 export class Tiles {
-    public static rock: Tile = new Tile(1, 1).setData(1.0)
+    public static rock: Tile = new StoneTile(1, 1).setData(1.0)
     public static grass: Tile = new GrassTile(2).setData(1.0)
     public static dirt: Tile = new DirtTile(3, 2).setData(1.0)
     public static stoneBrick: Tile = new Tile(4, 16).setData(1.0)
@@ -23,12 +29,12 @@ export class Tiles {
     public static calmLava: Tile
     public static sand: Tile
     public static gravel: Tile
-    public static goldOre: Tile
-    public static ironOre: Tile
-    public static coalOre: Tile
+    public static goldOre: Tile = new OreTile(14, 32).setData(1.0)
+    public static ironOre: Tile = new OreTile(15, 33).setData(1.0)
+    public static coalOre: Tile = new OreTile(16, 34).setData(1.0)
     public static treeTrunk: Tile = new TreeTile(17).setData(1.0)
     public static leaves: Tile = new LeafTile(18, 22).setData(0.4)
-    public static sponge: Tile // 0.9
+    public static sponge: Tile = new SpongeTile(19, 48).setData(0.9)
     public static glass: Tile = new GlassTile(20, 49, false).setData(1.0)
     public static cloth_00: Tile = new Tile(21, 64).setData(1.0)
     public static cloth_01: Tile = new Tile(22, 65).setData(1.0)
@@ -48,15 +54,15 @@ export class Tiles {
     public static cloth_15: Tile = new Tile(36, 79).setData(1.0)
     public static flower: Tile = new Bush(37, 13).setData(1.0)
     public static rose: Tile = new Bush(38, 12).setData(1.0)
-    public static mushroom1: Tile
-    public static mushroom2: Tile
-    public static goldBlock: Tile
-    public static ironBlock: Tile
+    public static mushroom1: Tile = new Mushroom(39, 29).setData(1.0)
+    public static mushroom2: Tile = new Mushroom(40, 28).setData(1.0)
+    public static goldBlock: Tile = new MetalTile(41, 40).setData(1.0)
+    public static ironBlock: Tile = new MetalTile(42, 39).setData(1.0)
     public static stoneSlab: Tile = new StoneSlabTile(43, true).setData(1.0)
     public static stoneSlabHalf: Tile = new StoneSlabTile(44, false).setData(1.0)
     public static redBrick: Tile = new Tile(45, 7).setData(1.0)
-    public static tnt: Tile
+    public static tnt: Tile = new TntTile(46, 8).setData(1.0)
     public static bookshelf: Tile = new BookshelfTile(47, 35).setData(1.0)
     public static mossStone: Tile = new Tile(48, 36).setData(1.0)
-    public static obsidian: Tile
+    public static obsidian: Tile = new StoneTile(49, 37).setData(1.0)
 }

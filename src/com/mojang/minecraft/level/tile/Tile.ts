@@ -10,12 +10,14 @@ import { Bush } from "./Bush";
 import { Tiles } from "./Tiles";
 import { Vec3 } from "../../character/Vec3";
 import { HitResult } from "../../HitResult";
+import { Material } from "../material/Material";
 
 export class Tile {
     protected static random: Random = new Random()
     public static tiles: Tile[] = new Array(256)
     public tex: number
     public id: number
+    private explodable: boolean = true
     public x0: number = 0
     public y0: number = 0
     public z0: number = 0
@@ -253,6 +255,10 @@ export class Tile {
         }
     }
 
+    public getMaterial(): Material {
+        return Material.none
+    }
+
     public neighborChanged(level: Level, x: number, y: number, z: number, type: number): void {
     }
 
@@ -268,6 +274,10 @@ export class Tile {
 
     public getResource(): number {
         return this.id
+    }
+
+    public isExplodable(): boolean {
+        return this.explodable
     }
 
     public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult | null {
@@ -351,6 +361,9 @@ export class Tile {
 
     private inXY(v: Vec3 | null): boolean {
         return v != null && v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
+    }
+
+    public explode(level: Level, x: number, y: number, z: number): void {
     }
 
     public render(level: Level, x: number, y: number, z: number, t: Tesselator): boolean {
