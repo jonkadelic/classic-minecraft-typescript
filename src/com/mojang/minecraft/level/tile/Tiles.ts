@@ -1,3 +1,4 @@
+import { BookshelfTile } from "./BookshelfTile";
 import { Bush } from "./Bush";
 import { DirtTile } from "./DirtTile";
 import { GlassTile } from "./GlassTile";
@@ -55,7 +56,7 @@ export class Tiles {
     public static stoneSlabHalf: Tile = new StoneSlabTile(44, false).setData(1.0)
     public static redBrick: Tile = new Tile(45, 7).setData(1.0)
     public static tnt: Tile
-    public static bookshelf: Tile
+    public static bookshelf: Tile = new BookshelfTile(47, 35).setData(1.0)
     public static mossStone: Tile = new Tile(48, 36).setData(1.0)
     public static obsidian: Tile
 }
