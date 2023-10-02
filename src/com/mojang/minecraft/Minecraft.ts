@@ -28,6 +28,7 @@ import { User } from "./User";
 import { Gui } from "./gui/Gui";
 import { Options } from "./Options";
 import { Key, Keyboard } from "../../util/input/Keyboard";
+import { LevelGenerator } from "./level/levelgen/RandomLevelSource";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -110,7 +111,7 @@ export class Minecraft {
         matrix.setActive(Matrix.MODELVIEW)
         this.checkGlError("Startup")
         this.options = new Options(this)
-        this.level = new Level(256, 256, 64)
+        this.level = new LevelGenerator().create("default", 256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
         this.player.input = new KeyboardInput(this.options)

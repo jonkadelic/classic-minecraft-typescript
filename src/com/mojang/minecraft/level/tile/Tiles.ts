@@ -23,12 +23,12 @@ export class Tiles {
     public static wood: Tile = new Tile(5, 4).setData(1.0)
     public static sapling: Tile = new Sapling(6, 15).setData(1.0)
     public static unbreakable: Tile = new Tile(7, 17).setData(1.0)
-    public static water: Tile
-    public static calmWater: Tile
-    public static lava: Tile
-    public static calmLava: Tile
-    public static sand: Tile
-    public static gravel: Tile
+    public static water: Tile = new Tile(8, 14).setData(0.0)
+    public static calmWater: Tile = new Tile(9, 14).setData(0.0)
+    public static lava: Tile = new Tile(10, 30).setData(1.0)
+    public static calmLava: Tile = new Tile(11, 30).setData(1.0)
+    public static sand: Tile = new Tile(12, 18).setData(1.0)
+    public static gravel: Tile = new Tile(13, 19).setData(1.0)
     public static goldOre: Tile = new OreTile(14, 32).setData(1.0)
     public static ironOre: Tile = new OreTile(15, 33).setData(1.0)
     public static coalOre: Tile = new OreTile(16, 34).setData(1.0)

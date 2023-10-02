@@ -28,9 +28,9 @@ export class LevelRenderer implements LevelListener {
         this.level = level
         this.textures = textures
         level.addListener(this)
-        this.xChunks = Math.ceil(level.width / LevelRenderer.CHUNK_SIZE)
-        this.yChunks = Math.ceil(level.depth / LevelRenderer.CHUNK_SIZE)
-        this.zChunks = Math.ceil(level.height / LevelRenderer.CHUNK_SIZE)
+        this.xChunks = Math.ceil(level.xSize / LevelRenderer.CHUNK_SIZE)
+        this.yChunks = Math.ceil(level.ySize / LevelRenderer.CHUNK_SIZE)
+        this.zChunks = Math.ceil(level.zSize / LevelRenderer.CHUNK_SIZE)
         this.chunks = new Array(this.xChunks * this.yChunks * this.zChunks)
         for (let x = 0; x < this.xChunks; x++) {
             for (let y = 0; y < this.yChunks; y++) {
@@ -41,14 +41,14 @@ export class LevelRenderer implements LevelListener {
                     let x1 = (x + 1) * LevelRenderer.CHUNK_SIZE
                     let y1 = (y + 1) * LevelRenderer.CHUNK_SIZE
                     let z1 = (z + 1) * LevelRenderer.CHUNK_SIZE
-                    if (x1 > level.width) {
-                        x1 = level.width
+                    if (x1 > level.xSize) {
+                        x1 = level.xSize
                     }
-                    if (y1 > level.depth) {
-                        y1 = level.depth
+                    if (y1 > level.ySize) {
+                        y1 = level.ySize
                     }
-                    if (z1 > level.height) {
-                        z1 = level.height
+                    if (z1 > level.zSize) {
+                        z1 = level.zSize
                     }
                     this.setChunk(x, y, z, new Chunk(level, x0, y0, z0, x1, y1, z1))
                 }
@@ -221,6 +221,6 @@ export class LevelRenderer implements LevelListener {
     }
 
     public allChanged(): void {
-        this.setDirty(0, 0, 0, this.level.width, this.level.depth, this.level.height)
+        this.setDirty(0, 0, 0, this.level.xSize, this.level.ySize, this.level.zSize)
     } 
 }

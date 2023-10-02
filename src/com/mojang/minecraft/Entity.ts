@@ -32,9 +32,9 @@ export class Entity {
     }
 
     public resetPos(): void {
-        let x = Math.random() * this.level.width
-        let y = this.level.depth + 10
-        let z = Math.random() * this.level.height
+        let x = Math.random() * this.level.xSize
+        let y = this.level.ySize + 10
+        let z = Math.random() * this.level.zSize
         this.setPos(x, y, z)
     }
 
