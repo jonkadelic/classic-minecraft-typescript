@@ -121,6 +121,25 @@ export class LiquidTile extends Tile {
         return this.material
     }
 
+    public override isFaceVisible(level: Level, x: number, y: number, z: number, face: number): boolean {
+        if (x >= 0 && y >= 0 && z >= 0 && x < level.xSize && z < level.zSize) {
+            let tile = level.getTile(x, y, z)
+            if (tile != this.liquidId && tile != this.calmLiquidId) {
+                return face != 1 ||
+                    level.getTile(x - 1, y, z) != 0 &&
+                    level.getTile(x + 1, y, z) != 0 &&
+                    level.getTile(x, y, z - 1) != 0 &&
+                    level.getTile(x, y, z + 1) != 0
+                ? super.isFaceVisible(level, x, y, z, face)
+                : true
+            } else {
+                return false
+            }
+        } else {
+            return false
+        }
+    }
+
     public override neighborChanged(level: Level, x: number, y: number, z: number, id: number): void {
         if (id != 0) {
             let material = Tile.tiles[id].getMaterial()

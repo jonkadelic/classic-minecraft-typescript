@@ -120,9 +120,6 @@ export class LevelRenderer implements LevelListener {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
         t.init()
         shader.setColor(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
-        //if (mode == 0) {
-        
-        // TODO: 0.30 line renderer
         let tile = Tile.tiles[this.level.getTile(h.x, h.y, h.z)]
         if (tile != null) {
             for (let i = 0; i < 6; i++) {
@@ -135,38 +132,6 @@ export class LevelRenderer implements LevelListener {
         }
         t.flush(this.hitRenderBuffer)
         this.hitRenderBuffer.draw()
-        
-        /*} else {
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-            let br = Math.sin(Date.now() / 100) * 0.2 + 0.8
-            shader.setColor(br, br, br, Math.sin(Date.now() / 200) * 0.2 + 0.5)
-            let id = this.textures.loadTexture("./terrain.png")
-            gl.bindTexture(gl.TEXTURE_2D, id)
-            let x = h.x
-            let y = h.y
-            let z = h.z
-            if (h.f == 0) {
-                y--
-            }
-            if (h.f == 1) {
-                y++
-            }
-            if (h.f == 2) {
-                z--
-            }
-            if (h.f == 3) {
-                z++
-            }
-            if (h.f == 4) {
-                x--
-            }
-            if (h.f == 5) {
-                x++
-            }
-            Tile.tiles[tileType].render(t, this.level, x, y, z)
-            t.flush(this.hitRenderBuffer)
-            this.hitRenderBuffer.draw()
-        }*/
         gl.disable(gl.BLEND)
     }
 

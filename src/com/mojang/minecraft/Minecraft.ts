@@ -449,6 +449,10 @@ export class Minecraft {
             this.setupFog()
             gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
             this.levelRenderer.render(this.player, 0)
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+            gl.enable(gl.BLEND)
+            this.levelRenderer.render(this.player, 1)
+            gl.disable(gl.BLEND)
             this.checkGlError("Rendered level")
             for (let i = 0; i < this.entities.length; i++) {
                 let entity = this.entities[i]
