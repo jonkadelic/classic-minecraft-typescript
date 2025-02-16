@@ -10,9 +10,10 @@ import Base256 from "base256-encoding"
 import { NoiseMap } from "./NoiseMap";
 import { Material } from "./material/Material";
 import { Entity } from "../Entity";
+import { TickNextTickData } from "./TickNextTickData";
 
 export class Level {
-    private static readonly TILE_UPDATE_INTERVAL = 400
+    private static readonly MAX_TICK_TILES_PER_TICK = 200
     public xSize: number
     public zSize: number
     public ySize: number
@@ -29,7 +30,11 @@ export class Level {
     private lightDepths: number[]
     private levelListeners: LevelListener[] = []
     private random: Random = new Random()
+    private randValue = this.random.nextInt()
+    private addend = 1013904223
+    private tickNextTickList: TickNextTickData[] = []
     private unprocessed = 0
+    private tickCount = 0
     private networkMode = false
 
     public constructor(xSize: number, zSize: number, ySize: number) {
@@ -326,7 +331,7 @@ export class Level {
 
     public isSolidTile(x: number, y: number, z: number): boolean {
         let tile = Tile.tiles[this.getTile(x, y, z)]
-        return tile != null && tile.isSolid()
+        return tile != null && tile.isSolidRender()
     }
 
     public getHighestTile(x: number, z: number): number {
@@ -351,18 +356,60 @@ export class Level {
     }
 
     public tick(): void {
-        this.unprocessed += this.xSize * this.zSize * this.ySize
-        let ticks = this.unprocessed / Level.TILE_UPDATE_INTERVAL
-        this.unprocessed -= ticks * Level.TILE_UPDATE_INTERVAL
-        for (let i = 0; i < ticks; i++) {
-            let x = this.random.nextInt(this.xSize)
-            let y = this.random.nextInt(this.ySize)
-            let z = this.random.nextInt(this.zSize)
-            let tile = Tile.tiles[this.getTile(x, y, z)]
-            if (tile != null) {
-                tile.tick(this, x, y, z, this.random)
+        this.tickCount++
+
+        let xSizeBits = 1
+        let ySizeBits = 1
+
+        while (1 << xSizeBits < this.xSize) {
+            xSizeBits++
+        }
+        while (1 << ySizeBits < this.ySize) {
+            ySizeBits++
+        }
+
+        let maxX = this.xSize - 1
+        let maxY = this.ySize - 1
+        let maxZ = this.zSize - 1
+
+        if (this.tickCount % 5 == 0) {
+            let ticksInList = this.tickNextTickList.length
+
+            for (let i = 0; i < ticksInList; i++) {
+                let tickData = this.tickNextTickList.shift() as TickNextTickData
+                if (tickData.delay > 0) {
+                    tickData.delay--
+                    this.tickNextTickList.push(tickData);
+                } else {
+                    if (this.isInLevel(tickData.x, tickData.y, tickData.z)) {
+                        let tile = this.getTile(tickData.x, tickData.y, tickData.z)
+                        if (tile == tickData.tileId && tile > 0) {
+                            Tile.tiles[tile].tick(this, tickData.x, tickData.y, tickData.z, this.random)
+                        }
+                    }
+                }
             }
         }
+
+        this.unprocessed = this.unprocessed + this.xSize * this.ySize * this.zSize
+        let toTake = Math.trunc(this.unprocessed / Level.MAX_TICK_TILES_PER_TICK)
+        this.unprocessed -= toTake * Level.MAX_TICK_TILES_PER_TICK
+
+        for (let i = 0; i < toTake; i++) {
+            this.randValue = this.randValue * 3 + this.addend;
+            let r = this.randValue >> 2
+            let rx = r & maxX
+            let ry = r >> xSizeBits & maxY
+            let rz = r >> (xSizeBits + ySizeBits) & maxZ
+            let tile = this.getTile(rx, ry, rz)
+            if (Tile.shouldTick[tile]) {
+                Tile.tiles[tile].tick(this, rx, ry, rz, this.random)
+            }
+        }
+    }
+
+    private isInLevel(x: number, y: number, z: number): boolean {
+        return x >= 0 && y >= 0 && z >= 0 && x < this.xSize && y < this.ySize && z < this.zSize;
     }
 
     public getGroundLevel() {
@@ -387,6 +434,17 @@ export class Level {
             return false
         }
         return Tile.tiles[tile].getMaterial() == Material.water
+    }
+
+    public addToTickNextTick(x: number, y: number, z: number, id: number): void {
+        if (!this.networkMode) {
+            let data = new TickNextTickData(x, y, z, id);
+            if (id > 0) {
+                data.delay = Tile.tiles[id].getTickDelay()
+            }
+
+            this.tickNextTickList.push(data)
+        }
     }
 
     public clip(a: Vec3, b: Vec3): HitResult | null {
@@ -577,7 +635,7 @@ export class Level {
                         if (!tile.isExplodable()) continue
                         // tile.dropItems(this, xx, yy, zz, 0.3)
                         this.setTile(xx, yy, zz, 0)
-                        Tile.tiles[id].explode(this, xx, yy, zz)
+                        Tile.tiles[id].wasExploded(this, xx, yy, zz)
                     }
                 }
             }

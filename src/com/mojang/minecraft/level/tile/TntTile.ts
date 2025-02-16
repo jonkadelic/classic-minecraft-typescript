@@ -21,7 +21,7 @@ export class TntTile extends Tile {
         return 0
     }
 
-    public override explode(level: Level, x: number, y: number, z: number): void {
+    public override wasExploded(level: Level, x: number, y: number, z: number): void {
         // TODO
     }
 

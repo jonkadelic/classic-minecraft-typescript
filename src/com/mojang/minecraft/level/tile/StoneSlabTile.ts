@@ -20,7 +20,7 @@ export class StoneSlabTile extends Tile {
         return 5
     }
 
-    public override isSolid(): boolean {
+    public override isSolidRender(): boolean {
         return this.isFullBlock
     }
 
@@ -49,14 +49,14 @@ export class StoneSlabTile extends Tile {
         return this.isFullBlock
     }
 
-    public override shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
+    public override isFaceVisible(level: Level, x: number, y: number, z: number, layer: number): boolean {
         if (this != Tiles.stoneSlabHalf) {
-            return super.shouldRenderFace(level, x, y, z, layer)
+            return super.isFaceVisible(level, x, y, z, layer)
         }
         if (layer == 1) {
             return true
         }
-        if (!super.shouldRenderFace(level, x, y, z, layer)) {
+        if (!super.isFaceVisible(level, x, y, z, layer)) {
             return false
         }
         if (layer == 0) {

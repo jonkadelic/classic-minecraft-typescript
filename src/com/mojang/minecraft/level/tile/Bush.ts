@@ -65,7 +65,7 @@ export class Bush extends Tile {
         return false
     }
 
-    public override isSolid(): boolean {
+    public override isSolidRender(): boolean {
         return false
     }
 

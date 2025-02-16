@@ -9,16 +9,16 @@ export class TransparentTile extends Tile {
         this.renderInside = renderInside
     }
 
-    public override isSolid(): boolean {
+    public override isSolidRender(): boolean {
         return false
     }
 
-    public override shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
+    public override isFaceVisible(level: Level, x: number, y: number, z: number, layer: number): boolean {
         let id = level.getTile(x, y, z)
         if (!this.renderInside && id == this.id) {
             return false
         }
-        return super.shouldRenderFace(level, x, y, z, layer)
+        return super.isFaceVisible(level, x, y, z, layer)
     }
 
     public override blocksLight(): boolean {

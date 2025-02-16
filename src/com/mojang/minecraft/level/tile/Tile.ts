@@ -11,21 +11,28 @@ import { Material } from "../material/Material";
 export class Tile {
     protected static random: Random = new Random()
     public static tiles: Tile[] = new Array(256)
+    public static shouldTick: boolean[] = new Array(256)
+    public static isSolid: boolean[] = Array(256)
+    public static isCubeShaped: boolean[] = Array(256)
+    public static tickSpeed: number[] = Array(256)
     public tex: number
     public id: number
+    private destroyProgress: number = 0
     private explodable: boolean = true
-    public x0: number = 0
-    public y0: number = 0
-    public z0: number = 0
-    public x1: number = 0
-    public y1: number = 0
-    public z1: number = 0
+    public xx0: number = 0
+    public yy0: number = 0
+    public zz0: number = 0
+    public xx1: number = 0
+    public yy1: number = 0
+    public zz1: number = 0
     public particleGravity: number = 0
 
     public constructor(id: number, tex: number = 0) {
+        Tile.tiles[id] = this
         this.id = id
         this.setShape(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        Tile.tiles[id] = this
+        Tile.isSolid[id] = this.isSolidRender();
+        Tile.isCubeShaped[id] = this.isCubeShaped();
         this.tex = tex
     }
 
@@ -33,21 +40,29 @@ export class Tile {
         return true
     }
 
+    public setTicking(shouldTick: boolean): void {
+        Tile.shouldTick[this.id] = shouldTick;
+    }
+
     public setData(particleGravity: number): Tile {
         this.particleGravity = particleGravity
         return this
     }
 
-    protected setShape(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
-        this.x0 = x0
-        this.y0 = y0
-        this.z0 = z0
-        this.x1 = x1
-        this.y1 = y1
-        this.z1 = z1
+    protected setShape(xx0: number, yy0: number, zz0: number, xx1: number, yy1: number, zz1: number): void {
+        this.xx0 = xx0
+        this.yy0 = yy0
+        this.zz0 = zz0
+        this.xx1 = xx1
+        this.yy1 = yy1
+        this.zz1 = zz1
     }
 
-    public renderInInventory(t: Tesselator) {
+    public setTickSpeed(tickSpeed: number): void {
+        Tile.tickSpeed[this.id] = tickSpeed;
+    }
+
+    public renderInInventory(t: Tesselator): void {
         let c1 = 0.5
         let c2 = 0.8
         let c3 = 0.6
@@ -68,12 +83,8 @@ export class Tile {
     protected getBrightness(level: Level, x: number, y: number, z: number): number {
         return level.getBrightness(x, y, z)
     }
-    
-    public getRenderPass(): number {
-        return 0
-    }
 
-    public shouldRenderFace(level: Level, x: number, y: number, z: number, layer: number): boolean {
+    public isFaceVisible(level: Level, x: number, y: number, z: number, face: number): boolean {
         return !level.isSolidTile(x, y, z);
     }
 
@@ -88,17 +99,17 @@ export class Tile {
         let v0 = Math.trunc(tex / 16) / 16.0
         let v1 = v0 + (1 / 16.0)
         if (face >= 2 && tex < 240) {
-            if (this.y0 >= 0.0 && this.y1 <= 1.0) {
-                v0 = (Math.trunc(tex / 16) + this.y0) / 16.0;
-                v1 = (Math.trunc(tex / 16) + this.y1) / 16.0;
+            if (this.yy0 >= 0.0 && this.yy1 <= 1.0) {
+                v0 = (Math.trunc(tex / 16) + this.yy0) / 16.0;
+                v1 = (Math.trunc(tex / 16) + this.yy1) / 16.0;
             }
         }
-        let x0 = x + this.x0
-        let x1 = x + this.x1
-        let y0 = y + this.y0
-        let y1 = y + this.y1
-        let z0 = z + this.z0
-        let z1 = z + this.z1
+        let x0 = x + this.xx0
+        let x1 = x + this.xx1
+        let y0 = y + this.yy0
+        let y1 = y + this.yy1
+        let z0 = z + this.zz0
+        let z1 = z + this.zz1
         if (face == 0) {
             t.vertexUV(x0, y0, z1, u0, v1);
             t.vertexUV(x0, y0, z0, u0, v0);
@@ -156,12 +167,12 @@ export class Tile {
     }
 
     public renderFaceNoTexture(t: Tesselator, x: number, y: number, z: number, face: number): void {
-        let x0 = x + this.x0
-        let x1 = x + this.x1
-        let y0 = y + this.y0
-        let y1 = y + this.y1
-        let z0 = z + this.z0
-        let z1 = z + this.z1
+        let x0 = x + this.xx0
+        let x1 = x + this.xx1
+        let y0 = y + this.yy0
+        let y1 = y + this.yy1
+        let z0 = z + this.zz0
+        let z1 = z + this.zz1
         if (face == 0) {
             t.vertex(x0, y0, z1);
             t.vertex(x0, y0, z0);
@@ -219,18 +230,18 @@ export class Tile {
     }
 
     public getTileAABB(x: number, y: number, z: number): AABB {
-        return new AABB(x + this.x0, y + this.y0, z + this.z0, x + this.x1, y + this.y1, z + this.z1)
+        return new AABB(x + this.xx0, y + this.yy0, z + this.zz0, x + this.xx1, y + this.yy1, z + this.zz1)
     }
     
     public getAABB(x: number, y: number, z: number): AABB | null {
-        return new AABB(x + this.x0, y + this.y0, z + this.z0, x + this.x1, y + this.y1, z + this.z1)
+        return new AABB(x + this.xx0, y + this.yy0, z + this.zz0, x + this.xx1, y + this.yy1, z + this.zz1)
     }
 
     public blocksLight(): boolean {
         return true
     }
 
-    public isSolid(): boolean {
+    public isSolidRender(): boolean {
         return true
     }
 
@@ -255,7 +266,14 @@ export class Tile {
         return Material.none
     }
 
-    public neighborChanged(level: Level, x: number, y: number, z: number, type: number): void {
+    public neighborChanged(level: Level, x: number, y: number, z: number, id: number): void {
+    }
+
+    public netChanged(level: Level, x: number, y: number, z: number): void {
+    }
+
+    public getTickDelay(): number {
+        return 0
     }
 
     public onPlace(level: Level, x: number, y: number, z: number): void {
@@ -272,6 +290,10 @@ export class Tile {
         return this.id
     }
 
+    public getDestroyProgress(): number {
+        return this.destroyProgress
+    }
+
     public isExplodable(): boolean {
         return this.explodable
     }
@@ -279,28 +301,28 @@ export class Tile {
     public clip(x: number, y: number, z: number, a: Vec3, b: Vec3): HitResult | null {
         a = a.add(-x, -y, -z)
         b = b.add(-x, -y, -z)
-        let x0clip = a.clipX(b, this.x0)
-        let x1clip = a.clipX(b, this.x1)
-        let y0clip = a.clipY(b, this.y0)
-        let y1clip = a.clipY(b, this.y1)
-        let z0clip = a.clipZ(b, this.z0)
-        let z1clip = a.clipZ(b, this.z1)
-        if (!this.inYZ(x0clip)) {
+        let x0clip = a.clipX(b, this.xx0)
+        let x1clip = a.clipX(b, this.xx1)
+        let y0clip = a.clipY(b, this.yy0)
+        let y1clip = a.clipY(b, this.yy1)
+        let z0clip = a.clipZ(b, this.zz0)
+        let z1clip = a.clipZ(b, this.zz1)
+        if (!this.containsX(x0clip)) {
             x0clip = null
         }
-        if (!this.inYZ(x1clip)) {
+        if (!this.containsX(x1clip)) {
             x1clip = null
         }
-        if (!this.inXZ(y0clip)) {
+        if (!this.containsY(y0clip)) {
             y0clip = null
         }
-        if (!this.inXZ(y1clip)) {
+        if (!this.containsY(y1clip)) {
             y1clip = null
         }
-        if (!this.inXY(z0clip)) {
+        if (!this.containsZ(z0clip)) {
             z0clip = null
         }
-        if (!this.inXY(z1clip)) {
+        if (!this.containsZ(z1clip)) {
             z1clip = null
         }
         let vec = null
@@ -347,19 +369,19 @@ export class Tile {
         return new HitResult(0, x, y, z, face)
     }
 
-    private inYZ(v: Vec3 | null): boolean {
-        return v != null && v.y >= this.y0 && v.y <= this.y1 && v.z >= this.z0 && v.z <= this.z1
+    private containsX(v: Vec3 | null): boolean {
+        return v != null && v.y >= this.yy0 && v.y <= this.yy1 && v.z >= this.zz0 && v.z <= this.zz1
     }
 
-    private inXZ(v: Vec3 | null): boolean {
-        return v != null && v.x >= this.x0 && v.x <= this.x1 && v.z >= this.z0 && v.z <= this.z1
+    private containsY(v: Vec3 | null): boolean {
+        return v != null && v.x >= this.xx0 && v.x <= this.xx1 && v.z >= this.zz0 && v.z <= this.zz1
     }
 
-    private inXY(v: Vec3 | null): boolean {
-        return v != null && v.x >= this.x0 && v.x <= this.x1 && v.y >= this.y0 && v.y <= this.y1
+    private containsZ(v: Vec3 | null): boolean {
+        return v != null && v.x >= this.xx0 && v.x <= this.xx1 && v.y >= this.yy0 && v.y <= this.yy1
     }
 
-    public explode(level: Level, x: number, y: number, z: number): void {
+    public wasExploded(level: Level, x: number, y: number, z: number): void {
     }
 
     public render(level: Level, x: number, y: number, z: number, t: Tesselator): boolean {
@@ -368,37 +390,37 @@ export class Tile {
         let c2 = 0.8
         let c3 = 0.6
         let brightness: number
-        if (this.shouldRenderFace(level, x, y - 1, z, 0)) {
+        if (this.isFaceVisible(level, x, y - 1, z, 0)) {
             brightness = this.getBrightness(level, x, y - 1, z)
             t.color_f(c1 * brightness, c1 * brightness, c1 * brightness)
             this.renderFace(t, x, y, z, 0)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y + 1, z, 1)) {
+        if (this.isFaceVisible(level, x, y + 1, z, 1)) {
             brightness = this.getBrightness(level, x, y + 1, z)
             t.color_f(brightness, brightness, brightness)
             this.renderFace(t, x, y, z, 1)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z - 1, 2)) {
+        if (this.isFaceVisible(level, x, y, z - 1, 2)) {
             brightness = this.getBrightness(level, x, y, z - 1)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 2)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x, y, z + 1, 3)) {
+        if (this.isFaceVisible(level, x, y, z + 1, 3)) {
             brightness = this.getBrightness(level, x, y, z + 1)
             t.color_f(c2 * brightness, c2 * brightness, c2 * brightness)
             this.renderFace(t, x, y, z, 3)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x - 1, y, z, 4)) {
+        if (this.isFaceVisible(level, x - 1, y, z, 4)) {
             brightness = this.getBrightness(level, x - 1, y, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 4)
             rendered = true
         }
-        if (this.shouldRenderFace(level, x + 1, y, z, 5)) {
+        if (this.isFaceVisible(level, x + 1, y, z, 5)) {
             brightness = this.getBrightness(level, x + 1, y, z)
             t.color_f(c3 * brightness, c3 * brightness, c3 * brightness)
             this.renderFace(t, x, y, z, 5)
@@ -407,4 +429,8 @@ export class Tile {
         return rendered
     }
 
+        
+    public getRenderLayer(): number {
+        return 0
+    }
 }
