@@ -10,6 +10,7 @@ import { LiquidTileStatic } from "./LiquidTileStatic";
 import { MetalTile } from "./MetalTile";
 import { Mushroom } from "./Mushroom";
 import { OreTile } from "./OreTile";
+import { SandTile } from "./SandTile";
 import { Sapling } from "./Sapling";
 import { SpongeTile } from "./SpongeTile";
 import { StoneSlabTile } from "./StoneSlabTile";
@@ -30,8 +31,8 @@ export class Tiles {
     public static calmWater: Tile = new LiquidTileStatic(9, Material.water).setData(0.0)
     public static lava: Tile = new LiquidTile(10, Material.lava).setData(1.0)
     public static calmLava: Tile = new LiquidTileStatic(11, Material.lava).setData(1.0)
-    public static sand: Tile = new Tile(12, 18).setData(1.0)
-    public static gravel: Tile = new Tile(13, 19).setData(1.0)
+    public static sand: Tile = new SandTile(12, 18).setData(1.0)
+    public static gravel: Tile = new SandTile(13, 19).setData(1.0)
     public static goldOre: Tile = new OreTile(14, 32).setData(1.0)
     public static ironOre: Tile = new OreTile(15, 33).setData(1.0)
     public static coalOre: Tile = new OreTile(16, 34).setData(1.0)

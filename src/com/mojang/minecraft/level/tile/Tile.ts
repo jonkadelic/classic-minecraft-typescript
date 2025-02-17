@@ -269,7 +269,7 @@ export class Tile {
     public neighborChanged(level: Level, x: number, y: number, z: number, id: number): void {
     }
 
-    public netChanged(level: Level, x: number, y: number, z: number): void {
+    public onPlaceByPlayer(level: Level, x: number, y: number, z: number): void {
     }
 
     public getTickDelay(): number {

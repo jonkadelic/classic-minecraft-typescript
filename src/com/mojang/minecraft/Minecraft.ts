@@ -270,6 +270,9 @@ export class Minecraft {
             aabb = Tile.tiles[selected].getAABB(x, y, z)
             if (aabb == null || this.isFree(aabb)) {
                 this.level.setTile(x, y, z, selected)
+                if (selected != 0) {
+                    Tile.tiles[selected].onPlaceByPlayer(this.level, x, y, z)
+                }
             }
         }
     }

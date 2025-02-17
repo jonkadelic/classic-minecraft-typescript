@@ -35,7 +35,7 @@ export class LiquidTile extends Tile {
         return false
     }
 
-    public override netChanged(level: Level, x: number, y: number, z: number): void {
+    public override onPlaceByPlayer(level: Level, x: number, y: number, z: number): void {
         level.addToTickNextTick(x, y, z, this.liquidId);
     }
 
