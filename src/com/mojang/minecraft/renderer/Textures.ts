@@ -1,7 +1,10 @@
 import { gl } from "../Minecraft";
+import { DynamicTexture } from "./ptexture/DynamicTexture";
 
 export class Textures {
-    private idMap: Map<string, WebGLTexture> = new Map();
+    public idMap: Map<string, WebGLTexture> = new Map();
+    public dynamicTextures: DynamicTexture[] = []
+    public pixels: Uint8Array = new Uint8Array(256 * 256 * 4)
 
     public preloadTextures(): void {
         this.loadTexture("./terrain.png")
@@ -67,5 +70,28 @@ export class Textures {
         this.idMap.set(resourceName, texture);
 
         return texture;
+    }
+
+    public addDynamicTexture(dynamicTexture: DynamicTexture): void {
+        this.dynamicTextures.push(dynamicTexture)
+        dynamicTexture.tick()
+    }
+
+    public tick(): void {
+        for (let i: number = 0; i < this.dynamicTextures.length; i++) {
+            let dynamicTexture: DynamicTexture = this.dynamicTextures[i]
+            dynamicTexture.tick()
+            gl.texSubImage2D(
+                gl.TEXTURE_2D, 
+                0, 
+                Math.trunc(dynamicTexture.tex % 16 << 4),
+                Math.trunc(dynamicTexture.tex / 16 << 4),
+                16,
+                16,
+                gl.RGBA,
+                gl.UNSIGNED_BYTE,
+                dynamicTexture.pixels
+            )
+        }
     }
 }

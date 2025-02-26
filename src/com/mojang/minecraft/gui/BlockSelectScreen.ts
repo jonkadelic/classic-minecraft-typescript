@@ -16,7 +16,7 @@ export class SelectBlockScreen extends Screen {
     }
 
     private getTileAt(mx: number, my: number): number {
-        for (let i = 0; i < User.tiles.length; i++) {
+        for (let i = 0; i < User.allowedTiles.length; i++) {
             let x = Math.trunc(this.width / 2) + i % 9 * 24 + -108 - 3
             let y = Math.trunc(this.height / 2) + Math.trunc(i / 9) * 24 + -60 + 3
             if (mx >= x && mx <= x + 24 && my >= y - 12 && my <= y + 12) {
@@ -39,8 +39,8 @@ export class SelectBlockScreen extends Screen {
         let t = Tesselator.instance
         let tex = textures.loadTexture("./terrain.png")
         gl.bindTexture(gl.TEXTURE_2D, tex)
-        for (let i = 0; i < User.tiles.length; i++) {
-            let cTile = User.tiles[i]
+        for (let i = 0; i < User.allowedTiles.length; i++) {
+            let cTile = User.allowedTiles[i]
             if (cTile == null) continue
             matrix.push()
             matrix.translate(Math.trunc(this.width / 2) + i % 9 * 24 - 108, Math.trunc(this.height / 2) + Math.trunc(i / 9) * 24 + -60, 0)

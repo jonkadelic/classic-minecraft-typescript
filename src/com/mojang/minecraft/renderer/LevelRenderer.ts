@@ -3,15 +3,15 @@ import { Matrix } from "../../../util/Matrix";
 import { HitResult } from "../HitResult";
 import { gl, matrix, shader } from "../Minecraft";
 import { Player } from "../player/Player";
-import { Frustum } from "../renderer/Frustum";
-import { Textures } from "../renderer/Textures";
+import { Frustum } from "./Frustum";
+import { Textures } from "./Textures";
 import { Chunk } from "./Chunk";
-import { Level } from "./Level";
-import { LevelListener } from "./LevelListener";
-import { Tesselator } from "../renderer/Tesselator";
+import { Level } from "../level/Level";
+import { LevelListener } from "../level/LevelListener";
+import { Tesselator } from "./Tesselator";
 import { RenderBuffer } from "../../../util/RenderBuffer";
-import { Tile } from "./tile/Tile";
-import { Tiles } from "./tile/Tiles";
+import { Tile } from "../level/tile/Tile";
+import { Tiles } from "../level/tile/Tiles";
 
 export class LevelRenderer implements LevelListener {
     public static readonly MAX_REBUILDS_PER_FRAME = 8
@@ -28,9 +28,9 @@ export class LevelRenderer implements LevelListener {
         this.level = level
         this.textures = textures
         level.addListener(this)
-        this.xChunks = Math.ceil(level.xSize / LevelRenderer.CHUNK_SIZE)
-        this.yChunks = Math.ceil(level.ySize / LevelRenderer.CHUNK_SIZE)
-        this.zChunks = Math.ceil(level.zSize / LevelRenderer.CHUNK_SIZE)
+        this.xChunks = Math.ceil(level.width / LevelRenderer.CHUNK_SIZE)
+        this.yChunks = Math.ceil(level.depth / LevelRenderer.CHUNK_SIZE)
+        this.zChunks = Math.ceil(level.height / LevelRenderer.CHUNK_SIZE)
         this.chunks = new Array(this.xChunks * this.yChunks * this.zChunks)
         for (let x = 0; x < this.xChunks; x++) {
             for (let y = 0; y < this.yChunks; y++) {
@@ -41,14 +41,14 @@ export class LevelRenderer implements LevelListener {
                     let x1 = (x + 1) * LevelRenderer.CHUNK_SIZE
                     let y1 = (y + 1) * LevelRenderer.CHUNK_SIZE
                     let z1 = (z + 1) * LevelRenderer.CHUNK_SIZE
-                    if (x1 > level.xSize) {
-                        x1 = level.xSize
+                    if (x1 > level.width) {
+                        x1 = level.width
                     }
-                    if (y1 > level.ySize) {
-                        y1 = level.ySize
+                    if (y1 > level.depth) {
+                        y1 = level.depth
                     }
-                    if (z1 > level.zSize) {
-                        z1 = level.zSize
+                    if (z1 > level.height) {
+                        z1 = level.height
                     }
                     this.setChunk(x, y, z, new Chunk(level, x0, y0, z0, x1, y1, z1))
                 }
@@ -186,6 +186,6 @@ export class LevelRenderer implements LevelListener {
     }
 
     public allChanged(): void {
-        this.setDirty(0, 0, 0, this.level.xSize, this.level.ySize, this.level.zSize)
+        this.setDirty(0, 0, 0, this.level.width, this.level.depth, this.level.height)
     } 
 }

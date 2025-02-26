@@ -1,14 +1,14 @@
 import { Mouse, MouseButton } from "syncinput";
 import { Timer } from "./Timer";
 import { Level } from "./level/Level";
-import { LevelRenderer } from "./level/LevelRenderer";
+import { LevelRenderer } from "./renderer/LevelRenderer";
 import { Player } from "./player/Player";
 import { ParticleEngine } from "./particle/ParticleEngine";
 import { Entity } from "./Entity";
 import { Textures } from "./renderer/Textures";
 import { HitResult } from "./HitResult";
 import { AABB } from "./phys/AABB";
-import { Chunk } from "./level/Chunk";
+import { Chunk } from "./renderer/Chunk";
 import { Tile } from "./level/tile/Tile";
 import { Matrix } from "../../util/Matrix";
 import { Frustum } from "./renderer/Frustum";
@@ -29,6 +29,7 @@ import { Gui } from "./gui/Gui";
 import { Options } from "./Options";
 import { Key, Keyboard } from "../../util/input/Keyboard";
 import { LevelGenerator } from "./level/levelgen/RandomLevelSource";
+import { WaterTexture } from "./renderer/ptexture/WaterTexture";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -111,6 +112,7 @@ export class Minecraft {
         matrix.setActive(Matrix.MODELVIEW)
         this.checkGlError("Startup")
         this.options = new Options(this)
+        this.textures.addDynamicTexture(new WaterTexture())
         this.level = new LevelGenerator().create("default", 256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
@@ -119,7 +121,7 @@ export class Minecraft {
         for (let i: number = 0; i < 9; ++i) {
             this.player.inventory.count[i] = 1
             if (this.player.inventory.slots[i] <= 0) {
-                this.player.inventory.slots[i] = User.tiles[i].id
+                this.player.inventory.slots[i] = User.allowedTiles[i].id
             }
         }
         this.particleEngine = new ParticleEngine(this.level, this.textures)
@@ -288,6 +290,10 @@ export class Minecraft {
         } else if (this.mouseGrabbed) {
             
         }*/
+
+        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./terrain.png"))
+        this.textures.tick()
+
         if (this.screen == null || this.screen.passEvents) {
             // Mouse
             if (this.screen == null) {

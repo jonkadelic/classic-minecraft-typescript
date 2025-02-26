@@ -2,10 +2,10 @@ import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft";
 import { Player } from "../player/Player";
 import { AABB } from "../phys/AABB";
-import { Tesselator } from "../renderer/Tesselator";
-import { Level } from "./Level";
-import { Tile } from "./tile/Tile";
-import { Tiles } from "./tile/Tiles";
+import { Tesselator } from "./Tesselator";
+import { Level } from "../level/Level";
+import { Tile } from "../level/tile/Tile";
+import { Tiles } from "../level/tile/Tiles";
 
 export class Chunk {
     public aabb: AABB

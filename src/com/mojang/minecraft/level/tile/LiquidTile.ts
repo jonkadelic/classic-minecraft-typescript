@@ -122,7 +122,7 @@ export class LiquidTile extends Tile {
     }
 
     public override isFaceVisible(level: Level, x: number, y: number, z: number, face: number): boolean {
-        if (x >= 0 && y >= 0 && z >= 0 && x < level.xSize && z < level.zSize) {
+        if (x >= 0 && y >= 0 && z >= 0 && x < level.width && z < level.height) {
             let tile = level.getTile(x, y, z)
             if (tile != this.liquidId && tile != this.calmLiquidId) {
                 return face != 1 ||
