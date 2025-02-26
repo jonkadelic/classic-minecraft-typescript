@@ -10,4 +10,15 @@ export class Mth {
     public static sqrt(x: number): number {
         return Math.sqrt(x)
     }
+
+    public static clamp(x: number, min: number, max: number): number {
+        if (x < min) {
+            return min
+        }
+        if (x > max) {
+            return max
+        }
+
+        return x
+    }
 }

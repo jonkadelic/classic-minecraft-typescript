@@ -1,3 +1,4 @@
+import { Mth } from "../../../util/Mth";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { gl } from "../Minecraft"
 
@@ -41,10 +42,10 @@ export class Tesselator {
     }
 
     public color_f(r: number, g: number, b: number, a: number = 1): void {
-        this.r = r
-        this.g = g
-        this.b = b
-        this.a = a
+        this.r = Mth.clamp(r, 0.0, 1.0)
+        this.g = Mth.clamp(g, 0.0, 1.0)
+        this.b = Mth.clamp(b, 0.0, 1.0)
+        this.a = Mth.clamp(a, 0.0, 1.0)
         this.hasColor = true
     }
 

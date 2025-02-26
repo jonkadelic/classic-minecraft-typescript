@@ -30,6 +30,7 @@ import { Options } from "./Options";
 import { Key, Keyboard } from "../../util/input/Keyboard";
 import { LevelGenerator } from "./level/levelgen/RandomLevelSource";
 import { WaterTexture } from "./renderer/ptexture/WaterTexture";
+import { LavaTexture } from "./renderer/ptexture/LavaTexture";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -113,6 +114,7 @@ export class Minecraft {
         this.checkGlError("Startup")
         this.options = new Options(this)
         this.textures.addDynamicTexture(new WaterTexture())
+        this.textures.addDynamicTexture(new LavaTexture())
         this.level = new LevelGenerator().create("default", 256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
