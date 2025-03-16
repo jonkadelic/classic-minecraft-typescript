@@ -118,6 +118,7 @@ export class Minecraft {
         this.level = new LevelGenerator().create("default", 256, 256, 64)
         this.levelRenderer = new LevelRenderer(this.level, this.textures)
         this.player = new Player(this.level)
+        this.level.player = this.player
         this.player.input = new KeyboardInput(this.options)
         // TODO make GameMode classes and move this to the creative gamemode apply(Player)
         for (let i: number = 0; i < 9; ++i) {
@@ -128,11 +129,6 @@ export class Minecraft {
         }
         this.particleEngine = new ParticleEngine(this.level, this.textures)
         this.font = new Font("./default.png", this.textures)
-        for (let i = 0; i < 10; i++) {
-            let zombie = new Zombie(this.level, this.textures, 128, 0, 128)
-            zombie.resetPos()
-            this.entities.push(zombie)
-        }
         this.checkGlError("Post startup")
         this.gui = new Gui(this)
 

@@ -1,4 +1,8 @@
+import { Mth } from "../../util/Mth";
+import { BlockMap } from "./level/BlockMap";
 import { Level } from "./level/Level";
+import { Material } from "./level/material/Material";
+import { Tile } from "./level/tile/Tile";
 import { AABB } from "./phys/AABB";
 
 export class Entity {
@@ -14,14 +18,30 @@ export class Entity {
     public zd: number = 0
     public yRot: number = 0
     public xRot: number = 0
+    public yRotO: number = 0
+    public xRotO: number = 0
     public bb: AABB
     public onGround: boolean = false
+    public horizontalCollision: boolean = false
+    public collision: boolean = false
+    public slide: boolean = true
     public removed: boolean = false
     protected heightOffset: number = 0
     protected bbWidth = 0.6
     protected bbHeight = 1.8
+    public walkDistO: number = 0.0
+    public walkDist: number = 0.0
+    public makeStepSound: boolean = true
+    public fallDistance: number = 0.0
+    private nextStep: number = 1
+    public blockMap: BlockMap | null = null
+    public xOld: number = 0.0
+    public yOld: number = 0.0
+    public zOld: number = 0.0
     public ySlideOffset: number = 0.0
     public footSize: number = 0.0
+    public noPhysics: boolean = false
+    public pushthrough: number = 0.0
 
     public constructor(level: Level) {
         this.level = level
@@ -73,73 +93,174 @@ export class Entity {
         this.zo = this.z
     }
 
+    public isFree(x: number, y: number, z: number, grow: number = 0): boolean {
+        let aabb = this.bb.grow(grow, grow, grow).cloneMove(x, y, z)
+        return this.level.getCubes(aabb).length > 0 ? false : !this.level.containsAnyLiquid(aabb)
+    }
+
     public move(xa: number, ya: number, za: number): void {
-        let xaOrg = xa
-        let yaOrg = ya
-        let zaOrg = za
-        let aABBOrg = this.bb.copy()
-        let aABBs = this.level.getCubes(this.bb.expand(xa, ya, za))
-        for (let i = 0; i < aABBs.length; i++) {
-            ya = aABBs[i].clipYCollide(this.bb, ya)
-        }
-        this.bb.move(0, ya, 0)
-        for (let i = 0; i < aABBs.length; i++) {
-            xa = aABBs[i].clipXCollide(this.bb, xa)
-        }
-        let step = this.onGround || yaOrg != ya && yaOrg < 0.0
-        this.bb.move(xa, 0, 0)
-        for (let i = 0; i < aABBs.length; i++) {
-            za = aABBs[i].clipZCollide(this.bb, za)
-        }
-        this.bb.move(0, 0, za)
+        if (this.noPhysics) {
+            this.bb.move(xa, ya, za)
+            this.x = (this.bb.x0 + this.bb.x1) / 2
+            this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset
+            this.z = (this.bb.z0 + this.bb.z1) / 2
+        } else {
+            let ox: number = this.x
+            let oz: number = this.z
+            let oxa: number = xa
+            let oya: number = ya
+            let oza: number = za
+            let obb: AABB = this.bb.copy()
+            let cubes: AABB[] = this.level.getCubes(this.bb.expand(xa, ya, za))
 
-        if (this.footSize > 0.0 && step && this.ySlideOffset < 0.05 && (xaOrg != xa || zaOrg != za)) {
-            let xaLast = xa
-            let yaLast = ya
-            let zaLast = za
-            xa = xaOrg
-            ya = this.footSize
-            za = zaOrg
-            let bbCopy = this.bb.copy()
-            this.bb = aABBOrg.copy()
-            aABBs = this.level.getCubes(this.bb.expand(xaOrg, ya, zaOrg))
-            for(let i = 0; i < aABBs.length; ++i) {
-                ya = aABBs[i].clipYCollide(this.bb, ya)
+            for (let i: number = 0; i < cubes.length; i++) {
+                ya = cubes[i].clipYCollide(this.bb, ya)
             }
+
             this.bb.move(0.0, ya, 0.0)
-            for(let i = 0; i < aABBs.length; ++i) {
-                xa = aABBs[i].clipXCollide(this.bb, xa)
+            if (!this.slide && oya != ya) {
+                za = 0.0
+                ya = 0.0
+                xa = 0.0
             }
+
+            let isCollidingBelow: boolean = this.onGround || oya != ya && oya < 0.0
+
+            for (let i = 0; i < cubes.length; i++) {
+                xa = cubes[i].clipXCollide(this.bb, xa)
+            }
+
             this.bb.move(xa, 0.0, 0.0)
-            for(let i = 0; i < aABBs.length; ++i) {
-               za = aABBs[i].clipZCollide(this.bb, za)
+            if (!this.slide && oxa != xa) {
+                za = 0.0
+                ya = 0.0
+                xa = 0.0
             }
+
+            for (let i = 0; i < cubes.length; i++) {
+                za = cubes[i].clipZCollide(this.bb, za)
+            }
+
             this.bb.move(0.0, 0.0, za)
-
-            if(xaLast * xaLast + zaLast * zaLast >= xa * xa + za * za) {
-               xa = xaLast
-               ya = yaLast
-               za = zaLast
-               this.bb = bbCopy.copy()
-            } else {
-               this.ySlideOffset += 0.5
+            if (!this.slide && oza != za) {
+                za = 0.0
+                ya = 0.0
+                xa = 0.0
             }
+
+            if (this.footSize > 0.0 && isCollidingBelow && this.ySlideOffset < 0.05 && (oxa != xa || oza != za)) {
+                let noxa: number = xa
+                let noya: number = ya
+                let noza: number = za
+                xa = oxa
+                ya = this.footSize
+                za = oza
+                let nobb: AABB = this.bb.copy()
+                this.bb = obb.copy()
+                cubes = this.level.getCubes(this.bb.expand(oxa, ya, oza))
+
+                for (let i: number = 0; i < cubes.length; i++) {
+                    ya = cubes[i].clipYCollide(this.bb, ya)
+                }
+
+                this.bb.move(0.0, ya, 0.0)
+                if (!this.slide && oya != ya) {
+                    za = 0.0
+                    ya = 0.0
+                    xa = 0.0
+                }
+
+                for (let i: number = 0; i < cubes.length; i++) {
+                    xa = cubes[i].clipXCollide(this.bb, xa)
+                }
+
+                this.bb.move(xa, 0.0, 0.0)
+                if (!this.slide && oxa != xa) {
+                    za = 0.0
+                    ya = 0.0
+                    xa = 0.0
+                }
+
+                for (let i: number = 0; i < cubes.length; i++) {
+                    za = cubes[i].clipZCollide(this.bb, za)
+                }
+
+                this.bb.move(0.0, 0.0, za)
+                if (!this.slide && oza != za) {
+                    za = 0.0
+                    ya = 0.0
+                    xa = 0.0
+                }
+
+                if (noxa * noxa + noza * noza >= xa * xa + za * za) {
+                    xa = noxa
+                    ya = noya
+                    za = noza
+                    this.bb = nobb.copy()
+                } else {
+                    this.ySlideOffset = this.ySlideOffset + 0.5
+                }
+            }
+
+            this.horizontalCollision = oxa != xa || oza != za
+            this.onGround = oya != ya && oya < 0.0
+            this.collision = this.horizontalCollision || oya != ya
+            if (this.onGround) {
+                if (this.fallDistance > 0.0) {
+                    this.causeFallDamage(this.fallDistance)
+                    this.fallDistance = 0.0
+                }
+            } else if (ya < 0.0) {
+                this.fallDistance -= ya
+            }
+
+            if (oxa != xa) {
+                this.xd = 0.0
+            }
+
+            if (oya != ya) {
+                this.yd = 0.0
+            }
+
+            if (oza != za) {
+                this.zd = 0.0
+            }
+
+            this.x = (this.bb.x0 + this.bb.x1) / 2
+            this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset
+            this.z = (this.bb.z0 + this.bb.z1) / 2
+            let dx: number = this.x - ox;
+            let dz: number = this.z - oz;
+            this.walkDist = this.walkDist + Mth.sqrt(dx * dx + dz * dz) * 0.6
+            if (this.makeStepSound) {
+                let tile: number = this.level.getTile(Math.trunc(this.x), Math.trunc(this.y - 0.2 - this.heightOffset), Math.trunc(this.z))
+                if (this.walkDist > this.nextStep && tile > 0) {
+                    // Sound stuff
+                }
+            }
+
+            this.ySlideOffset *= 0.4
+        }
+    }
+
+    protected causeFallDamage(damage: number): void {
+    }
+
+    public isInWater(): boolean {
+        return this.level.containsLiquid(this.bb.grow(0.0, -0.4, 0.0), Material.water)
+    }
+
+    public isUnderWater(): boolean {
+        let tile = this.level.getTile(Math.trunc(this.x), Math.trunc(this.y + 0.12), Math.trunc(this.z))
+        if (tile != 0) {
+            return Tile.tiles[tile].getMaterial() == Material.water
         }
 
-        let bl = this.onGround = yaOrg != ya && yaOrg < 0
-        if (xaOrg != xa) {
-            this.xd = 0
-        }
-        if (yaOrg != ya) {
-            this.yd = 0
-        }
-        if (zaOrg != za) {
-            this.zd = 0
-        }
-        this.x = (this.bb.x0 + this.bb.x1) / 2
-        this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset
-        this.z = (this.bb.z0 + this.bb.z1) / 2
-        this.ySlideOffset *= 0.4;
+        return false
+    }
+
+    public isInLava(): boolean {
+        return this.level.containsLiquid(this.bb.grow(0.0, -0.4, 0.0), Material.lava)
     }
 
     public moveRelative(xa: number, za: number, speed: number) {
@@ -169,5 +290,52 @@ export class Entity {
     }
 
     public render(a: number) {
+    }
+
+    public setLevel(level: Level): void {
+        this.level = level
+    }
+
+    public playerTouch(player: Entity): void { }
+
+    public push_(other: Entity): void {
+        let dx: number = other.x - this.x
+        let dz: number = other.z - this.z
+        let distanceSqr: number = dx * dx + dz * dz
+        if (distanceSqr >= 0.01) {
+            let distance: number = Mth.sqrt(distanceSqr)
+            dx /= distance
+            dz /= distance
+            dx /= distance
+            dz /= distance
+            dx *= 0.05
+            dz *= 0.05
+            dx *= 1.0 - this.pushthrough
+            dz *= 1.0 - this.pushthrough
+            this.push(-dx, 0.0, -dz)
+            other.push(dx, 0.0, dz)
+        }
+    }
+
+    public push(dx: number, dy: number, dz: number): void {
+        this.xd += dx
+        this.yd += dy
+        this.zd += dz
+    }
+
+    public hurt(attacker: Entity, damage: number): void { }
+
+    public intersects(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): boolean {
+        return this.bb.intersects_(x0, y0, z0, x1, y1, z1)
+    }
+
+    public isPushable(): boolean {
+        return false
+    }
+
+    public awardKillScore(killer: Entity, deathScore: number): void { }
+
+    public isCreativeModeAllowed(): boolean {
+        return false
     }
 }

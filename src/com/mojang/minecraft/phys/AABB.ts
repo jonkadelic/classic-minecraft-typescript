@@ -54,6 +54,10 @@ export class AABB {
         return new AABB(_x0, _y0, _z0, _x1, _y1, _z1)
     }
 
+    public cloneMove(xa: number, ya: number, za: number): AABB {
+        return new AABB(this.x0 + xa, this.y0 + ya, this.z0 + za, this.x1 + xa, this.y1 + ya, this.z1 + za)
+    }
+
     public copy(): AABB {
        return new AABB(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1)
     }
@@ -136,5 +140,18 @@ export class AABB {
         this.x1 += xa
         this.y1 += ya
         this.z1 += za
+    }
+
+    public intersects_(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): boolean {
+        if (x1 <= this.x0 || x0 >= this.x1) {
+            return false
+        }
+        if (y1 <= this.y0 || y0 >= this.y1) {
+            return false
+        }
+        if (z1 <= this.z0 || z0 >= this.z1) {
+            return false
+        }
+        return true
     }
 }

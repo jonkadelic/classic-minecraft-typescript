@@ -11,6 +11,7 @@ import { NoiseMap } from "./NoiseMap";
 import { Material } from "./material/Material";
 import { Entity } from "../Entity";
 import { TickNextTickData } from "./TickNextTickData";
+import { BlockMap } from "./BlockMap";
 
 export class Level {
     private static readonly MAX_TICK_TILES_PER_TICK = 200
@@ -29,26 +30,29 @@ export class Level {
     private randValue = this.random.nextInt()
     private addend = 1013904223
     private tickNextTickList: TickNextTickData[] = []
+    public blockMap: BlockMap | null = null
 
-    
+    public creativeMode: boolean = true
+
     public waterLevel: number = 0
     private lightDepths: number[]
     private levelListeners: LevelListener[] = []
     private unprocessed = 0
     private tickCount = 0
+    public player: Entity | null = null
     private networkMode = false
 
-    public constructor(xSize: number, zSize: number, ySize: number) {
-        this.width = xSize
-        this.height = zSize
-        this.depth = ySize
-        this.blocks = new Array(xSize * zSize * ySize)
-        this.lightDepths = new Array(xSize * zSize)
+    public constructor(width: number, height: number, depth: number) {
+        this.width = width
+        this.height = height
+        this.depth = depth
+        this.blocks = new Array(width * height * depth)
+        this.lightDepths = new Array(width * height)
         let mapLoaded = this.load()
         if (!mapLoaded) {
             this.regenerate()
         }
-        this.calcLightDepths(0, 0, xSize, zSize)
+        this.calcLightDepths(0, 0, width, height)
     }
 
     public regenerate(): void {
@@ -421,6 +425,104 @@ export class Level {
         return this.waterLevel
     }
 
+    public containsAnyLiquid(aabb: AABB): boolean {
+        let x0: number = Math.trunc(aabb.x0)
+        let x1: number = Math.trunc(aabb.x1) + 1
+        let y0: number = Math.trunc(aabb.y0)
+        let y1: number = Math.trunc(aabb.y1) + 1
+        let z0: number = Math.trunc(aabb.z0)
+        let z1: number = Math.trunc(aabb.z1) + 1
+
+        if (aabb.x0 < 0.0) {
+            x0--
+        }
+        if (aabb.y0 < 0.0) {
+            y0--
+        }
+        if (aabb.z0 < 0.0) {
+            z0--
+        }
+        if (x0 < 0) {
+            x0 = 0
+        }
+        if (y0 < 0) {
+            y0 = 0
+        }
+        if (z0 < 0) {
+            z0 = 0
+        }
+        if (x1 > this.width) {
+            x1 = this.width
+        }
+        if (y1 > this.depth) {
+            y1 = this.depth
+        }
+        if (z1 > this.height) {
+            z1 = this.height
+        }
+
+        for (let xx = x0; xx < x1; xx++) {
+            for (let yy = y0; yy < y1; yy++) {
+                for (let zz = z0; zz < z1; zz++) {
+                    let tile: Tile = Tile.tiles[this.getTile(xx, yy, zz)]
+                    if (tile == null || tile.getMaterial() == Material.none) continue
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    public containsLiquid(aabb: AABB, material: Material): boolean {
+        let x0: number = Math.trunc(aabb.x0)
+        let x1: number = Math.trunc(aabb.x1) + 1
+        let y0: number = Math.trunc(aabb.y0)
+        let y1: number = Math.trunc(aabb.y1) + 1
+        let z0: number = Math.trunc(aabb.z0)
+        let z1: number = Math.trunc(aabb.z1) + 1
+
+        if (aabb.x0 < 0.0) {
+            x0--
+        }
+        if (aabb.y0 < 0.0) {
+            y0--
+        }
+        if (aabb.z0 < 0.0) {
+            z0--
+        }
+        if (x0 < 0) {
+            x0 = 0
+        }
+        if (y0 < 0) {
+            y0 = 0
+        }
+        if (z0 < 0) {
+            z0 = 0
+        }
+        if (x1 > this.width) {
+            x1 = this.width
+        }
+        if (y1 > this.depth) {
+            y1 = this.depth
+        }
+        if (z1 > this.height) {
+            z1 = this.height
+        }
+
+        for (let xx = x0; xx < x1; xx++) {
+            for (let yy = y0; yy < y1; yy++) {
+                for (let zz = z0; zz < z1; zz++) {
+                    let tile: Tile = Tile.tiles[this.getTile(xx, yy, zz)]
+                    if (tile == null || tile.getMaterial() != material) continue
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
     public getLiquid(x: number, y: number, z: number): Material {
         let tile = this.getTile(x, y, z)
         if (tile == 0) {
@@ -446,6 +548,10 @@ export class Level {
 
             this.tickNextTickList.push(data)
         }
+    }
+
+    public findEntities(entity: Entity, aabb: AABB): Entity[] | null {
+        return null
     }
 
     public clip(a: Vec3, b: Vec3): HitResult | null {
@@ -611,6 +717,19 @@ export class Level {
             this.setTile(x, y + iy, z, Tiles.treeTrunk.id);
         }
         return true;
+    }
+
+    public getPlayer(): Entity | null {
+        return this.player
+    }
+
+    public addEntity(entity: Entity) {
+        this.blockMap?.insert(entity)
+        entity.setLevel(this)
+    }
+
+    public removeEntity(entity: Entity) {
+        this.blockMap?.remove(entity)
     }
 
     public explode(entity: Entity, x: number, y: number, z: number, radius: number): void {
