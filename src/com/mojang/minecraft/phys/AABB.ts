@@ -1,3 +1,7 @@
+import { vec3 } from "gl-matrix"
+import { Vec3 } from "../character/Vec3"
+import { HitResult } from "../HitResult"
+
 export class AABB {
     private epsilon: number = 0.0
     public x0: number
@@ -60,6 +64,92 @@ export class AABB {
 
     public copy(): AABB {
        return new AABB(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1)
+    }
+
+    public clip(a: Vec3, b: Vec3): HitResult | null {
+        let cx0: Vec3 | null = a.clipX(b, this.x0)
+        let cx1: Vec3 | null = a.clipX(b, this.x1)
+        let cy0: Vec3 | null = a.clipY(b, this.y0)
+        let cy1: Vec3 | null = a.clipY(b, this.y1)
+        let cz0: Vec3 | null = a.clipZ(b, this.z0)
+        let cz1: Vec3 | null = a.clipZ(b, this.z1)
+
+        if (!this.containsX(cx0)) {
+            cx0 = null
+        }
+        if (!this.containsX(cx1)) {
+            cx1 = null
+        }
+        if (!this.containsY(cy0)) {
+            cy0 = null
+        }
+        if (!this.containsY(cy1)) {
+            cy1 = null
+        }
+        if (!this.containsZ(cz0)) {
+            cz0 = null
+        }
+        if (!this.containsZ(cz1)) {
+            cz1 = null
+        }
+
+        let vec: Vec3 | null = null
+        if (cx0 != null) {
+            vec = cx0
+        }
+        if (cx1 != null && (vec == null || a.distanceToSqr(cx1) < a.distanceToSqr(vec))) {
+            vec = cx1
+        }
+        if (cy0 != null && (vec == null || a.distanceToSqr(cy0) < a.distanceToSqr(vec))) {
+            vec = cy0
+        }
+        if (cy1 != null && (vec == null || a.distanceToSqr(cy1) < a.distanceToSqr(vec))) {
+            vec = cy1
+        }
+        if (cz0 != null && (vec == null || a.distanceToSqr(cz0) < a.distanceToSqr(vec))) {
+            vec = cz0
+        }
+        if (cz1 != null && (vec == null || a.distanceToSqr(cz1) < a.distanceToSqr(vec))) {
+            vec = cz1
+        }
+
+        if (vec == null) {
+            return null
+        } else {
+            let face = -1
+            if (vec == cx0) {
+                face = 4
+            }
+            if (vec == cx1) {
+                face = 5
+            }
+            if (vec == cy0) {
+                face = 0
+            }
+            if (vec == cy1) {
+                face = 1
+            }
+            if (vec == cz0) {
+                face = 2
+            }
+            if (vec == cz1) {
+                face = 3
+            }
+
+            return HitResult.fromTile(0, 0, 0, face, vec)
+        }
+    }
+
+    private containsX(vec: Vec3 | null): boolean {
+        return vec == null ? false : vec.y >= this.y0 && vec.y <= this.y1 && vec.z >= this.z0 && vec.z <= this.z1
+    }
+
+    private containsY(vec: Vec3 | null): boolean {
+        return vec == null ? false : vec.x >= this.x0 && vec.x <= this.x1 && vec.z >= this.z0 && vec.z <= this.z1
+    }
+
+    private containsZ(vec: Vec3 | null): boolean {
+        return vec == null ? false : vec.x >= this.x0 && vec.x <= this.x1 && vec.y >= this.y0 && vec.y <= this.y1
     }
 
     public clipXCollide(c: AABB, xa: number): number {

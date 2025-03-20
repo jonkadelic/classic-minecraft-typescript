@@ -4,6 +4,7 @@ import { Level } from "./level/Level";
 import { Material } from "./level/material/Material";
 import { Tile } from "./level/tile/Tile";
 import { AABB } from "./phys/AABB";
+import { Textures } from "./renderer/Textures";
 
 export class Entity {
     protected level: Level
@@ -88,9 +89,12 @@ export class Entity {
     }
 
     public tick(): void {
+        this.walkDistO = this.walkDist
         this.xo = this.x
         this.yo = this.y
         this.zo = this.z
+        this.xRotO = this.xRot
+        this.yRotO = this.yRot
     }
 
     public isFree(x: number, y: number, z: number, grow: number = 0): boolean {
@@ -329,6 +333,10 @@ export class Entity {
         return this.bb.intersects_(x0, y0, z0, x1, y1, z1)
     }
 
+    public isPickable(): boolean {
+        return false
+    }
+
     public isPushable(): boolean {
         return false
     }
@@ -337,5 +345,9 @@ export class Entity {
 
     public isCreativeModeAllowed(): boolean {
         return false
+    }
+
+    public renderHover(textures: Textures, a: number) {
+        
     }
 }

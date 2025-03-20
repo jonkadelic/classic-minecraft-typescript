@@ -32,7 +32,7 @@ export class ParticleEngine {
         }
     }
 
-    public render(player: Player, a: number, layer: number): void {
+    public render(player: Player, a: number): void {
         if (this.particles.length === 0) return
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./terrain.png"))
         let xa = -(Math.cos(player.yRot * Math.PI / 180))
@@ -41,12 +41,18 @@ export class ParticleEngine {
         let za2 = xa * Math.sin(player.xRot * Math.PI / 180)
         let ya =  Math.cos(player.xRot * Math.PI / 180)
         let t = Tesselator.instance
-        t.init()
+        t.begin()
         for (let i = 0; i < this.particles.length; i++) {
             let p = this.particles[i]
             p.renderParticle(t, a, xa, ya, za, xa2, za2)
         }
-        t.flush(this.buffer)
+        t.end(this.buffer)
         this.buffer.draw()
+    }
+
+    public setLevel(level: Level): void {
+        this.level = level
+
+        // todo
     }
 }

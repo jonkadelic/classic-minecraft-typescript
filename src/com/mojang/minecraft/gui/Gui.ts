@@ -18,16 +18,16 @@ export class Gui extends GuiComponent {
         this.minecraft = minecraft
     }
 
-    public render(buffer: RenderBuffer, a: number, var2: boolean, mx: number, my: number) {
+    public render(buffer: RenderBuffer, a: number, isScreenOpen: boolean, mx: number, my: number) {
         let width = this.minecraft.width * 240 / this.minecraft.height
         let height = this.minecraft.height * 240 / this.minecraft.height
         let font = this.minecraft.font
-        this.minecraft.gameRenderer.setupGuiCamera()
+        this.minecraft.gameRenderer.setupGuiScreen()
         gl.bindTexture(gl.TEXTURE_2D, this.minecraft.textures.loadTexture("./gui/gui.png"))
         let t = Tesselator.instance
         shader.setColor(1, 1, 1, 1)
         gl.enable(gl.BLEND)
-        let inv = this.minecraft.player.inventory
+        let inv = this.minecraft.player!.inventory
         this.blitOffset = -90
         this.blit(buffer, Math.trunc(width / 2) - 91, height - 22, 0, 0, 182, 22)
         this.blit(buffer, Math.trunc(width / 2) - 91 - 1 + inv.selected * 20, height - 22 - 1, 0, 22, 24, 22)
@@ -73,9 +73,9 @@ export class Gui extends GuiComponent {
                 matrix.scale(-1, -1, -1)
                 let tex = this.minecraft.textures.loadTexture("./terrain.png")
                 gl.bindTexture(gl.TEXTURE_2D, tex)
-                t.init()
+                t.begin()
                 Tile.tiles[id].renderInInventory(t)
-                t.flush(buffer)
+                t.end(buffer)
                 buffer.draw()
                 matrix.pop()
                 if (inv.count[i] > 1) {

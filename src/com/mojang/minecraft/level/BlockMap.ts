@@ -1,5 +1,8 @@
+import { Vec3 } from "../character/Vec3"
 import { Entity } from "../Entity"
 import { AABB } from "../phys/AABB"
+import { Culler } from "../renderer/Culler"
+import { Textures } from "../renderer/Textures"
 
 export class BlockMap {
     private width: number
@@ -138,6 +141,10 @@ export class BlockMap {
             }
             this.moved(entity)
         }
+    }
+
+    public render(lerpedPos: Vec3, culler: Culler, textures: Textures, a: number) {
+        
     }
 
     static access$000(blockMap: BlockMap): number {

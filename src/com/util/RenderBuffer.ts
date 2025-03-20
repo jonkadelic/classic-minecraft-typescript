@@ -14,6 +14,10 @@ export class RenderBuffer {
         this.usage = usage
     }
 
+    public delete(): void {
+        gl.deleteBuffer(this.buffer)
+    }
+
     public bufferData(data: Float32Array, vertices: number): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
         gl.bufferData(gl.ARRAY_BUFFER, data, this.usage)

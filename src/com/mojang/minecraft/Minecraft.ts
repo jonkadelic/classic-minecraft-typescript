@@ -31,6 +31,8 @@ import { Key, Keyboard } from "../../util/input/Keyboard";
 import { LevelGenerator } from "./level/levelgen/RandomLevelSource";
 import { WaterTexture } from "./renderer/ptexture/WaterTexture";
 import { LavaTexture } from "./renderer/ptexture/LavaTexture";
+import { GameMode } from "./gamemode/GameMode";
+import { CreativeMode } from "./gamemode/CreativeMode";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -41,18 +43,18 @@ export let clickedElement: HTMLElement | null = null
 
 export class Minecraft {
     public static readonly VERSION_STRING = "0.30"
+    public gameMode: GameMode = new CreativeMode(this)
     public width: number
     public height: number
     private fogColor: number[] = new Array(4)
     private timer: Timer = new Timer(20)
+    public level: Level | null = null
     // @ts-ignore
-    public level: Level
+    public levelRenderer: LevelRenderer
+    public player: Player | null = null
     // @ts-ignore
-    private levelRenderer: LevelRenderer
-    // @ts-ignore
-    public player: Player
-    // @ts-ignore
-    private particleEngine: ParticleEngine
+    public particleEngine: ParticleEngine
+    public user: User | null = null
     private entities: Entity[] = []
     private parent: HTMLCanvasElement
     public paused: boolean = false
@@ -62,19 +64,20 @@ export class Minecraft {
     public font: Font
     public screen: Screen | null = null
     public gameRenderer: GameRenderer = new GameRenderer(this)
+    private ticks: number = 0
     // @ts-ignore
     public gui: Gui
+    public noRender: boolean = false
     private running: boolean = false
-    private fpsString: string = ""
-    private mouseGrabbed: boolean = false
-    private hitResult: HitResult | null = null
+    public fpsString: string = ""
+    public mouseGrabbed: boolean = false
+    public hitResult: HitResult | null = null
     // @ts-ignore
     public options: Options
+    public isRaining: boolean = false
     
     private frames: number = 0
     private lastTime: number = 0
-
-    private guiBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
 
     public constructor(parent: HTMLCanvasElement, width: number, height: number) {
         this.parent = parent
@@ -86,6 +89,10 @@ export class Minecraft {
         mouse = new Mouse(parent)
         mouse.setCanvas(parent)
         keyboard = new Keyboard()
+    }
+
+    public isDisplayActive(): boolean {
+        return document.pointerLockElement === this.parent
     }
 
     public init(): void {
@@ -100,36 +107,38 @@ export class Minecraft {
             })
 
         this.fogColor = [0xFF / 0xFF, 0xFF / 0xFF, 0xFF / 0xFF, 1.0]
-        let fr = 0.5
-        let fg = 0.8
-        let fb = 1.0
+
         this.checkGlError("Pre startup")
-        gl.clearColor(fr, fg, fb, 1.0)
         gl.clearDepth(1.0)
         gl.enable(gl.DEPTH_TEST)
         gl.depthFunc(gl.LEQUAL)
+        gl.cullFace(gl.BACK)
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
         matrix.setActive(Matrix.MODELVIEW)
+
         this.checkGlError("Startup")
         this.options = new Options(this)
         this.textures.addDynamicTexture(new WaterTexture())
         this.textures.addDynamicTexture(new LavaTexture())
-        this.level = new LevelGenerator().create("default", 256, 256, 64)
-        this.levelRenderer = new LevelRenderer(this.level, this.textures)
-        this.player = new Player(this.level)
-        this.level.player = this.player
-        this.player.input = new KeyboardInput(this.options)
-        // TODO make GameMode classes and move this to the creative gamemode apply(Player)
-        for (let i: number = 0; i < 9; ++i) {
-            this.player.inventory.count[i] = 1
-            if (this.player.inventory.slots[i] <= 0) {
-                this.player.inventory.slots[i] = User.allowedTiles[i].id
+        this.font = new Font("./default.png", this.textures)
+
+        this.levelRenderer = new LevelRenderer(this, this.textures)
+        gl.viewport(0, 0, this.width, this.height)
+        if (false /* connectToIp != null && user != null */) {
+
+        } else {
+            // todo - minecraft.java line 266
+
+            if (this.level == null) {
+                this.createLevel(1)
             }
         }
-        this.particleEngine = new ParticleEngine(this.level, this.textures)
-        this.font = new Font("./default.png", this.textures)
+
+        this.particleEngine = new ParticleEngine(this.level!, this.textures)
+
         this.checkGlError("Post startup")
+
         this.gui = new Gui(this)
 
         window.onunload = () => {
@@ -199,19 +208,30 @@ export class Minecraft {
             }
             MouseEvents.update() // lwjgl
             this.timer.advanceTime()
+
             for (let i = 0; i < this.timer.ticks; i++) {
+                this.ticks++
                 this.tick()
             }
+
             this.checkGlError("Pre render")
-            this.render(this.timer.a)
+
+            if (!this.noRender) {
+                this.gameMode.render(this.timer.a)
+                this.gameRenderer.render(this.timer.a)
+            }
+
             this.checkGlError("Post render")
+
             this.frames++
+
             while (Date.now() >= this.lastTime + 1000) {
                 this.fpsString = this.frames + " fps, " + Chunk.updates + " chunk updates"
                 Chunk.updates = 0
                 this.lastTime += 1000
                 this.frames = 0
             }
+
             requestAnimationFrame(() => this.loop())
         } else {
             this.destroy()
@@ -228,13 +248,17 @@ export class Minecraft {
         MouseEvents.setGrabbed(true)
     }
 
-    public pause(): void {
+    public pauseGame(): void {
         if (this.screen == null) {
             this.setScreen(new PauseScreen())
         }
     }
 
     private handleMouseClick(click: number): void {
+        if (this.player == null || this.level == null) {
+            return
+        }
+
         let selected = this.player.inventory.getSelected()
         if (click == 0) {
             if (this.hitResult != null) {
@@ -297,7 +321,7 @@ export class Minecraft {
             if (this.screen == null) {
                 while (MouseEvents.next()) {
                     if (MouseEvents.getEventDWheel() != 0) {
-                        this.player.inventory.swapPaint(MouseEvents.getEventDWheel())
+                        this.player!.inventory.swapPaint(MouseEvents.getEventDWheel())
                     }
                     if (!this.mouseGrabbed && MouseEvents.getEventButtonState() && clickedElement == this.parent) {
                         this.grabMouse();
@@ -310,43 +334,27 @@ export class Minecraft {
                         }
                     }
                 }
-                /*if (mouse.buttonPressed(MouseButton.LEFT)) {
-                    if (!this.mouse0) {
-                        this.mouse0 = true
-                        this.handleMouseClick(this.editMode)
-                    }
-                } else {
-                    this.mouse0 = false
-                }
-                if (mouse.buttonPressed(MouseButton.RIGHT)) {
-                    if (!this.mouse1) {
-                        this.mouse1 = true
-                        this.editMode = (this.editMode + 1) % 2
-                    }
-                } else {
-                    this.mouse1 = false
-                }*/
             }
 
             // Keyboard
             if (!this.mouseGrabbed && this.mouseGrabbed != oldGrabbed) {
-                this.pause()
+                this.pauseGame()
             }
             while (keyboard.next()) {
-                this.player.setKey(keyboard.getEventKey() as Key, keyboard.getEventKeyState() as boolean)
+                this.player!.setKey(keyboard.getEventKey() as Key, keyboard.getEventKeyState() as boolean)
                 if (this.screen != null) {
                     this.screen.keyboardEvent()
                 }
                 if (keyboard.getEventKeyState()) {
                     if (this.screen == null) {
                         if (keyboard.getEventKey() == Keyboard.KEY_RETURN) {
-                            this.level.save()
+                            this.level!.save()
                         }
                         if (keyboard.getEventKey() == Keyboard.KEY_Y) {
                             this.yMouseAxis *= -1
                         }
                         if (keyboard.getEventKey() == Keyboard.KEY_G) {
-                            this.entities.push(new Zombie(this.level, this.textures, this.player.x, this.player.y, this.player.z))
+                            this.entities.push(new Zombie(this.level!, this.textures, this.player!.x, this.player!.y, this.player!.z))
                         }
                         if (keyboard.getEventKey() == Keyboard.KEY_B) {
                             this.setScreen(new SelectBlockScreen())
@@ -354,7 +362,7 @@ export class Minecraft {
                     }
                     for (let i: number = 0; i < 9; ++i) {
                         if (keyboard.getEventKey() == (i + 1).toString()) {
-                            this.player.inventory.selected = i
+                            this.player!.inventory.selected = i
                         }
                     }
                 }
@@ -367,7 +375,12 @@ export class Minecraft {
                 this.screen.tick()
             }
         }
-        this.level.tick()
+
+        if (this.level != null) {
+            this.gameRenderer.tick_()
+        }
+        
+        this.level!.tick()
         this.particleEngine.tick()
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].tick()
@@ -375,11 +388,11 @@ export class Minecraft {
                 this.entities.splice(i--, 1)
             }
         }
-        this.player.tick()
+        this.player!.tick()
     }
 
     private isFree(aabb: AABB): boolean {
-        if (this.player.bb.intersects(aabb)) {
+        if (this.player!.bb.intersects(aabb)) {
             return false
         }
         for (let i = 0; i < this.entities.length; i++) {
@@ -390,118 +403,61 @@ export class Minecraft {
         return true
     }
 
-    private moveCameraToPlayer(a: number): void {
-        matrix.translate(0, 0, -0.3)
-        matrix.rotate(this.player.xRot, 1, 0, 0)
-        matrix.rotate(this.player.yRot, 0, 1, 0)
-        let x = this.player.xo + (this.player.x - this.player.xo) * a
-        let y = this.player.yo + (this.player.y - this.player.yo) * a
-        let z = this.player.zo + (this.player.z - this.player.zo) * a
-        matrix.translate(-x, -y, -z)
-    }
-
-    private setupCamera(a: number): void {
-        matrix.setActive(Matrix.PROJECTION)
-        matrix.loadIdentity()
-        matrix.perspective(70, this.width / this.height, 0.05, 1000)
-        matrix.setActive(Matrix.MODELVIEW)
-        matrix.loadIdentity()
-        this.moveCameraToPlayer(a)
-    }
-
-    private pick(a: number): void {
-        let yRot = this.player.yRot
-        let xRot = this.player.xRot
-        let cosY = Math.cos(-yRot * Math.PI / 180 - Math.PI)
-        let sinY = Math.sin(-yRot * Math.PI / 180 - Math.PI)
-        let cosX = Math.cos(-xRot * Math.PI / 180)
-        let sinX = Math.sin(-xRot * Math.PI / 180)
-        let pickRange = 5.0
-        let offsetX = sinY * cosX
-        let offsetY = sinX
-        let offsetZ = cosY * cosX
-        let playerVec = new Vec3(this.player.x, this.player.y, this.player.z)
-        let endVec = playerVec.add(offsetX * pickRange, offsetY * pickRange, offsetZ * pickRange)
-        this.hitResult = this.level.clip(playerVec, endVec)
-    }
-
-    public render(a: number): void {
-        if (!shader.isLoaded()) return
-        let screenWidth = Math.trunc(this.width * 240 / this.height)
-        let screenHeight = Math.trunc(this.height * 240 / this.height)
-        let mx = MouseEvents.getX() * screenWidth / this.width
-        let my = MouseEvents.getY() * screenHeight / this.height
-        if (this.level != null) {
-            gl.viewport(0, 0, this.width, this.height)
-            if (this.mouseGrabbed && document.pointerLockElement === this.parent) {
-                let xo = 0.0
-                let yo = 0.0
-                xo = MouseEvents.getDX()
-                yo = MouseEvents.getDY()
-                if (Math.abs(xo) < 500)
-                {
-                    this.player.turn(xo, yo * this.yMouseAxis)
-                }
-            }
-            this.checkGlError("Set viewport")
-            this.pick(a)
-            this.checkGlError("Picked")
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            this.setupCamera(a)
-            this.checkGlError("Set up camera")
-            gl.enable(gl.CULL_FACE)
-            let frustum = Frustum.getFrustum()
-            this.levelRenderer.updateDirtyChunks(this.player)
-            this.checkGlError("Update chunks")
-            this.setupFog()
-            gl.uniform1f(shader.getUniformLocation("uHasFog"), 1)
-            this.levelRenderer.render(this.player, 0)
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-            gl.enable(gl.BLEND)
-            this.levelRenderer.render(this.player, 1)
-            gl.disable(gl.BLEND)
-            this.checkGlError("Rendered level")
-            for (let i = 0; i < this.entities.length; i++) {
-                let entity = this.entities[i]
-                if (frustum.isVisible(entity.bb)) {
-                    entity.render(a)
-                }
-            }
-            this.checkGlError("Rendered entities")
-            this.particleEngine.render(this.player, a, 0)
-            this.checkGlError("Rendered particles")
-            gl.uniform1f(shader.getUniformLocation("uHasFog"), 0)
-            if (this.hitResult != null) {
-                this.levelRenderer.renderHit(this.hitResult)
-            }
-            this.checkGlError("Rendered hit")
-            this.gui.render(this.guiBuffer, a, this.screen != null, mx, my)
-        } else {
-            gl.viewport(0, 0, this.width, this.height)
-            gl.clearColor(0.0, 0.0, 0.0, 0.0)
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            matrix.setActive(Matrix.PROJECTION)
-            matrix.loadIdentity()
-            matrix.setActive(Matrix.MODELVIEW)
-            matrix.loadIdentity()
-            this.gameRenderer.setupGuiCamera()
-        }
-        if (this.screen != null) {
-            this.screen.render(this.guiBuffer, mx, my)
-        }
-        this.checkGlError("Rendered gui")
-    }
-
-    private setupFog(): void {
-        if (!shader.isLoaded()) return
-        shader.use()
-        gl.uniform1f(shader.getUniformLocation("uFogDensity"), 0.001)
-        gl.uniform4fv(shader.getUniformLocation("uFogColor"), this.fogColor)
-        shader.setColor(1, 1, 1, 1)
-    }
-
     public static checkError(): void {
         // TODO
+    }
+
+    public hasConnection(): boolean {
+        return false
+    }
+
+    public createLevel(size: number) {
+        let authorName = this.user != null ? this.user.name : "anonymous"
+        let level = new LevelGenerator().create(authorName, 128 << size, 128 << size, 64)
+        this.gameMode.onSpawn(level)
+        this.loadLevel(level)
+    }
+
+    public loadLevel(level: Level | null): void {
+        this.level = level
+        if (level != null) {
+            level.initTransient()
+            this.gameMode.initLevel(level)
+            level.font = this.font
+            level.rendererContext = this
+            if (!this.hasConnection()) {
+                this.player = null
+            } else if (this.player != null) {
+                this.player.resetPos()
+                this.gameMode.initPlayer(this.player)
+                if (level != null) {
+                    level.player = this.player
+                    level.addEntity(this.player)
+                }
+            }
+        }
+    
+        if (this.player == null) {
+            this.player = new Player(level!)
+            this.player.resetPos()
+            this.gameMode.initPlayer(this.player)
+            if (level != null) {
+                level.player = this.player
+            }
+        }
+
+        if (this.player != null) {
+            this.player.input = new KeyboardInput(this.options)
+            this.gameMode.adjustPlayer(this.player)
+        }
+
+        if (this.levelRenderer != null) {
+            this.levelRenderer.setLevel(level)
+        }
+
+        if (this.particleEngine != null) {
+            this.particleEngine.setLevel(level!)
+        }
     }
 }
 

@@ -16,7 +16,7 @@ export class GuiComponent {
 		let t = Tesselator.instance
 		gl.enable(gl.BLEND)
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-		t.init()
+		t.begin()
         t.color_f(r, g, b, a)
 		t.vertex(x0, y1, 0)
 		t.vertex(x1, y1, 0)
@@ -25,7 +25,7 @@ export class GuiComponent {
 		t.vertex(x1, y0, 0)
 		t.vertex(x0, y0, 0)
 		t.vertex(x0, y1, 0)
-		t.flush(buffer)
+		t.end(buffer)
         buffer.draw()
 		gl.disable(gl.BLEND)
     }
@@ -42,7 +42,7 @@ export class GuiComponent {
 		let t = Tesselator.instance
 		gl.enable(gl.BLEND)
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-		t.init();
+		t.begin();
 		t.color_f(r0, g0, b0, a0)
 		t.vertex(x1, y0, 0)
 		t.vertex(x0, y0, 0)
@@ -53,7 +53,7 @@ export class GuiComponent {
 		t.vertex(x1, y1, 0)
 		t.color_f(r0, g0, b0, a0)
 		t.vertex(x1, y0, 0)
-		t.flush(buffer)
+		t.end(buffer)
         buffer.draw()
 		gl.disable(gl.BLEND)
     }
@@ -70,7 +70,7 @@ export class GuiComponent {
         let pw = 1 / 256
         let ph = 1 / 256
         let t = Tesselator.instance
-        t.init()
+        t.begin()
         t.vertexUV(x, y + height, this.blitOffset, u * pw, (v + height) * ph);
         t.vertexUV(x + width, y + height, this.blitOffset, (u + width) * pw, (v + height) * ph);
         t.vertexUV(x + width, y, this.blitOffset, (u + width) * pw, v * ph);
@@ -78,7 +78,7 @@ export class GuiComponent {
         t.vertexUV(x + width, y, this.blitOffset, (u + width) * pw, v * ph);
         t.vertexUV(x, y, this.blitOffset, u * pw, v * ph);
         t.vertexUV(x, y + height, this.blitOffset, u * pw, (v + height) * ph);
-        t.flush(buffer)
+        t.end(buffer)
         buffer.draw()
     }
 }

@@ -18,7 +18,7 @@ export class Tesselator {
     private constructor() {
     }
 
-    public flush(buffer: RenderBuffer): void {
+    public end(buffer: RenderBuffer): void {
         buffer.configure(this.hasTexture, this.hasColor)
         buffer.bufferData(new Float32Array(this.array), this.vertices)
         this.clear()
@@ -29,7 +29,7 @@ export class Tesselator {
         this.array = []
     }
 
-    public init(): void {
+    public begin(): void {
         this.clear()
         this.hasTexture = false
         this.hasColor = false

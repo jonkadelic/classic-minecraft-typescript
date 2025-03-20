@@ -1,7 +1,6 @@
 import { Mth } from "../../../util/Mth";
 import { Entity } from "../Entity";
 import { Level } from "../level/Level";
-import { Player } from "../player/Player";
 import { AI } from "./ai/AI";
 import { BasicAI } from "./ai/BasicAI";
 
@@ -90,7 +89,7 @@ export class Mob extends Entity {
                 this.hurt(null, 2)
             }
         } else {
-            this.airSupply = Player.TOTAL_AIR_SUPPLY
+            this.airSupply = 300
         }
 
         if (this.isInWater()) {

@@ -7,6 +7,7 @@ import { Particle } from "../../particle/Particle";
 import { Vec3 } from "../../character/Vec3";
 import { HitResult } from "../../HitResult";
 import { Material } from "../material/Material";
+import { RenderBuffer } from "../../../../util/RenderBuffer";
 
 export class Tile {
     protected static random: Random = new Random()
@@ -294,6 +295,19 @@ export class Tile {
         return this.destroyProgress
     }
 
+    public renderInHand(t: Tesselator, buffer: RenderBuffer): void {
+        t.begin()
+
+        for (let face: number = 0; face < 6; face++) {
+            // TODO: diffuse lighting
+
+            this.renderFace(t, 0, 0, 0, face)
+        }
+
+        t.end(buffer)
+        buffer.draw()
+    }
+
     public isExplodable(): boolean {
         return this.explodable
     }
@@ -366,7 +380,7 @@ export class Tile {
         if (vec == z1clip) {
             face = 3
         }
-        return new HitResult(0, x, y, z, face)
+        return HitResult.fromTile(x, y, z, face, vec.add(x, y, z))
     }
 
     private containsX(v: Vec3 | null): boolean {

@@ -1,7 +1,7 @@
 import { mat4 } from "gl-matrix";
 import { Matrix } from "../../../util/Matrix";
 import { HitResult } from "../HitResult";
-import { gl, matrix, shader } from "../Minecraft";
+import { gl, matrix, Minecraft, shader } from "../Minecraft";
 import { Player } from "../player/Player";
 import { Frustum } from "./Frustum";
 import { Textures } from "./Textures";
@@ -12,130 +12,185 @@ import { Tesselator } from "./Tesselator";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { Tile } from "../level/tile/Tile";
 import { Tiles } from "../level/tile/Tiles";
+import { Culler } from "./Culler";
 
-export class LevelRenderer implements LevelListener {
-    public static readonly MAX_REBUILDS_PER_FRAME = 8
+export class LevelRenderer {
     public static readonly CHUNK_SIZE = 16
-    private level: Level
-    private chunks: Chunk[] = []
-    private xChunks: number
-    private yChunks: number
-    private zChunks: number
-    private textures: Textures
-    private hitRenderBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
+    public static readonly MAX_VISIBLE_REBUILDS_PER_FRAME = 3
+    public static readonly MAX_INVISIBLE_REBUILDS_PER_FRAME = 1
 
-    public constructor(level: Level, textures: Textures) {
-        this.level = level
+    public level: Level | null = null
+    public textures: Textures
+    public worldBorderRenderBuffers: RenderBuffer[]
+    public dirtyChunks: Chunk[] = []
+    private sortedChunks: Chunk[] | null = null
+    public chunks: Chunk[] | null = null
+    private xChunks: number = 0
+    private yChunks: number = 0
+    private zChunks: number = 0
+    private hitRenderBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
+    public mc: Minecraft
+    private xOld: number = -9999.0
+    private yOld: number = -9999.0
+    private zOld: number = -9999.0
+    public destroyProgress: number = 0.0
+
+    public constructor(mc: Minecraft, textures: Textures) {
+        this.mc = mc
         this.textures = textures
-        level.addListener(this)
-        this.xChunks = Math.ceil(level.width / LevelRenderer.CHUNK_SIZE)
-        this.yChunks = Math.ceil(level.depth / LevelRenderer.CHUNK_SIZE)
-        this.zChunks = Math.ceil(level.height / LevelRenderer.CHUNK_SIZE)
+        this.worldBorderRenderBuffers = [
+            new RenderBuffer(gl.STATIC_DRAW),
+            new RenderBuffer(gl.STATIC_DRAW),
+        ]
+    }
+
+    private renderBedrockBorder(): void {
+        // todo: LevelRenderer.java line 60
+    }
+
+    private renderWaterBorder(): void {
+        // todo: LevelRenderer.java line 122
+    }
+
+    public setLevel(level: Level | null): void {
+        if (this.level != null) {
+            this.level.removeListener(this)
+        }
+
+        this.level = level
+        if (level != null) {
+            level.addListener(this)
+            this.allChanged()
+        }
+    }
+
+    public allChanged(): void {
+        if (this.level == null) {
+            return
+        }
+
+        if (this.chunks != null) {
+            for (let chunk of this.chunks) {
+                chunk.delete()
+            }
+        }
+
+        this.xChunks = Math.trunc(this.level.width / 16.0)
+        this.yChunks = Math.trunc(this.level.depth / 16.0)
+        this.zChunks = Math.trunc(this.level.height / 16.0)
+
         this.chunks = new Array(this.xChunks * this.yChunks * this.zChunks)
+        this.sortedChunks = new Array(this.xChunks * this.yChunks * this.zChunks)
+
+        let c = 0
         for (let x = 0; x < this.xChunks; x++) {
             for (let y = 0; y < this.yChunks; y++) {
                 for (let z = 0; z < this.zChunks; z++) {
-                    let x0 = x * LevelRenderer.CHUNK_SIZE
-                    let y0 = y * LevelRenderer.CHUNK_SIZE
-                    let z0 = z * LevelRenderer.CHUNK_SIZE
-                    let x1 = (x + 1) * LevelRenderer.CHUNK_SIZE
-                    let y1 = (y + 1) * LevelRenderer.CHUNK_SIZE
-                    let z1 = (z + 1) * LevelRenderer.CHUNK_SIZE
-                    if (x1 > level.width) {
-                        x1 = level.width
-                    }
-                    if (y1 > level.depth) {
-                        y1 = level.depth
-                    }
-                    if (z1 > level.height) {
-                        z1 = level.height
-                    }
-                    this.setChunk(x, y, z, new Chunk(level, x0, y0, z0, x1, y1, z1))
+                    this.chunks[(z * this.yChunks + y) * this.xChunks + x] = new Chunk(this.level, x << 4, y << 4, z << 4, 16)
+                    this.sortedChunks[(z * this.yChunks + y) * this.xChunks + x] = this.chunks[(z * this.yChunks + y) * this.xChunks + x]
+                    c += 2
                 }
             }
         }
+
+        for (let dc of this.dirtyChunks) {
+            dc.dirty = false
+        }
+
+        this.dirtyChunks.length = 0
+
+        this.renderBedrockBorder()
+        this.renderWaterBorder()
+
+        this.setDirty(0, 0, 0, this.level.width, this.level.depth, this.level.height)
     }
 
-    public getAllDirtyChunks(): Chunk[] | null {
-        let dirtyChunks: Chunk[] | null = null
-        for (let chunk of this.chunks) {
-            if (chunk.dirty) {
-                if (dirtyChunks == null) {
-                    dirtyChunks = []
+    public renderClouds(a: number): void {
+        // todo: Minecraft.java line 685
+    }
+
+    public render(player: Player, layer: number): number {
+        if (this.sortedChunks == null) {
+            return 0
+        }
+
+        let dx = player.x - this.xOld
+        let dy = player.y - this.yOld
+        let dz = player.z - this.zOld
+
+        if (dx * dx + dy * dy + dz * dz > 64.0) {
+            this.xOld = player.x
+            this.yOld = player.y
+            this.zOld = player.z
+            this.sortedChunks.sort((c0, c1) => {
+                if (c0 == c1) {
+                    return 0
                 }
-                dirtyChunks.push(chunk)
-            }
+        
+                return c0.compare(this.mc.player!) < c1.compare(this.mc.player!) ? -1 : 1        
+            })
         }
-        return dirtyChunks
-    }
 
-    public render(player: Player, layer: number): void {
-        if (!shader.isLoaded()) return
-        let id = this.textures.loadTexture("./terrain.png")
-        gl.bindTexture(gl.TEXTURE_2D, id)
-        let frustum = Frustum.getFrustum()
-        shader.use()
-
-        for (let chunk of this.chunks) {
-            if (frustum.isVisible(chunk.aabb)) {
-                chunk.render(layer)
-            }
+        let total = 0
+        for (let c of this.sortedChunks) {
+            total += c.render()
         }
+
+        return total
     }
 
     public updateDirtyChunks(player: Player) {
-        let dirty = this.getAllDirtyChunks()
-        if (dirty == null) {
-            return
-        }
-        let frustum = Frustum.getFrustum()
-        let now = Date.now()
-        dirty.sort((c0, c1) => {
-            let i0 = frustum.isVisible(c0.aabb)
-            let i1 = frustum.isVisible(c1.aabb)
+        this.dirtyChunks.sort((c0, c1) => {
+            if (c0 == c1) {
+                return 0
+            }
+
+            let i0 = c0.visible
+            let i1 = c1.visible
             if (i0 && !i1) {
-                return -1
-            }
-            if (i1 && !i0) {
                 return 1
-            }
-            let t0 = Math.trunc((now - c0.dirtiedTime) / 2000)
-            let t1 = Math.trunc((now - c1.dirtiedTime) / 2000)
-            if (t0 < t1) {
+            } else if (i1 && !i0) {
                 return -1
+            } else {
+                let d0 = c0.compare(player)
+                let d1 = c1.compare(player)
+                if (d0 < d1) {
+                    return 1
+                } else if (d0 > d1) {
+                    return -1
+                } else {
+                    return 0
+                }
             }
-            if (t0 > t1) {
-                return 1
-            }
-            return c0.distanceToSqr(player) < c1.distanceToSqr(player) ? -1 : 1
         })
-        for (let i = 0; i < LevelRenderer.MAX_REBUILDS_PER_FRAME && i < dirty.length; i++) {
-            dirty[i].rebuild()
+
+        let maxDirtyChunksIndex = this.dirtyChunks.length - 1
+        let dirtyChunksToRebuild = this.dirtyChunks.length
+        if (dirtyChunksToRebuild > LevelRenderer.MAX_VISIBLE_REBUILDS_PER_FRAME) {
+            dirtyChunksToRebuild = LevelRenderer.MAX_VISIBLE_REBUILDS_PER_FRAME
+        }
+
+        for (let i = 0; i < dirtyChunksToRebuild; i++) {
+            let chunk = this.dirtyChunks[maxDirtyChunksIndex - i]
+            this.dirtyChunks.splice(maxDirtyChunksIndex - i)
+            chunk.rebuild()
+            chunk.dirty = false
         }
     }
 
-    public renderHit(h: HitResult): void {
-        let t = Tesselator.instance
-        gl.enable(gl.BLEND)
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-        t.init()
-        shader.setColor(1, 1, 1, (Math.sin(Date.now() / 100) * 0.2 + 0.4) * 0.5)
-        let tile = Tile.tiles[this.level.getTile(h.x, h.y, h.z)]
-        if (tile != null) {
-            for (let i = 0; i < 6; i++) {
-                tile.renderFaceNoTexture(t, h.x, h.y, h.z, i)
-            }
-        } else {
-            for (let i = 0; i < 6; i++) {
-                Tiles.rock.renderFaceNoTexture(t, h.x, h.y, h.z, i)
-            }
-        }
-        t.flush(this.hitRenderBuffer)
-        this.hitRenderBuffer.draw()
-        gl.disable(gl.BLEND)
+    public renderHit(player: Player, h: HitResult, mode: number, item: number, a: number): void {
+
+    }
+
+    public renderHitOutline(player: Player, h: HitResult, mode: number, item: number, a: number) {
+
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {
+        if (this.chunks == null) {
+            return
+        }
+
         x0 = Math.trunc(x0 / LevelRenderer.CHUNK_SIZE)
         x1 = Math.trunc(x1 / LevelRenderer.CHUNK_SIZE)
         y0 = Math.trunc(y0 / LevelRenderer.CHUNK_SIZE)
@@ -163,29 +218,23 @@ export class LevelRenderer implements LevelListener {
         for (let x = x0; x <= x1; x++) {
             for (let y = y0; y <= y1; y++) {
                 for (let z = z0; z <= z1; z++) {
-                    this.getChunk(x, y, z).setDirty()
+                    let chunk = this.chunks[(z * this.yChunks + y) * this.xChunks + x]
+                    if (!chunk.dirty) {
+                        chunk.dirty = true
+                        this.dirtyChunks.push(chunk)
+                    }
                 }
             }
         }
     }
 
-    private getChunk(x: number, y: number, z: number): Chunk {
-        return this.chunks[(y * this.xChunks * this.zChunks) + (x * this.zChunks) + z]
-    }
+    public cull(culler: Culler) {
+        if (this.chunks == null) {
+            return
+        }
 
-    private setChunk(x: number, y: number, z: number, chunk: Chunk): void {
-        this.chunks[(y * this.xChunks * this.zChunks) + (x * this.zChunks) + z] = chunk
+        for (let i = 0; i < this.chunks.length; i++) {
+            this.chunks[i].cull(culler)
+        }
     }
-
-    public tileChanged(x: number, y: number, z: number): void {
-        this.setDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1)
-    }
-
-    public lightColumnChanged(x: number, z: number, y0: number, y1: number): void {
-        this.setDirty(x - 1, y0 - 1, z - 1, x + 1, y1 + 1, z + 1)
-    }
-
-    public allChanged(): void {
-        this.setDirty(0, 0, 0, this.level.width, this.level.depth, this.level.height)
-    } 
 }

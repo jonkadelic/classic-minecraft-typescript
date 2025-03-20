@@ -12,6 +12,10 @@ import { Material } from "./material/Material";
 import { Entity } from "../Entity";
 import { TickNextTickData } from "./TickNextTickData";
 import { BlockMap } from "./BlockMap";
+import { LevelRenderer } from "../renderer/LevelRenderer";
+import { Minecraft } from "../Minecraft";
+import { ParticleEngine } from "../particle/ParticleEngine";
+import { Font } from "../gui/Font";
 
 export class Level {
     private static readonly MAX_TICK_TILES_PER_TICK = 200
@@ -26,21 +30,59 @@ export class Level {
     public ySpawn: number = 0
     public zSpawn: number = 0
     public rotSpawn: number = 0
+    private levelRenderers: LevelRenderer[] = []
+    private lightDepths: number[]
     private random: Random = new Random()
     private randValue = this.random.nextInt()
     private addend = 1013904223
     private tickNextTickList: TickNextTickData[] = []
     public blockMap: BlockMap | null = null
-
+    private networkMode = false
+    public rendererContext: Minecraft | null = null
     public creativeMode: boolean = true
-
     public waterLevel: number = 0
-    private lightDepths: number[]
-    private levelListeners: LevelListener[] = []
+    public skyColor: number = 0
+    public fogColor: number = 0
+    public cloudColor: number = 0
     private unprocessed = 0
     private tickCount = 0
     public player: Entity | null = null
-    private networkMode = false
+    public particleEngine: ParticleEngine | null = null
+    public font: Font | null = null
+    public growTrees: boolean = false
+
+    public initTransient(): void {
+        this.levelRenderers = []
+        this.lightDepths = new Array(this.width * this.height).fill(this.depth)
+        this.calcLightDepths(0, 0, this.width, this.height)
+        this.random = new Random()
+        this.randValue = this.random.nextInt()
+        this.tickNextTickList = []
+
+        if (this.waterLevel == 0) {
+            this.waterLevel = this.depth / 2
+        }
+
+        if (this.skyColor == 0) {
+            this.skyColor = 0x99CCFF
+        }
+
+        if (this.fogColor == 0) {
+            this.fogColor = 0xFFFFFF
+        }
+
+        if (this.cloudColor == 0) {
+            this.cloudColor = 0xFFFFFF
+        }
+
+        if (this.xSpawn == 0 && this.ySpawn == 0 && this.zSpawn == 0) {
+            this.findSpawn()
+        }
+
+        if (this.blockMap == null) {
+            this.blockMap = new BlockMap(this.width, this.depth, this.height)
+        }
+    }
 
     public constructor(width: number, height: number, depth: number) {
         this.width = width
@@ -74,8 +116,8 @@ export class Level {
         }
 
         this.calcLightDepths(0, 0, this.width, this.height)
-        for (let i = 0; i < this.levelListeners.length; i++) {
-            this.levelListeners[i].allChanged()
+        for (let i = 0; i < this.levelRenderers.length; i++) {
+            this.levelRenderers[i].allChanged()
         }
     }
 
@@ -87,8 +129,8 @@ export class Level {
         this.blocks = Array.from(Base256.decode(level))
 
         this.calcLightDepths(0, 0, this.width, this.height)
-        for (let i = 0; i < this.levelListeners.length; i++) {
-            this.levelListeners[i].allChanged()
+        for (let i = 0; i < this.levelRenderers.length; i++) {
+            this.levelRenderers[i].allChanged()
         }
         console.log("Loaded level")
         return true
@@ -110,11 +152,12 @@ export class Level {
         this.depth = ySize
         this.blocks = blocks
         this.calcLightDepths(0, 0, xSize, zSize)
-        for (let i = 0; i < this.levelListeners.length; i++) {
-            this.levelListeners[i].allChanged()
+        for (let i = 0; i < this.levelRenderers.length; i++) {
+            this.levelRenderers[i].allChanged()
         }
-
+        this.tickNextTickList.length = 0
         this.findSpawn()
+        this.initTransient()
     }
 
     public findSpawn() {
@@ -157,8 +200,8 @@ export class Level {
                     let y10 = oldDepth < y ? oldDepth : y
                     let y11 = oldDepth > y ? oldDepth : y
                     let i = 0
-                    while (i < this.levelListeners.length) {
-                        this.levelListeners[i].lightColumnChanged(x, z, y10, y11)
+                    while (i < this.levelRenderers.length) {
+                        this.levelRenderers[i].setDirty(x - 1, y10 - 1, z - 1, x + 1, y11 + 1, z + 1)
                         i++
                     }
                 }
@@ -168,12 +211,12 @@ export class Level {
         }
     }
 
-    public addListener(listener: LevelListener): void {
-        this.levelListeners.push(listener)
+    public addListener(listener: LevelRenderer): void {
+        this.levelRenderers.push(listener)
     }
 
-    public removeListener(listener: LevelListener): void {
-        this.levelListeners.splice(this.levelListeners.indexOf(listener), 1)
+    public removeListener(listener: LevelRenderer): void {
+        this.levelRenderers.splice(this.levelRenderers.indexOf(listener), 1)
     }
 
     public isLightBlocker(x: number, y: number, z: number): boolean {
@@ -251,8 +294,11 @@ export class Level {
         if (type == this.getTile(x, y, z)) {
             return false
         }
-        if (type == 0 && (x == 0 || z == 0 || x == this.width - 1 || z == this.height - 1)) {
-            // type = Tiles.water.id
+        if (type == 0 && (x == 0 || z == 0 || x == this.width - 1 || z == this.height - 1) &&
+            y >= this.getGroundLevel() &&
+            y < this.getWaterLevel()    
+        ) {
+            type = Tiles.water.id
         }
         let currentTile = this.getTile(x, y, z)
         this.blocks[x + z * this.width + y * this.width * this.height] = type
@@ -264,9 +310,8 @@ export class Level {
         }
         this.calcLightDepths(x, z, 1, 1)
 
-        // TODO: Stopgap solution until LevelRenderer is updated
-        for (let i = 0; i < this.levelListeners.length; i++) {
-            this.levelListeners[i].tileChanged(x, y, z)
+        for (let i = 0; i < this.levelRenderers.length; i++) {
+            this.levelRenderers[i].setDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1)
         }
         return true
     }
@@ -332,6 +377,28 @@ export class Level {
             return 0
         }
         return this.blocks[x + z * this.width + y * this.width * this.height]
+    }
+
+    public isSolid(x: number, y: number, z: number, r: number): boolean {
+        if (this.isSolidTile(x - r, y - r, z - r)) {
+            return true
+        } else if (this.isSolidTile(x - r, y - r, z + r)) {
+            return true
+        } else if (this.isSolidTile(x - r, y + r, z - r)) {
+            return true
+        } else if (this.isSolidTile(x - r, y + r, z + r)) {
+            return true
+        } else if (this.isSolidTile(x + r, y - r, z - r)) {
+            return true
+        } else if (this.isSolidTile(x + r, y - r, z + r)) {
+            return true
+        } else if (this.isSolidTile(x + r, y + r, z - r)) {
+            return true
+        } else if (this.isSolidTile(x + r, y + r, z + r)) {
+            return true
+        } else {
+            return false
+        }
     }
 
     public isSolidTile(x: number, y: number, z: number): boolean {

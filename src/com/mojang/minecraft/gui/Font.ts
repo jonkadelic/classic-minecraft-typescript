@@ -74,7 +74,7 @@ export class Font {
         
 		gl.bindTexture(gl.TEXTURE_2D, this.fontTexture)
         let t = Tesselator.instance
-        t.init()
+        t.begin()
         t.color_i(color)
         
         let xo: number = 0
@@ -105,7 +105,7 @@ export class Font {
 			xo += this.charWidths[ch]
         }
         
-        t.flush(this.buffer)
+        t.end(this.buffer)
         this.buffer.draw()
     }
     

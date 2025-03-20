@@ -53,9 +53,9 @@ export class SelectBlockScreen extends Screen {
             }
             matrix.translate(-1.5, 0.5, 0.5)
             matrix.scale(-1, -1, -1)
-            t.init()
+            t.begin()
             cTile.renderInInventory(t)
-            t.flush(buffer)
+            t.end(buffer)
             buffer.draw()
             matrix.pop()
         }
@@ -63,7 +63,7 @@ export class SelectBlockScreen extends Screen {
 
     protected override mouseClicked(mx: number, my: number, eventButton: number): void {
         if (eventButton == MouseButton.LEFT) {
-            this.minecraft.player.inventory.replaceSlot(this.getTileAt(mx, my))
+            this.minecraft.player!.inventory.replaceSlot(this.getTileAt(mx, my))
             this.minecraft.setScreen(null)
         }
     }

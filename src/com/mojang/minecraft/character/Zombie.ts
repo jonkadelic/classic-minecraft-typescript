@@ -18,33 +18,6 @@ export class Zombie extends Mob {
         this.setPos(x, y, z)
     }
 
-    public override tick(): void {
-        super.tick()
-        let xa = 0.0
-        let ya = 0.0
-        if (this.y < -100) {
-            this.remove()
-        }
-        this.rot += this.rotA
-        this.rotA = (this.rotA * 0.99)
-        this.rotA = (this.rotA + (Math.random() - Math.random()) * Math.random() * Math.random() * 0.08)
-        xa = Math.sin(this.rot)
-        ya = Math.cos(this.rot)
-        if (this.onGround && Math.random() < 0.08) {
-            this.yd = 0.42
-        }
-        this.moveRelative(xa, ya, this.onGround ? 0.1 : 0.02)
-        this.move(this.xd, this.yd, this.zd)
-        this.xd *= 0.91
-        this.yd *= 0.98
-        this.zd *= 0.91
-        this.yd -= 0.08
-        if (this.onGround) {
-            this.xd *= 0.6
-            this.zd *= 0.6
-        }
-    }
-
     public override render(a: number): void {
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./char.png"))
         matrix.push()

@@ -26,8 +26,8 @@ export class GenerateLevelScreen extends Screen {
         }
 
         // TODO
-        this.minecraft.level.regenerate()
-        this.minecraft.player.resetPos()
+        this.minecraft.level!.regenerate()
+        this.minecraft.player!.resetPos()
 
         this.minecraft.grabMouse()
         this.minecraft.setScreen(null)

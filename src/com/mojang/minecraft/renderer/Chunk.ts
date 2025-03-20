@@ -6,94 +6,114 @@ import { Tesselator } from "./Tesselator";
 import { Level } from "../level/Level";
 import { Tile } from "../level/tile/Tile";
 import { Tiles } from "../level/tile/Tiles";
+import { Culler } from "./Culler";
 
 export class Chunk {
-    public aabb: AABB
-    public readonly level: Level
-    public readonly x0: number
-    public readonly y0: number
-    public readonly z0: number
-    public readonly x1: number
-    public readonly y1: number
-    public readonly z1: number
-    public readonly x: number
-    public readonly y: number
-    public readonly z: number
-    public dirty: boolean = true
+    private static readonly NUM_LAYERS: number = 2
+
+    private readonly level: Level
     private buffers: RenderBuffer[] = []
-    public dirtiedTime: number = 0
     private static t: Tesselator = Tesselator.instance
     public static updates: number = 0
-    private static totalTime: number = 0
-    private static totalUpdates: number = 0
+    private readonly x: number
+    private readonly y: number
+    private readonly z: number
+    private readonly xs: number
+    private readonly ys: number
+    private readonly zs: number
+    public visible: boolean = false
+    public empty: boolean[] = new Array(Chunk.NUM_LAYERS)
+    public dirty: boolean = false
 
-    public constructor(level: Level, x0: number, y0: number, z0: number, x1: number, y1: number, z1: number) {
+    public constructor(level: Level, x: number, y: number, z: number, size: number) {
         this.level = level
-        this.x0 = x0
-        this.y0 = y0
-        this.z0 = z0
-        this.x1 = x1
-        this.y1 = y1
-        this.z1 = z1
-        this.x = (x0 + x1) / 2
-        this.y = (y0 + y1) / 2
-        this.z = (z0 + z1) / 2
-        this.aabb = new AABB(x0, y0, z0, x1, y1, z1)
+        this.x = x
+        this.y = y
+        this.z = z
+        this.xs = this.ys = this.zs = size
         this.buffers = [new RenderBuffer(gl.STATIC_DRAW), new RenderBuffer(gl.STATIC_DRAW)]
+        this.reset()
     }
 
-    private rebuildLayer(layer: number): void {
-        this.dirty = false
+    public rebuild(): void {
         Chunk.updates++
-        let before = Date.now()
-        Chunk.t.init()
-        let tiles = 0
-        for (let x = this.x0; x < this.x1; x++) {
-            for (let y = this.y0; y < this.y1; y++) {
-                for (let z = this.z0; z < this.z1; z++) {
-                    let tileId = this.level.getTile(x, y, z)
-                    if (tileId > 0) {
-                        let tile: Tile = Tile.tiles[tileId]
-                        if (tile.getRenderLayer() == layer) {
-                            Tile.tiles[tileId].render(this.level, x, y, z, Chunk.t)
-                            tiles++
+        let x0 = this.x
+        let y0 = this.y
+        let z0 = this.z
+        let x1 = this.x + this.xs
+        let y1 = this.y + this.ys
+        let z1 = this.z + this.zs
+
+        this.empty.fill(true)
+
+        for (let i = 0; i < Chunk.NUM_LAYERS; i++) {
+            let renderNextLayer = false
+            let rendered = false
+
+            Chunk.t.begin()
+
+            for (let x = x0; x < x1; x++) {
+                for (let y = y0; y < y1; y++) {
+                    for (let z = z0; z < z1; z++) {
+                        let tileId = this.level.getTile(x, y, z)
+                        if (tileId > 0) {
+                            let tile = Tile.tiles[tileId]
+                            if (tile.getRenderLayer() != i) {
+                                renderNextLayer = true
+                            } else {
+                                rendered = tile.render(this.level, x, y, z, Chunk.t) || rendered
+                            }
                         }
                     }
                 }
             }
-        }
-        Chunk.t.flush(this.buffers[layer])
-        let after = Date.now()
-        if (tiles > 0) {
-            Chunk.totalTime += after - before
-            Chunk.totalUpdates++
-        }
-    }
 
-    public rebuild(): void {
-        this.rebuildLayer(0)
-        this.rebuildLayer(1)
-    }
+            Chunk.t.end(this.buffers[i])
 
-    public render(layer: number): void {
-        this.buffers[layer].draw()
-    }
-
-    public setDirty(): void {
-        if (!this.dirty) {
-            this.dirty = true
-            this.dirtiedTime = Date.now()
+            if (rendered) {
+                this.empty[i] = false
+            }
+            if (!renderNextLayer) {
+                break
+            }
         }
     }
 
-    public isDirty(): boolean {
-        return this.dirty
+    public compare(player: Player): number {
+        let dx = player.x - this.x
+        let dy = player.y - this.y
+        let dz = player.z - this.z
+        return dx * dx + dy * dy + dz * dz
     }
 
-    public distanceToSqr(player: Player): number {
-        let xd = this.x - player.x
-        let yd = this.y - player.y
-        let zd = this.z - player.z
-        return xd * xd + yd * yd + zd * zd
+    private reset(): void {
+        this.empty.fill(true)
+    }
+
+    public delete(): void {
+        this.reset()
+        for (let rb of this.buffers) {
+            rb.delete()
+        }
+    }
+
+    public render(): number {
+        if (!this.visible) {
+            return 0
+        }
+
+        let c = 0
+        for (let i = 0; i < Chunk.NUM_LAYERS; i++) {
+            if (!this.empty[i]) {
+                this.buffers[i].draw()
+                c++
+            }
+        }
+
+        return c
+    }
+
+    public cull(culler: Culler): void {
+        this.visible = culler.cubeInFrustum(this.x, this.y, this.z, this.x + this.xs, this.y + this.ys, this.z + this.zs)
     }
 }

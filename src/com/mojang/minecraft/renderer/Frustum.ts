@@ -1,25 +1,14 @@
 import { Matrix } from "../../../util/Matrix";
 import { matrix } from "../Minecraft";
 import { AABB } from "../phys/AABB";
+import { Culler } from "./Culler";
 
-export class Frustum {
-    public m_Frustum: number[][] = new Array(6).fill(0).map(() => new Array(4).fill(0))
-    public static readonly RIGHT: number = 0
-    public static readonly LEFT: number = 1
-    public static readonly BOTTOM: number = 2
-    public static readonly TOP: number = 3
-    public static readonly BACK: number = 4
-    public static readonly FRONT: number = 5
-    public static readonly A: number = 0
-    public static readonly B: number = 1
-    public static readonly C: number = 2
-    public static readonly D: number = 3
+export class Frustum extends Culler {
     private static frustum: Frustum = new Frustum()
-    private proj: number[] = new Array(16)
-    private modl: number[] = new Array(16)
-    private clip: number[] = new Array(16)
 
-    private constructor() { }
+    private constructor() {
+        super()
+    }
 
     public static getFrustum(): Frustum {
         this.frustum.calculateFrustum()
@@ -28,14 +17,10 @@ export class Frustum {
 
     private normalizePlane(frustum: number[][], side: number): void {
         let magnitude = Math.sqrt(frustum[side][0] * frustum[side][0] + frustum[side][1] * frustum[side][1] + frustum[side][2] * frustum[side][2]);
-        let fArray = frustum[side];
-        fArray[0] = fArray[0] / magnitude;
-        let fArray2 = frustum[side];
-        fArray2[1] = fArray2[1] / magnitude;
-        let fArray3 = frustum[side];
-        fArray3[2] = fArray3[2] / magnitude;
-        let fArray4 = frustum[side];
-        fArray4[3] = fArray4[3] / magnitude;
+        frustum[side][0] /= magnitude
+        frustum[side][1] /= magnitude
+        frustum[side][2] /= magnitude
+        frustum[side][3] /= magnitude
     }
 
     private calculateFrustum(): void {
@@ -87,74 +72,5 @@ export class Frustum {
         this.m_Frustum[5][2] = this.clip[11] + this.clip[10];
         this.m_Frustum[5][3] = this.clip[15] + this.clip[14];
         this.normalizePlane(this.m_Frustum, 5);
-    }
-
-    public pointInFrustum(x: number, y: number, z: number): boolean {
-        let i = 0;
-        while (i < 6) {
-            if (this.m_Frustum[i][0] * x + this.m_Frustum[i][1] * y + this.m_Frustum[i][2] * z + this.m_Frustum[i][3] <= 0.0) {
-                return false;
-            }
-            ++i;
-        }
-        return true;   
-    }
-
-    public sphereInFrustum(x: number, y: number, z: number, radius: number): boolean {
-        let i = 0;
-        while (i < 6) {
-            if (this.m_Frustum[i][0] * x + this.m_Frustum[i][1] * y + this.m_Frustum[i][2] * z + this.m_Frustum[i][3] <= -radius) {
-                return false;
-            }
-            ++i;
-        }
-        return true;
-    }
-
-    public cubeFullyInFrustum(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): boolean {
-        let i = 0;
-        while (i < 6) {
-            if (!(this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            if (!(this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            ++i;
-        }
-        return true;
-    }
-
-    public cubeInFrustum(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): boolean {
-        let i = 0;
-        while (i < 6) {
-            if (!(this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z1 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y1 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x1 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0 || this.m_Frustum[i][0] * x2 + this.m_Frustum[i][1] * y2 + this.m_Frustum[i][2] * z2 + this.m_Frustum[i][3] > 0.0)) {
-                return false;
-            }
-            ++i;
-        }
-        return true;
-    }
-
-    public isVisible(aabb: AABB): boolean {
-        return this.cubeInFrustum(aabb.x0, aabb.y0, aabb.z0, aabb.x1, aabb.y1, aabb.z1);
     }
 }

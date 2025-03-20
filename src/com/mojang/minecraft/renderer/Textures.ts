@@ -2,7 +2,8 @@ import { gl } from "../Minecraft";
 import { DynamicTexture } from "./ptexture/DynamicTexture";
 
 export class Textures {
-    public idMap: Map<string, WebGLTexture> = new Map();
+    public idMap: Map<string, WebGLTexture> = new Map()
+    private readyMap: Map<string, boolean> = new Map()
     public dynamicTextures: DynamicTexture[] = []
     public pixels: Uint8Array = new Uint8Array(256 * 256 * 4)
 
@@ -48,6 +49,8 @@ export class Textures {
             pixel
         );
 
+        this.readyMap.set(resourceName, false)
+
         const image = new Image();
         image.onload = () => {
             gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -64,6 +67,7 @@ export class Textures {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            this.readyMap.set(resourceName, true)
         };
         image.src = resourceName;
 
@@ -78,14 +82,18 @@ export class Textures {
     }
 
     public tick(): void {
+        if (!this.readyMap.get("./terrain.png")) {
+            return
+        }
+        
         for (let i: number = 0; i < this.dynamicTextures.length; i++) {
             let dynamicTexture: DynamicTexture = this.dynamicTextures[i]
             dynamicTexture.tick()
             gl.texSubImage2D(
                 gl.TEXTURE_2D, 
                 0, 
-                Math.trunc(dynamicTexture.tex % 16 << 4),
-                Math.trunc(dynamicTexture.tex / 16 << 4),
+                Math.trunc(dynamicTexture.tex % 16) << 4,
+                Math.trunc(dynamicTexture.tex / 16) << 4,
                 16,
                 16,
                 gl.RGBA,

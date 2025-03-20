@@ -81,11 +81,11 @@ export class Cube {
     private compile(): void {
         this.renderBuffer = new RenderBuffer(gl.STATIC_DRAW)
         let t = Tesselator.instance
-        t.init()
+        t.begin()
         for (let i = 0; i < this.polygons.length; i++) {
             this.polygons[i].render(t)
         }
-        t.flush(this.renderBuffer)
+        t.end(this.renderBuffer)
         this.compiled = true
     }
 }
