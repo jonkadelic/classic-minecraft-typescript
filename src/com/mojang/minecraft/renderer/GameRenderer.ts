@@ -185,10 +185,6 @@ export class GameRenderer {
         this.moveCameraToPlayer(a)
     }
 
-    private renderItemInHand(a: number): void {
-        // todo: minecraft.java line 939
-    }
-
     public render(a: number): void {
         if (!shader.isLoaded()) {
             return
@@ -369,7 +365,7 @@ export class GameRenderer {
             this.bobView(a)
         }
 
-        this.renderItemInHand(a)
+        this.itemInHandRenderer.render(a)
     }
 
     private tickRain(): void {

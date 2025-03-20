@@ -268,6 +268,7 @@ export class Minecraft {
                     oldTile.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine)
                 }
             }
+            this.gameRenderer.itemInHandRenderer.swing_()
         } else if (click == 1 && this.hitResult != null && selected > 0) {
             let aabb: AABB | null
             let x = this.hitResult.x
@@ -297,6 +298,7 @@ export class Minecraft {
                 if (selected != 0) {
                     Tile.tiles[selected].onPlaceByPlayer(this.level, x, y, z)
                 }
+                this.gameRenderer.itemInHandRenderer.place()
             }
         }
     }

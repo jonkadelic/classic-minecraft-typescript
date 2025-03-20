@@ -21,6 +21,15 @@ export class ItemInHandRenderer {
         this.mc = mc
     }
 
+    public swing_(): void {
+        this.swing = -1
+        this.isSwinging = true
+    }
+
+    public place(): void {
+        this.height = 0
+    }
+
     public render(a: number): void {
         let h: number = this.oHeight + (this.height - this.oHeight) * a
         let player: Player = this.mc.player!
