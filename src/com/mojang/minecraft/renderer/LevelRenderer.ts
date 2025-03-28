@@ -29,7 +29,9 @@ export class LevelRenderer {
     private yChunks: number = 0
     private zChunks: number = 0
     private hitRenderBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
+    private cloudRenderBuffer: RenderBuffer = new RenderBuffer(gl.DYNAMIC_DRAW)
     public mc: Minecraft
+    public ticks: number = 0
     private xOld: number = -9999.0
     private yOld: number = -9999.0
     private zOld: number = -9999.0
@@ -105,8 +107,79 @@ export class LevelRenderer {
         this.setDirty(0, 0, 0, this.level.width, this.level.depth, this.level.height)
     }
 
+    public tick(): void {
+        this.ticks++
+    }
+
     public renderClouds(a: number): void {
-        // todo: Minecraft.java line 685
+        // Minecraft.java line 685 to 749 inclusive
+
+        gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./clouds.png"))
+        shader.setColor(1.0, 1.0, 1.0, 1.0)
+
+        let s = 512
+        let d = 2048 / s
+
+        let cr = (this.level!.cloudColor >> 16 & 0xFF) / 255.0
+        let cg = (this.level!.cloudColor >> 8 & 0xFF) / 255.0
+        let cb = (this.level!.cloudColor >> 0 & 0xFF) / 255.0
+
+        let t = Tesselator.instance
+        
+        let scale = 4.8828125E-4;
+        let yy = this.level!.depth - 2
+        let zOffset = (this.ticks + a) * scale * 0.03
+
+        t.begin()
+        t.color_f(cr, cg, cb)
+
+        for (let xx = -s * d; xx < this.level!.width + s * d; xx += s) {
+            for (let zz = -s * d; zz < this.level!.height + s * d; zz += s) {
+                t.vertexUV(xx,     yy, zz + s, xx * scale + zOffset,       (zz + s) * scale);
+                t.vertexUV(xx + s, yy, zz + s, (xx + s) * scale + zOffset, (zz + s) * scale);
+                t.vertexUV(xx + s, yy, zz,     (xx + s) * scale + zOffset, zz * scale);
+                
+                t.vertexUV(xx + s, yy, zz,     (xx + s) * scale + zOffset, zz * scale);
+                t.vertexUV(xx,     yy, zz,     xx * scale + zOffset,       zz * scale);
+                t.vertexUV(xx,     yy, zz + s, xx * scale + zOffset,       (zz + s) * scale);
+
+                t.vertexUV(xx,     yy, zz,     xx * scale + zOffset,       zz * scale);
+                t.vertexUV(xx + s, yy, zz,     (xx + s) * scale + zOffset, zz * scale);
+                t.vertexUV(xx + s, yy, zz + s, (xx + s) * scale + zOffset, (zz + s) * scale);
+                
+                t.vertexUV(xx + s, yy, zz + s, (xx + s) * scale + zOffset, (zz + s) * scale);
+                t.vertexUV(xx,     yy, zz + s, xx * scale + zOffset,       (zz + s) * scale);
+                t.vertexUV(xx,     yy, zz,     xx * scale + zOffset,       zz * scale);
+            }
+        }
+
+        t.end(this.cloudRenderBuffer)
+        this.cloudRenderBuffer.draw()
+
+        t.begin()
+
+        cr = (this.level!.skyColor >> 16 & 0xFF) / 255.0
+        cg = (this.level!.skyColor >> 8 & 0xFF) / 255.0
+        cb = (this.level!.skyColor >> 0 & 0xFF) / 255.0
+
+        t.color_f(cr, cg, cb)
+
+        yy = this.level!.depth + 10
+
+        for (let x = -s * d; x < this.level!.width + s * d; x += s) {
+            for (let z = -s * d; z < this.level!.height + s * d; z += s) {
+                t.vertex(x, yy, z)
+                t.vertex(x + s, yy, z)
+                t.vertex(x + s, yy, z + s)
+                
+                t.vertex(x + s, yy, z + s)
+                t.vertex(x, yy, z + s)
+                t.vertex(x, yy, z)
+            }
+        }
+
+        t.end(this.cloudRenderBuffer)
+        this.cloudRenderBuffer.draw()
     }
 
     public render(player: Player, layer: number): number {

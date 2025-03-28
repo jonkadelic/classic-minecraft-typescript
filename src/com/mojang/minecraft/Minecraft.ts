@@ -381,6 +381,10 @@ export class Minecraft {
         if (this.level != null) {
             this.gameRenderer.tick_()
         }
+
+        if (this.level != null) {
+            this.levelRenderer.tick()
+        }
         
         this.level!.tick()
         this.particleEngine.tick()
