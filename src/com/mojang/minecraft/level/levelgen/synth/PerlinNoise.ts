@@ -1,9 +1,9 @@
 import { Random } from "../../../../../util/Random";
-import { ImprovedNoise } from "./ImprovedNoise";
-import { SurfaceNoise } from "./SurfaceNoise";
+import { BasicNoise } from "./ImprovedNoise";
+import { Synth } from "./Synth";
 
-export class PerlinNoise extends SurfaceNoise {
-    private noiseLevels: SurfaceNoise[]
+export class PerlinNoise extends Synth {
+    private noiseLevels: Synth[]
     private levels: number
 
     public constructor(random: Random, levels: number) {
@@ -11,7 +11,7 @@ export class PerlinNoise extends SurfaceNoise {
         this.levels = levels
         this.noiseLevels = new Array(levels)
         for (let i = 0; i < levels; i++) {
-            this.noiseLevels[i] = new ImprovedNoise(random)
+            this.noiseLevels[i] = new BasicNoise(random)
         }
     }
 

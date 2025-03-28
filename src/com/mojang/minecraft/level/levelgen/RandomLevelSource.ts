@@ -2,7 +2,7 @@ import { Random } from "../../../../util/Random";
 import { Level } from "../Level";
 import { Tile } from "../tile/Tile";
 import { Tiles } from "../tile/Tiles";
-import { CompositeNoise } from "./synth/CompositeNoise";
+import { Distort } from "./synth/CompositeNoise";
 import { PerlinNoise } from "./synth/PerlinNoise";
 
 export class LevelGenerator {
@@ -31,8 +31,8 @@ export class LevelGenerator {
         }
 
         // Raising phase
-        let heightNoiseGeneratorA = new CompositeNoise(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
-        let heightNoiseGeneratorB = new CompositeNoise(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
+        let heightNoiseGeneratorA = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
+        let heightNoiseGeneratorB = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
         let heightNoiseGeneratorSelector = new PerlinNoise(this.random, 6)
         let heightMap = new Array(sizeX * sizeZ)
         let xzScale = 1.3
@@ -55,8 +55,8 @@ export class LevelGenerator {
         }
 
         // Eroding phase
-        let erosionPowerNoiseGenerator = new CompositeNoise(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
-        let erosionAmountNoiseGenerator = new CompositeNoise(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
+        let erosionPowerNoiseGenerator = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
+        let erosionAmountNoiseGenerator = new Distort(new PerlinNoise(this.random, 8), new PerlinNoise(this.random, 8))
         
         for (let x = 0; x < this.sizeX; x++) {
             for (let z = 0; z < this.sizeZ; z++) {

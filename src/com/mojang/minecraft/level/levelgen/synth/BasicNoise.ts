@@ -1,7 +1,7 @@
 import { Random } from "../../../../../util/Random";
-import { SurfaceNoise } from "./SurfaceNoise";
+import { Synth } from "./Synth";
 
-export class ImprovedNoise extends SurfaceNoise {
+export class BasicNoise extends Synth {
     private p: number[] = new Array(512)
 
     public constructor(random: Random = new Random()) {
@@ -43,40 +43,40 @@ export class ImprovedNoise extends SurfaceNoise {
         X -= Math.floor(X)
         Y -= Math.floor(Y)
         Z -= Math.floor(Z)
-        let u = ImprovedNoise.fade(X)
-        let v = ImprovedNoise.fade(Y)
-        let w = ImprovedNoise.fade(Z)
+        let u = BasicNoise.fade(X)
+        let v = BasicNoise.fade(Y)
+        let w = BasicNoise.fade(Z)
         let A = this.p[floorX] + floorY
         let AA = this.p[A] + floorZ
         let AB = this.p[A + 1] + floorZ
         let B = this.p[floorX + 1] + floorY
         let BA = this.p[B] + floorZ
         let BB = this.p[B + 1] + floorZ
-        return ImprovedNoise.lerp(
+        return BasicNoise.lerp(
             w,
-            ImprovedNoise.lerp(
+            BasicNoise.lerp(
                 v,
-                ImprovedNoise.lerp(
+                BasicNoise.lerp(
                     u,
-                    ImprovedNoise.grad(this.p[AA], X, Y, Z),
-                    ImprovedNoise.grad(this.p[BA], X - 1, Y, Z)
+                    BasicNoise.grad(this.p[AA], X, Y, Z),
+                    BasicNoise.grad(this.p[BA], X - 1, Y, Z)
                 ),
-                ImprovedNoise.lerp(
+                BasicNoise.lerp(
                     u,
-                    ImprovedNoise.grad(this.p[AB], X, Y - 1, Z),
-                    ImprovedNoise.grad(this.p[BB], X - 1, Y - 1, Z)
+                    BasicNoise.grad(this.p[AB], X, Y - 1, Z),
+                    BasicNoise.grad(this.p[BB], X - 1, Y - 1, Z)
                 )
             ),
-            ImprovedNoise.lerp(
+            BasicNoise.lerp(
                 v,
-                ImprovedNoise.lerp(
+                BasicNoise.lerp(
                     u,
-                    ImprovedNoise.grad(this.p[AA + 1], X, Y, Z - 1),
-                    ImprovedNoise.grad(this.p[BA + 1], X - 1, Y, Z - 1)
-                ), ImprovedNoise.lerp(
+                    BasicNoise.grad(this.p[AA + 1], X, Y, Z - 1),
+                    BasicNoise.grad(this.p[BA + 1], X - 1, Y, Z - 1)
+                ), BasicNoise.lerp(
                     u,
-                    ImprovedNoise.grad(this.p[AB + 1], X, Y - 1, Z - 1),
-                    ImprovedNoise.grad(this.p[BB + 1], X - 1, Y - 1, Z - 1)
+                    BasicNoise.grad(this.p[AB + 1], X, Y - 1, Z - 1),
+                    BasicNoise.grad(this.p[BB + 1], X - 1, Y - 1, Z - 1)
                 )
             )
         )
