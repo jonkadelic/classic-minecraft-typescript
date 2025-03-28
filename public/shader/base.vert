@@ -30,13 +30,7 @@ varying highp vec2 vTextureCoord;
 varying highp vec4 vColor;
 varying highp vec3 vNormal;
 
-varying highp float vFogAmount;
-
 varying highp vec4 vDiffuseColor;
-
-float fogFactorLinear(const float dist, const float start, const float end) {
-  return 1.0 - clamp((end - dist) / (end - start), 0.0, 1.0);
-}
 
 void main(void) {
     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
@@ -57,13 +51,6 @@ void main(void) {
         vNormal = vec3(0.0, 0.0, 0.0);
     }
     vPosition = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;
-
-    if (uHasFog) {
-        float fogDistance = length(gl_Position.xyz);
-        vFogAmount = fogFactorLinear(fogDistance, uFogPosition.y, uFogPosition.x);
-    } else {
-        vFogAmount = 0.0;
-    }
 
     if (uHasLight) {
         highp vec3 lightPosition = (uMVLightMatrix * vec4(uLightPosition, 1.0)).xyz;

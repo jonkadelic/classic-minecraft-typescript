@@ -257,8 +257,10 @@ export class LevelRenderer {
 
     public renderHitOutline(h: HitResult, mode: number) {
         if (mode == 0 && h.type == 0) {
+            let n = 2
             gl.enable(gl.BLEND)
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+            gl.colorMask(true, true, true, false)
             shader.setColor(0.0, 0.0, 0.0, 0.4)
             gl.lineWidth(2.0)
             gl.depthMask(false)
@@ -277,7 +279,17 @@ export class LevelRenderer {
                 t.vertex(bb.x0, bb.y0, bb.z1)
                 t.vertex(bb.x0, bb.y0, bb.z0)
                 t.end(this.hitRenderBuffer)
-                this.hitRenderBuffer.draw(gl.LINE_STRIP)
+
+                for (let x = -n / 2; x < n / 2; x++) {
+                    for (let y = -n / 2; y < n / 2; y++) {
+                        for (let z = -n / 2; z < n / 2; z++) {
+                            matrix.push()
+                            matrix.translate(x * ss, y * ss, z * ss)
+                            this.hitRenderBuffer.draw(gl.LINE_STRIP)
+                            matrix.pop()
+                        }
+                    }
+                }
 
                 t.begin()
                 t.vertex(bb.x0, bb.y1, bb.z0)
@@ -286,7 +298,17 @@ export class LevelRenderer {
                 t.vertex(bb.x0, bb.y1, bb.z1)
                 t.vertex(bb.x0, bb.y1, bb.z0)
                 t.end(this.hitRenderBuffer)
-                this.hitRenderBuffer.draw(gl.LINE_STRIP)
+
+                for (let x = -n / 2; x < n / 2; x++) {
+                    for (let y = -n / 2; y < n / 2; y++) {
+                        for (let z = -n / 2; z < n / 2; z++) {
+                            matrix.push()
+                            matrix.translate(x * ss, y * ss, z * ss)
+                            this.hitRenderBuffer.draw(gl.LINE_STRIP)
+                            matrix.pop()
+                        }
+                    }
+                }
 
                 t.begin()
                 t.vertex(bb.x0, bb.y0, bb.z0)
@@ -298,12 +320,23 @@ export class LevelRenderer {
                 t.vertex(bb.x0, bb.y0, bb.z1)
                 t.vertex(bb.x0, bb.y1, bb.z1)
                 t.end(this.hitRenderBuffer)
-                this.hitRenderBuffer.draw(gl.LINES)
+
+                for (let x = -n / 2; x < n / 2; x++) {
+                    for (let y = -n / 2; y < n / 2; y++) {
+                        for (let z = -n / 2; z < n / 2; z++) {
+                            matrix.push()
+                            matrix.translate(x * ss, y * ss, z * ss)
+                            this.hitRenderBuffer.draw(gl.LINES)
+                            matrix.pop()
+                        }
+                    }
+                }
             }
 
             gl.depthMask(true)
             gl.disable(gl.BLEND)
             shader.setColor(1.0, 1.0, 1.0, 1.0)
+            gl.colorMask(true, true, true, true)
         }
     }
 

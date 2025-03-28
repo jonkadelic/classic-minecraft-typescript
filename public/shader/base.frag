@@ -23,9 +23,11 @@ varying highp vec2 vTextureCoord;
 varying highp vec4 vColor;
 varying highp vec3 vNormal;
 
-varying highp float vFogAmount;
-
 varying highp vec4 vDiffuseColor;
+
+highp float fogFactorLinear(const highp float dist, const highp float start, const highp float end) {
+  return 1.0 - clamp((end - dist) / (end - start), 0.0, 1.0);
+}
 
 void main(void) {
     highp vec4 texelColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -48,7 +50,9 @@ void main(void) {
     texelColor = texelColor * uColor;
 
     if (uHasFog) {
-        gl_FragColor = vFogAmount * texelColor + (1.0 - vFogAmount) * uFogColor;
+        highp float fogDistance = length(vPosition.xyz);
+        highp float fogAmount = fogFactorLinear(fogDistance, uFogPosition.y, uFogPosition.x);
+        gl_FragColor = fogAmount * texelColor + (1.0 - fogAmount) * uFogColor;
     } else {
         gl_FragColor = texelColor;
     }

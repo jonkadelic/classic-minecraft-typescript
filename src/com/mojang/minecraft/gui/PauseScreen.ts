@@ -3,6 +3,7 @@ import { Button } from "./Button";
 import { RenderBuffer } from "../../../util/RenderBuffer";
 import { GenerateLevelScreen } from "./GenerateLevelScreen";
 import { OptionsScreen } from "./OptionsScreen";
+import { gl } from "../Minecraft";
 
 export class PauseScreen extends Screen {
 
@@ -35,7 +36,9 @@ export class PauseScreen extends Screen {
     }
 
     public override render(buffer: RenderBuffer, mx: number, my: number) {
+        gl.colorMask(true, true, true, false)
         PauseScreen.fillGradient(buffer, 0, 0, this.width, this.height, 0x60050500, 0xA0303060)
+        gl.colorMask(true, true, true, true)
         PauseScreen.drawCenteredString(this.minecraft.font, "Game menu", Math.trunc(this.width / 2), 40, 0xFFFFFF)
         super.render(buffer, mx, my)
     }
