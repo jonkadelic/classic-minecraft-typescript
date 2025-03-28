@@ -59,6 +59,21 @@ export class Shader {
         gl.uniform4f(this.getUniformLocation("uColor"), r, g, b, a)
     }
 
+    public setFog(enabled: boolean): void {
+        if (!this.program) return
+        gl.uniform1f(this.getUniformLocation("uHasFog"), enabled ? 1 : 0)
+    }
+
+    public setFogColor(r: number, g: number, b: number, a: number): void {
+        if (!this.program) return
+        gl.uniform4f(this.getUniformLocation("uFogColor"), r, g, b, a)
+    }
+
+    public setFogDistance(start: number, end: number): void {
+        if (!this.program) return
+        gl.uniform2f(this.getUniformLocation("uFogPosition"), start, end)
+    }
+
     private loadShader(type: number, source: string): WebGLShader {
         let shader = gl.createShader(type)
         if (!shader) throw new Error("Failed to create shader")

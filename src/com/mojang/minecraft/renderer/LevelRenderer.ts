@@ -206,7 +206,7 @@ export class LevelRenderer {
 
         let total = 0
         for (let c of this.sortedChunks) {
-            total += c.render()
+            total += c.render(layer)
         }
 
         return total

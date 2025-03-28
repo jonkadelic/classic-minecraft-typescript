@@ -18,23 +18,23 @@ export class KeyboardInput extends Input {
 
     public override setKeyState(key: string, state: boolean): void {
         let i: number = -1
-        if (key == this.options.keyUp.defaultKey) {
+        if (key == this.options.keyUp.key) {
             i = KeyboardInput.KEY_UP
         }
 
-        if (key == this.options.keyDown.defaultKey) {
+        if (key == this.options.keyDown.key) {
             i = KeyboardInput.KEY_DOWN
         }
 
-        if (key == this.options.keyLeft.defaultKey) {
+        if (key == this.options.keyLeft.key) {
             i = KeyboardInput.KEY_LEFT
         }
 
-        if (key == this.options.keyRight.defaultKey) {
+        if (key == this.options.keyRight.key) {
             i = KeyboardInput.KEY_RIGHT
         }
 
-        if (key == this.options.keyJump.defaultKey) {
+        if (key == this.options.keyJump.key) {
             i = KeyboardInput.KEY_JUMP
         }
 

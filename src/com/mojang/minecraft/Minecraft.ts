@@ -349,17 +349,24 @@ export class Minecraft {
                 }
                 if (keyboard.getEventKeyState()) {
                     if (this.screen == null) {
-                        if (keyboard.getEventKey() == Keyboard.KEY_RETURN) {
-                            this.level!.save()
+                        if (this.gameMode instanceof CreativeMode) {
+                            if (keyboard.getEventKey() == this.options.keyLoadLocation.key) {
+                                this.player?.resetPos()
+                            }
+                            if (keyboard.getEventKey() == this.options.keySaveLocation.key) {
+                                this.level?.setSpawnPos(Math.trunc(this.player!.x), Math.trunc(this.player!.y), Math.trunc(this.player!.z), this.player!.yRot)
+                                this.player?.resetPos()
+                            }
                         }
-                        if (keyboard.getEventKey() == Keyboard.KEY_Y) {
-                            this.yMouseAxis *= -1
+                        
+                        if (keyboard.getEventKey() == Keyboard.KEY_F5) {
+                            this.isRaining = !this.isRaining
                         }
-                        if (keyboard.getEventKey() == Keyboard.KEY_G) {
-                            this.entities.push(new Zombie(this.level!, this.textures, this.player!.x, this.player!.y, this.player!.z))
+                        if (keyboard.getEventKey() == Keyboard.KEY_TAB && false /* todo survival mode - Minecraft.java line 1504 */) {
+
                         }
-                        if (keyboard.getEventKey() == Keyboard.KEY_B) {
-                            this.setScreen(new SelectBlockScreen())
+                        if (keyboard.getEventKey() == this.options.keyBuild.key) {
+                            this.gameMode.openInventory()
                         }
                     }
                     for (let i: number = 0; i < 9; ++i) {
@@ -367,8 +374,11 @@ export class Minecraft {
                             this.player!.inventory.selected = i
                         }
                     }
+
+                    if (keyboard.getEventKey() == this.options.keyFog.key) {
+                        this.options.set(4, !keyboard.isKeyDown(Keyboard.KEY_SHIFT) ? 1 : -1)
+                    }
                 }
-                // toggle fog key here
             }
         }
         if (this.screen != null) {

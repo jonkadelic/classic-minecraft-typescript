@@ -97,17 +97,15 @@ export class Chunk {
         }
     }
 
-    public render(): number {
+    public render(layer: number): number {
         if (!this.visible) {
             return 0
         }
 
         let c = 0
-        for (let i = 0; i < Chunk.NUM_LAYERS; i++) {
-            if (!this.empty[i]) {
-                this.buffers[i].draw()
-                c++
-            }
+        if (!this.empty[layer]) {
+            this.buffers[layer].draw()
+            c++
         }
 
         return c

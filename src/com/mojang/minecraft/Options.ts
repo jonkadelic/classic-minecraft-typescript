@@ -18,7 +18,7 @@ export class Options {
     public keyJump: KeyMapping = new KeyMapping("Jump", Keyboard.KEY_SPACE)
     public keyBuild: KeyMapping = new KeyMapping("Build", Keyboard.KEY_B)
     public keyChat: KeyMapping = new KeyMapping("Chat", Keyboard.KEY_T)
-    public keyToggleFog: KeyMapping = new KeyMapping("Toggle fog", Keyboard.KEY_F)
+    public keyFog: KeyMapping = new KeyMapping("Toggle fog", Keyboard.KEY_F)
     public keySaveLocation: KeyMapping = new KeyMapping("Save location", Keyboard.KEY_RETURN)
     public keyLoadLocation: KeyMapping = new KeyMapping("Load location", Keyboard.KEY_R)
     public keyMappings: KeyMapping[] = [
@@ -29,7 +29,7 @@ export class Options {
         this.keyJump, 
         this.keyBuild, 
         this.keyChat, 
-        this.keyToggleFog, 
+        this.keyFog, 
         this.keySaveLocation, 
         this.keyLoadLocation
     ]
@@ -41,17 +41,17 @@ export class Options {
         this.load()
     }
 
-    public getKeyBinding(key: number): string {
-        return this.keyMappings[key].name + ": " + this.keyMappings[key].defaultKey
+    public getKeyDescription(id: number): string {
+        return this.keyMappings[id].name + ": " + this.keyMappings[id].key
     }
 
-    public setKeyBinding(key: number, value: string): void {
-        this.keyMappings[key].defaultKey = value
+    public setKey(id: number, key: string): void {
+        this.keyMappings[id].key = key
         this.save()
     }
 
-    public setOption(i: number, value: number): void {
-        switch (i) {
+    public set(option: number, value: number): void {
+        switch (option) {
             case 0:
                 this.music = !this.music
                 break
@@ -77,8 +77,8 @@ export class Options {
         this.save()
     }
 
-    public getOption(i: number): string {
-        switch (i) {
+    public getOption(option: number): string {
+        switch (option) {
             case 0:
                 return "Music: " + (this.music ? "ON" : "OFF")
             case 1:
@@ -127,7 +127,7 @@ export class Options {
         }
         for (let i = 0; i < this.keyMappings.length; i++) {
             if ("key_" + this.keyMappings[i].name in obj) {
-                this.keyMappings[i].defaultKey = obj["key_" + this.keyMappings[i].name]
+                this.keyMappings[i].key = obj["key_" + this.keyMappings[i].name]
             }
         }
     }
@@ -144,7 +144,7 @@ export class Options {
         }
         for (let i = 0; i < this.keyMappings.length; i++) {
             // @ts-ignore
-            obj["key_" + this.keyMappings[i].name] = this.keyMappings[i].defaultKey
+            obj["key_" + this.keyMappings[i].name] = this.keyMappings[i].key
         }
         let str = JSON.stringify(obj)
         localStorage.setItem("options", str)

@@ -29,7 +29,7 @@ export class OptionsScreen extends Screen {
             return
         }
         if (button.id < 100) {
-            this.options.setOption(button.id, 1)
+            this.options.set(button.id, 1)
             button.message = this.options.getOption(button.id)
         }
         if (button.id == 100) {

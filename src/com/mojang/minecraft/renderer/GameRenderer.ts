@@ -161,7 +161,7 @@ export class GameRenderer {
     }
 
     private setupCamera(a: number): void {
-        this.renderDistance = (512 >> this.mc.options.viewDistance << 1)
+        this.renderDistance = (512 >> (this.mc.options.viewDistance << 1))
         matrix.setActive(Matrix.PROJECTION)
         matrix.loadIdentity()
 
@@ -262,6 +262,7 @@ export class GameRenderer {
         levelRenderer.updateDirtyChunks(player)
 
         this.setupFog()
+        shader.setFog(true)
         gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./terrain.png"))
         levelRenderer.render(player, 0)
 
@@ -337,18 +338,12 @@ export class GameRenderer {
         gl.disable(gl.BLEND)
 
         gl.enable(gl.BLEND)
-        gl.colorMask(false, false, false, false)
-        let numRendered = levelRenderer.render(player, 1)
-        gl.colorMask(true, true, true, true)
-
-        if (numRendered > 0) {
-            gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./terrain.png"))
-            // todo: figure out. Minecraft.java line 866
-        }
+        gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./terrain.png"))
+        levelRenderer.render(player, 1)
 
         gl.depthMask(true)
         gl.disable(gl.BLEND)
-        // disable fog
+        shader.setFog(false)
         if (this.mc.isRaining) {
             this.renderRain(a)
         }
@@ -428,7 +423,24 @@ export class GameRenderer {
     }
 
     private setupFog(): void {
+        let level = this.mc.level!
+        let player = this.mc.player!
 
+        shader.setFogColor(this.fr, this.fg, this.fb, 1.0)
+
+        let tile = Tile.tiles[level.getTile(Math.trunc(player.x), Math.trunc(player.y + 0.12), Math.trunc(player.z))]
+        if (tile != null && tile.getMaterial() != Material.none) {
+            let material = tile.getMaterial()
+            // todo - set exp fog
+            if (material == Material.water) {
+                // todo
+            } else if (material == Material.lava) {
+                // todo
+            }
+        } else {
+            // todo - set linear fog
+            shader.setFogDistance(0.0, this.renderDistance)
+        }
     }
 
     public updateAllChunks(): void {
