@@ -93,8 +93,10 @@ export class Tile {
         return this.tex
     }
 
-    public renderFace(t: Tesselator, x: number, y: number, z: number, face: number): void {
-        let tex = this.getTexture(face)
+    public renderFace(t: Tesselator, x: number, y: number, z: number, face: number, tex: number | null = null): void {
+        if (tex == null) {
+            tex = this.getTexture(face)
+        }
         let u0 = (tex % 16) / 16.0
         let u1 = u0 + (1 / 16.0)
         let v0 = Math.trunc(tex / 16) / 16.0
@@ -167,7 +169,18 @@ export class Tile {
         }
     }
 
-    public renderFaceNoTexture(t: Tesselator, x: number, y: number, z: number, face: number): void {
+    public renderFaceInner(t: Tesselator, x: number, y: number, z: number, face: number): void {
+        let tex = this.getTexture(face)
+        let u0 = (tex % 16) / 16.0
+        let u1 = u0 + (1 / 16.0)
+        let v0 = Math.trunc(tex / 16) / 16.0
+        let v1 = v0 + (1 / 16.0)
+        if (face >= 2 && tex < 240) {
+            if (this.yy0 >= 0.0 && this.yy1 <= 1.0) {
+                v0 = (Math.trunc(tex / 16) + this.yy0) / 16.0;
+                v1 = (Math.trunc(tex / 16) + this.yy1) / 16.0;
+            }
+        }
         let x0 = x + this.xx0
         let x1 = x + this.xx1
         let y0 = y + this.yy0
@@ -175,59 +188,60 @@ export class Tile {
         let z0 = z + this.zz0
         let z1 = z + this.zz1
         if (face == 0) {
-            t.vertex(x0, y0, z1);
-            t.vertex(x0, y0, z0);
-            t.vertex(x1, y0, z0);
+            t.vertexUV(x1, y0, z1, u0, v1);
+            t.vertexUV(x1, y0, z0, u0, v0);
+            t.vertexUV(x0, y0, z0, u1, v0);
             
-            t.vertex(x1, y0, z0);
-            t.vertex(x1, y0, z1);
-            t.vertex(x0, y0, z1);
+            t.vertexUV(x0, y0, z0, u1, v0);
+            t.vertexUV(x0, y0, z1, u1, v1);
+            t.vertexUV(x1, y0, z1, u0, v1);
         }
         if (face == 1) {
-            t.vertex(x1, y1, z1);
-            t.vertex(x1, y1, z0);
-            t.vertex(x0, y1, z0);
+            t.vertexUV(x0, y1, z1, u1, v1);
+            t.vertexUV(x0, y1, z0, u1, v0);
+            t.vertexUV(x1, y1, z0, u0, v0);
             
-            t.vertex(x0, y1, z0);
-            t.vertex(x0, y1, z1);
-            t.vertex(x1, y1, z1);
+            t.vertexUV(x1, y1, z0, u0, v0);
+            t.vertexUV(x1, y1, z1, u0, v1);
+            t.vertexUV(x0, y1, z1, u1, v1);
         }
         if (face == 2) {
-            t.vertex(x0, y1, z0);
-            t.vertex(x1, y1, z0);
-            t.vertex(x1, y0, z0);
+            t.vertexUV(x0, y0, z0, u1, v0);
+            t.vertexUV(x1, y0, z0, u0, v0);
+            t.vertexUV(x1, y1, z0, u0, v1);
             
-            t.vertex(x1, y0, z0);
-            t.vertex(x0, y0, z0);
-            t.vertex(x0, y1, z0);
+            t.vertexUV(x1, y1, z0, u0, v1);
+            t.vertexUV(x0, y1, z0, u1, v1);
+            t.vertexUV(x0, y0, z0, u1, v0);
         }
         if (face == 3) {
-            t.vertex(x0, y1, z1);
-            t.vertex(x0, y0, z1);
-            t.vertex(x1, y0, z1);
+            t.vertexUV(x0, y0, z1, u0, v0);
+            t.vertexUV(x0, y1, z1, u0, v1);
+            t.vertexUV(x1, y1, z1, u1, v1);
             
-            t.vertex(x1, y0, z1);
-            t.vertex(x1, y1, z1);
-            t.vertex(x0, y1, z1);
+            t.vertexUV(x1, y1, z1, u1, v1);
+            t.vertexUV(x1, y0, z1, u1, v0);
+            t.vertexUV(x0, y0, z1, u0, v0);
         }
         if (face == 4) {
-            t.vertex(x0, y1, z1);
-            t.vertex(x0, y1, z0);
-            t.vertex(x0, y0, z0);
+            t.vertexUV(x0, y1, z0, u1, v0);
+            t.vertexUV(x0, y1, z1, u0, v0);
+            t.vertexUV(x0, y0, z1, u0, v1);
             
-            t.vertex(x0, y0, z0);
-            t.vertex(x0, y0, z1);
-            t.vertex(x0, y1, z1);
+            t.vertexUV(x0, y0, z1, u0, v1);
+            t.vertexUV(x0, y0, z0, u1, v1);
+            t.vertexUV(x0, y1, z0, u1, v0);
         }
         if (face == 5) {
-            t.vertex(x1, y0, z1);
-            t.vertex(x1, y0, z0);
-            t.vertex(x1, y1, z0);
+            t.vertexUV(x1, y0, z0, u0, v1);
+            t.vertexUV(x1, y0, z1, u1, v1);
+            t.vertexUV(x1, y1, z1, u1, v0);
             
-            t.vertex(x1, y1, z0);
-            t.vertex(x1, y1, z1);
-            t.vertex(x1, y0, z1);
+            t.vertexUV(x1, y1, z1, u1, v0);
+            t.vertexUV(x1, y1, z0, u0, v0);
+            t.vertexUV(x1, y0, z0, u0, v1);
         }
+
     }
 
     public getTileAABB(x: number, y: number, z: number): AABB {

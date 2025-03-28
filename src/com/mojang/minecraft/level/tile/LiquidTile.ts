@@ -1,5 +1,6 @@
 import { Random } from "../../../../util/Random";
 import { AABB } from "../../phys/AABB";
+import { Tesselator } from "../../renderer/Tesselator";
 import { Level } from "../Level";
 import { Material } from "../material/Material";
 import { Tile } from "./Tile";
@@ -138,6 +139,11 @@ export class LiquidTile extends Tile {
         } else {
             return false
         }
+    }
+
+    public override renderFace(t: Tesselator, x: number, y: number, z: number, face: number, tex?: number | null): void {
+        super.renderFace(t, x, y, z, face, tex)
+        super.renderFaceInner(t, x, y, z, face)
     }
 
     public override neighborChanged(level: Level, x: number, y: number, z: number, id: number): void {
