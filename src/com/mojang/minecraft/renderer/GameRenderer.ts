@@ -355,7 +355,9 @@ export class GameRenderer {
 
         gl.enable(gl.BLEND)
         gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./terrain.png"))
+        gl.colorMask(true, true, true, false)
         levelRenderer.render(player, 1)
+        gl.colorMask(true, true, true, true)
 
         gl.depthMask(true)
         gl.disable(gl.BLEND)
