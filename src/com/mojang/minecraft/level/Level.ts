@@ -320,6 +320,14 @@ export class Level {
         if (this.networkMode) {
             return false
         }
+
+        if (type == 0 && (x == 0 || z == 0 || x == this.width - 1 || z == this.height - 1) &&
+            y >= this.getGroundLevel() &&
+            y < this.getWaterLevel()    
+        ) {
+            type = Tiles.water.id
+        }
+
         if (this.setTileNoNeighborChange(x, y, z, type)) {
             this.updateNeighborsAt(x, y, z, type)
             return true
@@ -328,6 +336,13 @@ export class Level {
     }
 
     public netSetTile(x: number, y: number, z: number, type: number): boolean {
+        if (type == 0 && (x == 0 || z == 0 || x == this.width - 1 || z == this.height - 1) &&
+            y >= this.getGroundLevel() &&
+            y < this.getWaterLevel()    
+        ) {
+            type = Tiles.water.id
+        }
+        
         if (this.setTileNoNeighborChange(x, y, z, type)) {
             this.updateNeighborsAt(x, y, z, type)
             return true
@@ -436,7 +451,7 @@ export class Level {
         while (1 << xSizeBits < this.width) {
             xSizeBits++
         }
-        while (1 << ySizeBits < this.depth) {
+        while (1 << ySizeBits < this.height) {
             ySizeBits++
         }
 
