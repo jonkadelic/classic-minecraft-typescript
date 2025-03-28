@@ -81,12 +81,12 @@ export class GameRenderer {
         let xRot = player.xRotO + (player.xRot - player.xRotO) * a
         let yRot = player.yRotO + (player.yRot - player.yRotO) * a
         let lerpedPos = this.getPos(a)
-        let var27 = Mth.cos(-yRot * (Math.PI / 180.0) - Math.PI)
-        let var94 = Mth.sin(-yRot * (Math.PI / 180.0) - Math.PI)
-        let var112 = Mth.cos(-xRot * (Math.PI / 180.0))
+        let cosYaw = Mth.cos(-yRot * (Math.PI / 180.0) - Math.PI)
+        let sinYaw = Mth.sin(-yRot * (Math.PI / 180.0) - Math.PI)
+        let cosPitch = Mth.cos(-xRot * (Math.PI / 180.0))
         let dy = Mth.sin(-xRot * (Math.PI / 180.0))
-        let dx = var94 * var112
-        let dz = var27 * var112
+        let dx = sinYaw * cosPitch
+        let dz = cosYaw * cosPitch
         let pickRange = this.mc.gameMode.getPickRange()
         let offsetPos = lerpedPos.add(dx * pickRange, dy * pickRange, dz * pickRange)
         this.mc.hitResult = this.mc.level!.clip(lerpedPos, offsetPos)

@@ -11,18 +11,12 @@ import { AABB } from "./phys/AABB";
 import { Chunk } from "./renderer/Chunk";
 import { Tile } from "./level/tile/Tile";
 import { Matrix } from "../../util/Matrix";
-import { Frustum } from "./renderer/Frustum";
 import { Shader } from "../../../shader";
-import { Vec3 } from "./character/Vec3";
-import { RenderBuffer } from "../../util/RenderBuffer";
-import { Tesselator } from "./renderer/Tesselator";
 import { Font } from "./gui/Font";
-import { Zombie } from "./character/Zombie";
 import { Screen } from "./gui/Screen";
 import { PauseScreen } from "./gui/PauseScreen";
 import { MouseEvents } from "./input/MouseEvents";
 import { KeyboardInput } from "./player/KeyboardInput";
-import { SelectBlockScreen } from "./gui/BlockSelectScreen";
 import { GameRenderer } from "./renderer/GameRenderer";
 import { User } from "./User";
 import { Gui } from "./gui/Gui";
@@ -55,10 +49,8 @@ export class Minecraft {
     // @ts-ignore
     public particleEngine: ParticleEngine
     public user: User | null = null
-    private entities: Entity[] = []
     private parent: HTMLCanvasElement
     public paused: boolean = false
-    private yMouseAxis: number = -1
     public textures: Textures
     // @ts-ignore
     public font: Font
@@ -398,23 +390,13 @@ export class Minecraft {
         
         this.level!.tick()
         this.particleEngine.tick()
-        for (let i = 0; i < this.entities.length; i++) {
-            this.entities[i].tick()
-            if (this.entities[i].removed) {
-                this.entities.splice(i--, 1)
-            }
-        }
+
         this.player!.tick()
     }
 
     private isFree(aabb: AABB): boolean {
         if (this.player!.bb.intersects(aabb)) {
             return false
-        }
-        for (let i = 0; i < this.entities.length; i++) {
-            if (this.entities[i].bb.intersects(aabb)) {
-                return false
-            }
         }
         return true
     }

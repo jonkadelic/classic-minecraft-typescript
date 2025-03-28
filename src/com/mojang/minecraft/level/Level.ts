@@ -724,13 +724,18 @@ export class Level {
 
             let tileId = this.getTile(xa, ya, za)
             let tile = Tile.tiles[tileId]
-            if (tileId <= 0 || tile == null) {
-                continue
-            }
-
-            let hitResult: HitResult | null = tile.clip(xa, ya, za, a, b)
-            if (hitResult != null) {
-                return hitResult
+            if (tileId > 0 && tile.getMaterial() == Material.none) {
+                if (tile.isCubeShaped()) {
+                    let h = tile.clip(xa, ya, za, a, b)
+                    if (h != null) {
+                        return h
+                    }
+                } else {
+                    let h = tile.clip(xa, ya, za, a, b)
+                    if (h != null) {
+                        return h
+                    }
+                }
             }
         }
 
