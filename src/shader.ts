@@ -1,6 +1,10 @@
 import { gl } from "./com/mojang/minecraft/Minecraft";
 
 export class Shader {
+    public static readonly FOG_MODE_LINEAR: number = 0
+    public static readonly FOG_MODE_EXP: number = 1
+    public static readonly FOG_MODE_EXP2: number = 2
+
     private program: WebGLProgram | null = null
     private attributeMap: Map<string, number> = new Map()
     private uniformMap: Map<string, WebGLUniformLocation> = new Map()
@@ -64,6 +68,11 @@ export class Shader {
         gl.uniform1f(this.getUniformLocation("uHasFog"), enabled ? 1 : 0)
     }
 
+    public setFogMode(mode: number): void {
+        if (!this.program) return
+        gl.uniform1i(this.getUniformLocation("uFogMode"), mode)
+    }
+
     public setFogColor(r: number, g: number, b: number, a: number): void {
         if (!this.program) return
         gl.uniform4f(this.getUniformLocation("uFogColor"), r, g, b, a)
@@ -72,6 +81,11 @@ export class Shader {
     public setFogDistance(start: number, end: number): void {
         if (!this.program) return
         gl.uniform2f(this.getUniformLocation("uFogPosition"), start, end)
+    }
+
+    public setFogDensity(density: number): void {
+        if (!this.program) return
+        gl.uniform1f(this.getUniformLocation("uFogDensity"), density)
     }
 
     public setLight(enabled: boolean): void {

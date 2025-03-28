@@ -8,8 +8,10 @@ uniform bool uHasColor;
 uniform bool uHasNormal;
 
 uniform bool uHasFog;
+uniform int uFogMode;
 uniform highp vec4 uFogColor;
 uniform highp vec2 uFogPosition;
+uniform highp float uFogDensity;
 
 uniform bool uHasLight;
 uniform highp vec3 uLightPosition;
@@ -26,7 +28,17 @@ varying highp vec3 vNormal;
 varying highp vec4 vDiffuseColor;
 
 highp float fogFactorLinear(const highp float dist, const highp float start, const highp float end) {
-  return 1.0 - clamp((end - dist) / (end - start), 0.0, 1.0);
+  return clamp((end - dist) / (end - start), 0.0, 1.0);
+}
+
+highp float fogFactorExp(const highp float dist, const highp float density) {
+    return clamp(exp(-density * dist), 0.0, 1.0);
+}
+
+highp float fogFactorExp2(const highp float dist, const highp float density) {
+    const highp float LOG2 = -1.442695;
+    highp float d = density * dist;
+    return clamp(exp2(d * d * LOG2), 0.0, 1.0);
 }
 
 void main(void) {
@@ -51,7 +63,14 @@ void main(void) {
 
     if (uHasFog) {
         highp float fogDistance = length(vPosition.xyz);
-        highp float fogAmount = fogFactorLinear(fogDistance, uFogPosition.y, uFogPosition.x);
+        highp float fogAmount = 0.0;
+        if (uFogMode == 0) { // Linear
+            fogAmount = fogFactorLinear(fogDistance, uFogPosition.x, uFogPosition.y);
+        } else if (uFogMode == 1) { // Exp
+            fogAmount = fogFactorExp(fogDistance, uFogDensity);
+        } else if (uFogMode == 2) { // Exp2
+            fogAmount = fogFactorExp2(fogDistance, uFogDensity);
+        }
         gl_FragColor = fogAmount * texelColor + (1.0 - fogAmount) * uFogColor;
     } else {
         gl_FragColor = texelColor;

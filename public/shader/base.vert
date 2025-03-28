@@ -7,8 +7,10 @@ uniform bool uHasColor;
 uniform bool uHasNormal;
 
 uniform bool uHasFog;
+uniform int uFogMode;
 uniform highp vec4 uFogColor;
 uniform highp vec2 uFogPosition;
+uniform highp float uFogDensity;
 
 uniform bool uHasLight;
 uniform highp vec3 uLightPosition;

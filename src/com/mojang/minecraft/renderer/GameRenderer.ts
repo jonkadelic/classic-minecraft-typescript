@@ -15,6 +15,7 @@ import { Material } from "../level/material/Material";
 import { Frustum } from "./Frustum";
 import { Tesselator } from "./Tesselator";
 import { Textures } from "./Textures";
+import { Shader } from "../../../../shader";
 
 export class GameRenderer {
     public mc: Minecraft
@@ -446,15 +447,18 @@ export class GameRenderer {
         let tile = Tile.tiles[level.getTile(Math.trunc(player.x), Math.trunc(player.y + 0.12), Math.trunc(player.z))]
         if (tile != null && tile.getMaterial() != Material.none) {
             let material = tile.getMaterial()
-            // todo - set exp fog
+            shader.setFogMode(Shader.FOG_MODE_EXP)
             if (material == Material.water) {
-                // todo
+                shader.setFogDensity(0.1)
+                shader.setSceneAmbient(0.4, 0.4, 0.9, 1.0)
             } else if (material == Material.lava) {
-                // todo
+                shader.setFogDensity(2.0)
+                shader.setSceneAmbient(0.4, 0.3, 0.3, 1.0)
             }
         } else {
-            // todo - set linear fog
+            shader.setFogMode(Shader.FOG_MODE_LINEAR)
             shader.setFogDistance(0.0, this.renderDistance)
+            shader.setSceneAmbient(1.0, 1.0, 1.0, 1.0)
         }
     }
 
