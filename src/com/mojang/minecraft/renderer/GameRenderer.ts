@@ -333,7 +333,8 @@ export class GameRenderer {
         particleEngine.render(player, a)
 
         gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./rock.png"))
-        // todo: figure out what this is. Minecraft.java line 682
+        levelRenderer.worldBorderRenderBuffers[0].draw()
+        levelRenderer.worldBorderRenderBuffers[1].draw()
         this.setupFog()
 
         levelRenderer.renderClouds(a)
@@ -350,7 +351,7 @@ export class GameRenderer {
         this.setupFog()
         gl.enable(gl.BLEND)
         gl.bindTexture(gl.TEXTURE_2D, levelRenderer.textures.loadTexture("./water.png"))
-        // todo: figure out what this is. Minecraft.java line 850
+        levelRenderer.worldBorderRenderBuffers[2].draw()
         gl.disable(gl.BLEND)
 
         gl.enable(gl.BLEND)

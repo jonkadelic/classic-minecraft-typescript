@@ -43,15 +43,130 @@ export class LevelRenderer {
         this.worldBorderRenderBuffers = [
             new RenderBuffer(gl.STATIC_DRAW),
             new RenderBuffer(gl.STATIC_DRAW),
+            new RenderBuffer(gl.STATIC_DRAW)
         ]
     }
 
     private renderBedrockBorder(): void {
-        // todo: LevelRenderer.java line 60
+        let br = 0.5
+        let t = Tesselator.instance
+        let groundLevel = this.level!.getGroundLevel()
+
+        t.color_f(br, br, br, 1.0)
+
+        let s = 128
+        if (s > this.level!.width) {
+            s = this.level!.width
+        }
+        if (s > this.level!.height) {
+            s = this.level!.height
+        }
+
+        let d = Math.trunc(2048 / s)
+
+        t.begin()
+        for (let x = -s * d; x < this.level!.width + s * d; x += s) {
+            for (let z = -s * d; z < this.level!.height + s * d; z += s) {
+                let y = groundLevel
+                if (x >= 0 && z >= 0 && x < this.level!.width && z < this.level!.height) {
+                    y = 0.0
+                }
+
+                t.vertexUV(x, y, z + s, 0.0, s)
+                t.vertexUV(x + s, y, z + s, s, s)
+                t.vertexUV(x + s, y, z, s, 0.0)
+                
+                t.vertexUV(x + s, y, z, s, 0.0)
+                t.vertexUV(x, y, z, 0.0, 0.0)
+                t.vertexUV(x, y, z + s, 0.0, s)
+            }
+        }
+        t.end(this.worldBorderRenderBuffers[0])
+
+        t.begin()
+        t.color_f(0.8, 0.8, 0.8, 1.0)
+
+        for (let x = 0; x < this.level!.width; x += s) {
+            t.vertexUV(x, 0.0, 0.0, 0.0, 0.0)
+            t.vertexUV(x + s, 0.0, 0.0, s, 0.0)
+            t.vertexUV(x + s, groundLevel, 0.0, s, groundLevel)
+            
+            t.vertexUV(x + s, groundLevel, 0.0, s, groundLevel)
+            t.vertexUV(x, groundLevel, 0.0, 0.0, groundLevel)
+            t.vertexUV(x, 0.0, 0.0, 0.0, 0.0)
+
+            t.vertexUV(x, groundLevel, this.level!.height, 0.0, groundLevel)
+            t.vertexUV(x + s, groundLevel, this.level!.height, s, groundLevel)
+            t.vertexUV(x + s, 0.0, this.level!.height, s, 0.0)
+            
+            t.vertexUV(x + s, 0.0, this.level!.height, s, 0.0)
+            t.vertexUV(x, 0.0, this.level!.height, 0.0, 0.0)
+            t.vertexUV(x, groundLevel, this.level!.height, 0.0, groundLevel)
+        }
+
+        t.color_f(0.6, 0.6, 0.6, 1.0)
+
+        for (let z = 0; z < this.level!.height; z += s) {
+            t.vertexUV(0.0, groundLevel, z, 0.0, 0.0)
+            t.vertexUV(0.0, groundLevel, z + s, s, 0.0)
+            t.vertexUV(0.0, 0.0, z + s, s, groundLevel)
+            
+            t.vertexUV(0.0, 0.0, z + s, s, groundLevel)
+            t.vertexUV(0.0, 0.0, z, 0.0, groundLevel)
+            t.vertexUV(0.0, groundLevel, z, 0.0, 0.0)
+            
+            t.vertexUV(this.level!.width, 0.0, z, 0.0, groundLevel)
+            t.vertexUV(this.level!.width, 0.0, z + s, z, groundLevel)
+            t.vertexUV(this.level!.width, groundLevel, z + s, s, 0.0)
+            
+            t.vertexUV(this.level!.width, groundLevel, z + s, s, 0.0)
+            t.vertexUV(this.level!.width, groundLevel, z, 0.0, 0.0)
+            t.vertexUV(this.level!.width, 0.0, z, 0.0, groundLevel)
+        }
+
+        t.end(this.worldBorderRenderBuffers[1])
     }
 
     private renderWaterBorder(): void {
-        // todo: LevelRenderer.java line 122
+        let waterLevel = this.level!.getWaterLevel()
+        let t = Tesselator.instance
+        let s = 128
+        if (s > this.level!.width) {
+            s = this.level!.width
+        }
+        if (s > this.level!.height) {
+            s = this.level!.height
+        }
+
+        let d = 2048 / s
+
+        t.begin()
+
+        for (let x = -s * d; x < this.level!.width + s * d; x += s) {
+            for (let z = -s * d; z < this.level!.height + s * d; z += s) {
+                let y = waterLevel - 0.1
+
+                if (x < 0 || z < 0 || x >= this.level!.width || z >= this.level!.height) {
+                    t.vertexUV(x, y, z + s, 0.0, s)
+                    t.vertexUV(x + s, y, z + s, s, s)
+                    t.vertexUV(x + s, y, z, s, 0.0)
+
+                    t.vertexUV(x + s, y, z, s, 0.0)
+                    t.vertexUV(x, y, z, 0.0, 0.0)
+                    t.vertexUV(x, y, z + s, 0.0, s)
+
+                    t.vertexUV(x, y, z, 0.0, 0.0)
+                    t.vertexUV(x + s, y, z, s, 0.0)
+                    t.vertexUV(x + s, y, z + s, s, s)
+                    
+                    t.vertexUV(x + s, y, z + s, s, s)
+                    t.vertexUV(x, y, z + s, 0.0, s)
+                    t.vertexUV(x, y, z, 0.0, 0.0)
+                }
+            }
+        }
+
+        t.end(this.worldBorderRenderBuffers[2])
     }
 
     public setLevel(level: Level | null): void {
