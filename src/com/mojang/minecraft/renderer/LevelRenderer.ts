@@ -255,8 +255,56 @@ export class LevelRenderer {
 
     }
 
-    public renderHitOutline(player: Player, h: HitResult, mode: number, item: number, a: number) {
+    public renderHitOutline(h: HitResult, mode: number) {
+        if (mode == 0 && h.type == 0) {
+            gl.enable(gl.BLEND)
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+            shader.setColor(0.0, 0.0, 0.0, 0.4)
+            gl.lineWidth(2.0)
+            gl.depthMask(false)
+    
+            let t = Tesselator.instance
+            let ss = 0.002
+            let tile = this.level!.getTile(h.x, h.y, h.z)
 
+            if (tile > 0) {
+                let bb = Tile.tiles[tile].getTileAABB(h.x, h.y, h.z).grow(ss, ss, ss)
+
+                t.begin()
+                t.vertex(bb.x0, bb.y0, bb.z0)
+                t.vertex(bb.x1, bb.y0, bb.z0)
+                t.vertex(bb.x1, bb.y0, bb.z1)
+                t.vertex(bb.x0, bb.y0, bb.z1)
+                t.vertex(bb.x0, bb.y0, bb.z0)
+                t.end(this.hitRenderBuffer)
+                this.hitRenderBuffer.draw(gl.LINE_STRIP)
+
+                t.begin()
+                t.vertex(bb.x0, bb.y1, bb.z0)
+                t.vertex(bb.x1, bb.y1, bb.z0)
+                t.vertex(bb.x1, bb.y1, bb.z1)
+                t.vertex(bb.x0, bb.y1, bb.z1)
+                t.vertex(bb.x0, bb.y1, bb.z0)
+                t.end(this.hitRenderBuffer)
+                this.hitRenderBuffer.draw(gl.LINE_STRIP)
+
+                t.begin()
+                t.vertex(bb.x0, bb.y0, bb.z0)
+                t.vertex(bb.x0, bb.y1, bb.z0)
+                t.vertex(bb.x1, bb.y0, bb.z0)
+                t.vertex(bb.x1, bb.y1, bb.z0)
+                t.vertex(bb.x1, bb.y0, bb.z1)
+                t.vertex(bb.x1, bb.y1, bb.z1)
+                t.vertex(bb.x0, bb.y0, bb.z1)
+                t.vertex(bb.x0, bb.y1, bb.z1)
+                t.end(this.hitRenderBuffer)
+                this.hitRenderBuffer.draw(gl.LINES)
+            }
+
+            gl.depthMask(true)
+            gl.disable(gl.BLEND)
+            shader.setColor(1.0, 1.0, 1.0, 1.0)
+        }
     }
 
     public setDirty(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): void {

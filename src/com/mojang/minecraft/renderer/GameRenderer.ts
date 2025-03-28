@@ -341,7 +341,7 @@ export class GameRenderer {
         if (this.mc.hitResult != null) {
             // disable alpha test
             levelRenderer.renderHit(player, this.mc.hitResult, 0, player.inventory.getSelected(), a)
-            levelRenderer.renderHitOutline(player, this.mc.hitResult, 0, player.inventory.getSelected(), a)
+            levelRenderer.renderHitOutline(this.mc.hitResult, 0)
             // enable alpha test
         }
 

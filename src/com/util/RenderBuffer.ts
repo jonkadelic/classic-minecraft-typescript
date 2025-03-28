@@ -31,7 +31,7 @@ export class RenderBuffer {
         this.hasNormal = hasNormal
     }
 
-    public draw(): void {
+    public draw(mode: number = gl.TRIANGLES): void {
         if (!shader.isLoaded()) return
         if (this.vertices == 0) return
 
@@ -100,6 +100,6 @@ export class RenderBuffer {
 
         matrix.applyUniforms()
 
-        gl.drawArrays(gl.TRIANGLES, 0, this.vertices)
+        gl.drawArrays(mode, 0, this.vertices)
     }
 }

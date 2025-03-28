@@ -73,7 +73,6 @@ void main(void) {
         highp vec4 diffuse = vec4(diff * uLightDiffuse.rgb, uLightDiffuse.a);
 
         vDiffuseColor = diffuse;
-
     } else {
         vDiffuseColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
