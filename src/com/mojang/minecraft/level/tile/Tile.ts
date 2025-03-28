@@ -299,7 +299,24 @@ export class Tile {
         t.begin()
 
         for (let face: number = 0; face < 6; face++) {
-            // TODO: diffuse lighting
+            if (face == 0) {
+                t.normal(0.0, 1.0, 0.0)
+            }
+            if (face == 1) {
+                t.normal(0.0, -1.0, 0.0)
+            }
+            if (face == 2) {
+                t.normal(0.0, 0.0, 1.0)
+            }
+            if (face == 3) {
+                t.normal(0.0, 0.0, -1.0)
+            }
+            if (face == 4) {
+                t.normal(1.0, 0.0, 0.0)
+            }
+            if (face == 5) {
+                t.normal(-1.0, 0.0, 0.0)
+            }
 
             this.renderFace(t, 0, 0, 0, face)
         }

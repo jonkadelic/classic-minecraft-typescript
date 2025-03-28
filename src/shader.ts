@@ -74,6 +74,31 @@ export class Shader {
         gl.uniform2f(this.getUniformLocation("uFogPosition"), start, end)
     }
 
+    public setLight(enabled: boolean): void {
+        if (!this.program) return
+        gl.uniform1f(this.getUniformLocation("uHasLight"), enabled ? 1 : 0)
+    }
+
+    public setLightPosition(x: number, y: number, z: number): void {
+        if (!this.program) return
+        gl.uniform3f(this.getUniformLocation("uLightPosition"), x, y, z)
+    }
+
+    public setLightAmbient(r: number, g: number, b: number, a: number): void {
+        if (!this.program) return
+        gl.uniform4f(this.getUniformLocation("uLightAmbient"), r, g, b, a)
+    }
+
+    public setLightDiffuse(r: number, g: number, b: number, a: number): void {
+        if (!this.program) return
+        gl.uniform4f(this.getUniformLocation("uLightDiffuse"), r, g, b, a)
+    }
+
+    public setSceneAmbient(r: number, g: number, b: number, a: number): void {
+        if (!this.program) return
+        gl.uniform4f(this.getUniformLocation("uSceneAmbient"), r, g, b, a)
+    }
+
     private loadShader(type: number, source: string): WebGLShader {
         let shader = gl.createShader(type)
         if (!shader) throw new Error("Failed to create shader")

@@ -75,4 +75,10 @@ export class Matrix {
         gl.uniformMatrix4fv(shader.getUniformLocation("uMVMatrix"), false, new Float32Array(this.getFloat(Matrix.MODELVIEW)));
         gl.uniformMatrix4fv(shader.getUniformLocation("uPMatrix"), false, new Float32Array(this.getFloat(Matrix.PROJECTION)));
     }
+
+    public applyLightUniforms(): void {
+        if (!shader.isLoaded()) return
+        gl.uniformMatrix4fv(shader.getUniformLocation("uMVLightMatrix"), false, new Float32Array(this.getFloat(Matrix.MODELVIEW)));
+        gl.uniformMatrix4fv(shader.getUniformLocation("uPLightMatrix"), false, new Float32Array(this.getFloat(Matrix.PROJECTION)));
+    }
 }

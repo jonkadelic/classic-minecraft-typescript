@@ -33,10 +33,13 @@ export class ItemInHandRenderer {
     public render(a: number): void {
         let h: number = this.oHeight + (this.height - this.oHeight) * a
         let player: Player = this.mc.player!
+        
         matrix.push()
         matrix.rotate(player.xRotO + (player.xRot - player.xRotO) * a, 1.0, 0.0, 0.0)
         matrix.rotate(player.yRotO + (player.yRot - player.yRotO) * a, 0.0, 1.0, 0.0)
+        this.mc.gameRenderer.setLighting(true)
         matrix.pop()
+
         matrix.push()
         let d: number = 0.8
 
@@ -73,6 +76,7 @@ export class ItemInHandRenderer {
         }
 
         matrix.pop()
+        this.mc.gameRenderer.setLighting(false)
     }
 
     public tick(): void {

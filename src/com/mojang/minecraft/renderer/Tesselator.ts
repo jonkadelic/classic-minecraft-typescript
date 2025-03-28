@@ -11,15 +11,19 @@ export class Tesselator {
     private g: number = 0
     private b: number = 0
     private a: number = 0
+    private nx: number = 0
+    private ny: number = 0
+    private nz: number = 0
     private hasColor: boolean = false
     private hasTexture: boolean = false
+    private hasNormal: boolean = false
     public static instance: Tesselator = new Tesselator()
 
     private constructor() {
     }
 
     public end(buffer: RenderBuffer): void {
-        buffer.configure(this.hasTexture, this.hasColor)
+        buffer.configure(this.hasTexture, this.hasColor, this.hasNormal)
         buffer.bufferData(new Float32Array(this.array), this.vertices)
         this.clear()
     }
@@ -33,6 +37,7 @@ export class Tesselator {
         this.clear()
         this.hasTexture = false
         this.hasColor = false
+        this.hasNormal = false
     }
 
     public tex(u: number, v: number): void {
@@ -65,6 +70,11 @@ export class Tesselator {
             this.array.push(this.b)
             this.array.push(this.a)
         }
+        if (this.hasNormal) {
+            this.array.push(this.nx)
+            this.array.push(this.ny)
+            this.array.push(this.nz)
+        }
         this.array.push(x)
         this.array.push(y)
         this.array.push(z)
@@ -77,5 +87,12 @@ export class Tesselator {
         const g: number = (c >> 8) & 0xff
         const b: number = c & 0xff
         this.color_f(r / 255, g / 255, b / 255, a / 255)
+    }
+
+    public normal(x: number, y: number, z: number): void {
+        this.nx = x
+        this.ny = y
+        this.nz = z
+        this.hasNormal = true
     }
 }

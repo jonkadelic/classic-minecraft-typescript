@@ -57,7 +57,22 @@ export class GameRenderer {
     }
 
     public setLighting(enabled: boolean): void {
-        // todo
+        if (!enabled) {
+            shader.setLight(false)
+        } else {
+            shader.setLight(true)
+            matrix.applyLightUniforms();
+            
+            let a = 0.7
+            let d = 0.3
+
+            let l = new Vec3(0.0, -1.0, 0.5).normalize()
+
+            shader.setLightPosition(l.x, l.y, l.z)
+            shader.setLightDiffuse(d, d, d, 1.0)
+            shader.setLightAmbient(0.0, 0.0, 0.0, 1.0)
+            shader.setSceneAmbient(a, a, a, 1.0)
+        }
     }
 
     public pick(a: number): void {
