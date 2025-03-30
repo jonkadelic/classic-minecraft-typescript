@@ -1,5 +1,5 @@
 import { Random } from "../../../../../util/Random";
-import { BasicNoise } from "./ImprovedNoise";
+import { BasicNoise } from "./BasicNoise";
 import { Synth } from "./Synth";
 
 export class PerlinNoise extends Synth {

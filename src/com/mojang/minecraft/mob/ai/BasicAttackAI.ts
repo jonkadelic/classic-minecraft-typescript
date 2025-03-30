@@ -1,5 +1,5 @@
 import { Mth } from "../../../../util/Mth";
-import { Vec3 } from "../../character/Vec3";
+import { Vec3 } from "../../phys/Vec3";
 import { Entity } from "../../Entity";
 import { Mob } from "../Mob";
 import { BasicAI } from "./BasicAI";

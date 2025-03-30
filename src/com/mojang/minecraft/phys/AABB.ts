@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix"
-import { Vec3 } from "../character/Vec3"
+import { Vec3 } from "./Vec3"
 import { HitResult } from "../HitResult"
 
 export class AABB {

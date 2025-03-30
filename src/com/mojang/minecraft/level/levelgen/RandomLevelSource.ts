@@ -2,7 +2,7 @@ import { Random } from "../../../../util/Random";
 import { Level } from "../Level";
 import { Tile } from "../tile/Tile";
 import { Tiles } from "../tile/Tiles";
-import { Distort } from "./synth/CompositeNoise";
+import { Distort } from "./synth/Distort";
 import { PerlinNoise } from "./synth/PerlinNoise";
 
 export class LevelGenerator {

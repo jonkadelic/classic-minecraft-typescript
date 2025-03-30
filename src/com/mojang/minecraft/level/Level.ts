@@ -1,7 +1,7 @@
 import { Random } from "../../../util/Random";
 import { HitResult } from "../HitResult";
 import { AABB } from "../phys/AABB";
-import { Vec3 } from "../character/Vec3";
+import { Vec3 } from "../phys/Vec3";
 import { LevelGen } from "./LevelGen";
 import { LevelListener } from "./LevelListener";
 import { Tile } from "./tile/Tile";
@@ -342,7 +342,7 @@ export class Level {
         ) {
             type = Tiles.water.id
         }
-        
+
         if (this.setTileNoNeighborChange(x, y, z, type)) {
             this.updateNeighborsAt(x, y, z, type)
             return true

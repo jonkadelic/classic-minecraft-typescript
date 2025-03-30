@@ -4,7 +4,7 @@ import { Level } from "../Level";
 import { Random } from "../../../../util/Random";
 import { ParticleEngine } from "../../particle/ParticleEngine";
 import { Particle } from "../../particle/Particle";
-import { Vec3 } from "../../character/Vec3";
+import { Vec3 } from "../../phys/Vec3";
 import { HitResult } from "../../HitResult";
 import { Material } from "../material/Material";
 import { RenderBuffer } from "../../../../util/RenderBuffer";

@@ -1,4 +1,4 @@
-import { Vec3 } from "../character/Vec3"
+import { Vec3 } from "../phys/Vec3"
 import { Entity } from "../Entity"
 import { AABB } from "../phys/AABB"
 import { Culler } from "../renderer/Culler"

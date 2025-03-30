@@ -5,7 +5,7 @@ import { Entity } from "../Entity";
 import { Random } from "../../../util/Random";
 import { MouseEvents } from "../input/MouseEvents";
 import { RenderBuffer } from "../../../util/RenderBuffer";
-import { Vec3 } from "../character/Vec3";
+import { Vec3 } from "../phys/Vec3";
 import { Mth } from "../../../util/Mth";
 import { CreativeMode } from "../gamemode/CreativeMode";
 import { AABB } from "../phys/AABB";

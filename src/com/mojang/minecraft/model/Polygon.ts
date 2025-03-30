@@ -1,4 +1,5 @@
 import { shader } from "../Minecraft";
+import { Vec3 } from "../phys/Vec3";
 import { Tesselator } from "../renderer/Tesselator";
 import { Vertex } from "./Vertex";
 
@@ -26,10 +27,26 @@ export class Polygon {
         }
     }
 
-    public render(t: Tesselator): void {
-        for (let i = this.vertexCount - 1; i >= 0; i--) {
-            const vertex = this.vertices[i]
-            t.vertexUV(vertex.pos.x, vertex.pos.y, vertex.pos.z, vertex.u / 63.999, vertex.v / 31.999)
+    public mirror(): void {
+        let newVertices: Vertex[] = new Array(this.vertices.length)
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            newVertices[i] = this.vertices[this.vertices.length - i - 1]
+        }
+
+        this.vertices = newVertices
+    }
+
+    public render(t: Tesselator, scale: number): void {
+        let v0 = this.vertices[1].pos.vectorTo(this.vertices[0].pos)
+        let v1 = this.vertices[1].pos.vectorTo(this.vertices[2].pos)
+        let n = new Vec3(v0.y * v1.z - v0.z * v1.y, v0.z * v1.x - v0.x * v1.z, v0.x * v1.y - v0.y * v1.x).normalize()
+
+        t.normal(n.x, n.y, n.z)
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            let v = this.vertices[i]
+            t.vertexUV(v.pos.x * scale, v.pos.y * scale, v.pos.z * scale, v.u, v.v)
         }
     }
 }
