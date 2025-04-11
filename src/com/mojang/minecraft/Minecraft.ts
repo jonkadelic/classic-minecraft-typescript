@@ -470,18 +470,18 @@ export function main() {
         if ((e as KeyboardEvent).code == "Space" && clickedElement == canvas) {
             e.preventDefault()
         }
-    })
+    }, true)
 
     window.addEventListener("mousedown", (e) => {
         clickedElement = e.target as HTMLElement
-    })
+    }, true)
 
     window.addEventListener("wheel", (e) => {
         if (e.deltaY == 0) return
         MouseEvents.wheelUpdated = true
         MouseEvents.wheel -= (e.deltaY > 0 ? 1 : -1)
         MouseEvents.dWheel -= (e.deltaY > 0 ? 1 : -1)
-    })
+    }, true)
 
     window.addEventListener("resize", () => {
         if (window.innerHeight == screen.height) {
@@ -497,7 +497,7 @@ export function main() {
         }
         console.log("Resized to " + canvas.width + "x" + canvas.height)
         minecraft.updateSize(canvas.width, canvas.height)
-    })
+    }, true)
 
     const minecraft = new Minecraft(canvas, canvas.width, canvas.height)
     minecraft.run()

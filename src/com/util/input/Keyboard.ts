@@ -110,7 +110,7 @@ export class Keyboard {
                 this.eventQueue.shift()
             }
             this.eventQueue.push(new KeyEvent(event.key.toLocaleUpperCase(), true, event.repeat))
-        })
+        }, true)
 
         document.addEventListener("keyup", (event: KeyboardEvent) => {
             event.preventDefault()
@@ -118,7 +118,7 @@ export class Keyboard {
                 this.eventQueue.shift()
             }
             this.eventQueue.push(new KeyEvent(event.key.toLocaleUpperCase(), false, false))
-        })
+        }, true)
     }
 
     public areRepeatEventsEnabled(): boolean {
