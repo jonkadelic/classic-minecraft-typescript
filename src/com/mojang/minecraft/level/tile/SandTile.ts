@@ -30,7 +30,7 @@ export class SandTile extends Tile {
         if (tile == 0) {
             return true
         } else {
-            let material = Tile.tiles[tile].getMaterial()
+            let material = Tile.tiles[tile]!.getMaterial()
             return material == Material.water || material == Material.lava
         }
     }

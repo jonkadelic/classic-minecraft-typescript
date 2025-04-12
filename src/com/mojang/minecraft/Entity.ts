@@ -257,7 +257,7 @@ export class Entity {
     public isUnderWater(): boolean {
         let tile = this.level.getTile(Math.trunc(this.x), Math.trunc(this.y + 0.12), Math.trunc(this.z))
         if (tile != 0) {
-            return Tile.tiles[tile].getMaterial() == Material.water
+            return Tile.tiles[tile]!.getMaterial() == Material.water
         }
 
         return false

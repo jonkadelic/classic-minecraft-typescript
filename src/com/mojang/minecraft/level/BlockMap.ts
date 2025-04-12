@@ -66,12 +66,12 @@ export class BlockMap {
         }
     }
 
-    public getEntities(entity: Entity, x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Entity[] {
+    public getEntities(entity: Entity | null, x0: number, y0: number, z0: number, x1: number, y1: number, z1: number): Entity[] {
         this.tmp.length = 0
         return this.getEntities_(entity, x0, y0, z0, x1, y1, z1, this.tmp)
     }
 
-    public getEntities_(entity: Entity, x0: number, y0: number, z0: number, x1: number, y1: number, z1: number, entities: Entity[]): Entity[] {
+    public getEntities_(entity: Entity | null, x0: number, y0: number, z0: number, x1: number, y1: number, z1: number, entities: Entity[]): Entity[] {
         let slot: BlockMap$Slot = this.slot.init(x0, y0, z0)
         let slot2: BlockMap$Slot = this.slot2.init(x1, y1, z1)
 
@@ -85,7 +85,7 @@ export class BlockMap {
                     let subList = this.entityGrid[(z * this.depth + y) * this.width + x]
                     for (let i: number = 0; i < subList.length; i++) {
                         let e: Entity = subList[i]
-                        if (e == entity || !entity.intersects(x0, y0, z0, x1, y1, z1)) {
+                        if (e == entity || !e.intersects(x0, y0, z0, x1, y1, z1)) {
                             continue
                         }
                         entities.push(e)
@@ -112,12 +112,12 @@ export class BlockMap {
         }
     }
 
-    public getEntities__(entity: Entity, aabb: AABB): Entity[] {
+    public getEntities__(entity: Entity | null, aabb: AABB): Entity[] {
         this.tmp.length = 0
         return this.getEntities_(entity, aabb.x0, aabb.y0, aabb.z0, aabb.x1, aabb.y1, aabb.z1, this.tmp)
     }
 
-    public getEntities___(entity: Entity, aabb: AABB, entities: Entity[]): Entity[] {
+    public getEntities___(entity: Entity | null, aabb: AABB, entities: Entity[]): Entity[] {
         return this.getEntities_(entity, aabb.x0, aabb.y0, aabb.z0, aabb.x1, aabb.y1, aabb.z1, entities)
     }
 

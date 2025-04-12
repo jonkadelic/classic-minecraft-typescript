@@ -37,7 +37,7 @@ export class LiquidTileStatic extends LiquidTile {
         }
 
         if (id != 0) {
-            let material = Tile.tiles[id].getMaterial()
+            let material = Tile.tiles[id]!.getMaterial()
             if (this.material == Material.water && material == Material.lava ||
                 this.material == Material.lava && material == Material.water
             ) {

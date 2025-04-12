@@ -27,6 +27,8 @@ import { WaterTexture } from "./renderer/ptexture/WaterTexture";
 import { LavaTexture } from "./renderer/ptexture/LavaTexture";
 import { GameMode } from "./gamemode/GameMode";
 import { CreativeMode } from "./gamemode/CreativeMode";
+import { ProgressRenderer } from "./ProgressRenderer";
+import { Tiles } from "./level/tile/Tiles";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -40,7 +42,6 @@ export class Minecraft {
     public gameMode: GameMode = new CreativeMode(this)
     public width: number
     public height: number
-    private fogColor: number[] = new Array(4)
     private timer: Timer = new Timer(20)
     public level: Level | null = null
     // @ts-ignore
@@ -50,22 +51,25 @@ export class Minecraft {
     public particleEngine: ParticleEngine
     public user: User | null = null
     private parent: HTMLCanvasElement
-    public paused: boolean = false
+    public pause: boolean = false
     public textures: Textures
     // @ts-ignore
     public font: Font
     public screen: Screen | null = null
+    public progressRenderer: ProgressRenderer = new ProgressRenderer(this)
     public gameRenderer: GameRenderer = new GameRenderer(this)
     private ticks: number = 0
+    private missTime: number = 0
     // @ts-ignore
     public gui: Gui
     public noRender: boolean = false
-    private running: boolean = false
-    public fpsString: string = ""
-    public mouseGrabbed: boolean = false
     public hitResult: HitResult | null = null
     // @ts-ignore
     public options: Options
+    public running: boolean = false
+    public fpsString: string = ""
+    public mouseGrabbed: boolean = false
+    private lastClickTick: number = 0
     public isRaining: boolean = false
     
     private frames: number = 0
@@ -98,8 +102,6 @@ export class Minecraft {
                     })
             })
 
-        this.fogColor = [0xFF / 0xFF, 0xFF / 0xFF, 0xFF / 0xFF, 1.0]
-
         this.checkGlError("Pre startup")
         gl.clearDepth(1.0)
         gl.enable(gl.DEPTH_TEST)
@@ -123,7 +125,7 @@ export class Minecraft {
             // todo - minecraft.java line 266
 
             if (this.level == null) {
-                this.createLevel(1)
+                this.generateNewLevel(1)
             }
         }
 
@@ -194,7 +196,7 @@ export class Minecraft {
     private loop(): void {
         if (this.running) {
             mouse.update()
-            if (this.paused) {
+            if (this.pause) {
                 requestAnimationFrame(() => this.loop())
                 return
             }
@@ -251,46 +253,88 @@ export class Minecraft {
             return
         }
 
-        let selected = this.player.inventory.getSelected()
-        if (click == 0) {
-            if (this.hitResult != null) {
-                let oldTile: Tile = Tile.tiles[this.level.getTile(this.hitResult.x, this.hitResult.y, this.hitResult.z)]
-                let changed = this.level.setTile(this.hitResult.x, this.hitResult.y, this.hitResult.z, 0)
-                if (oldTile != null && changed) {
-                    oldTile.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine)
-                }
+        if (click != 0 || this.missTime <= 0) {
+            if (click == 0) {
+                this.gameRenderer.itemInHandRenderer.swing_()
             }
-            this.gameRenderer.itemInHandRenderer.swing_()
-        } else if (click == 1 && this.hitResult != null && selected > 0) {
-            let aabb: AABB | null
-            let x = this.hitResult.x
-            let y = this.hitResult.y
-            let z = this.hitResult.z
-            if (this.hitResult.f == 0) {
-                y--
-            }
-            if (this.hitResult.f == 1) {
-                y++
-            }
-            if (this.hitResult.f == 2) {
-                z--
-            }
-            if (this.hitResult.f == 3) {
-                z++
-            }
-            if (this.hitResult.f == 4) {
-                x--
-            }
-            if (this.hitResult.f == 5) {
-                x++
-            }
-            aabb = Tile.tiles[selected].getAABB(x, y, z)
-            if (aabb == null || this.isFree(aabb)) {
-                this.level.setTile(x, y, z, selected)
-                if (selected != 0) {
-                    Tile.tiles[selected].onPlaceByPlayer(this.level, x, y, z)
-                }
+
+            let selected = this.player.inventory.getSelected()
+            if (click == 1 && selected > 0 && this.gameMode.useItem(this.player, selected)) {
                 this.gameRenderer.itemInHandRenderer.place()
+            } else if (this.hitResult == null) {
+                if (click == 0 && !(this.gameMode instanceof CreativeMode)) {
+                    this.missTime = 10
+                }
+            } else {
+                if (this.hitResult.type == 1) {
+                    if (click == 0) {
+                        this.hitResult.entity!.hurt(this.player, 4)
+                        return
+                    }
+                } else if (this.hitResult.type == 0) {
+                    let x = this.hitResult.x
+                    let y = this.hitResult.y
+                    let z = this.hitResult.z
+
+                    if (click != 0) {
+                        if (this.hitResult.f == 0) {
+                            y--
+                        }
+                        if (this.hitResult.f == 1) {
+                            y++
+                        }
+                        if (this.hitResult.f == 2) {
+                            z--
+                        }
+                        if (this.hitResult.f == 3) {
+                            z++
+                        }
+                        if (this.hitResult.f == 4) {
+                            x--
+                        }
+                        if (this.hitResult.f == 5) {
+                            x++
+                        }
+                    }
+
+                    let tile = Tile.tiles[this.level.getTile(x, y, z)]
+                    if (click == 0) {
+                        if (tile != Tiles.unbreakable || this.player.userType >= 100) {
+                            this.gameMode.startDestroyBlock(x, y, z)
+                            return
+                        }
+                    } else {
+                        let selected = this.player.inventory.getSelected()
+                        if (selected <= 0) {
+                            return
+                        }
+
+                        let tile = Tile.tiles[this.level.getTile(x, y, z)]
+                        let aabb = Tile.tiles[selected]!.getAABB(x, y, z)
+
+                        if ((
+                            tile == null ||
+                            tile == Tiles.water ||
+                            tile == Tiles.calmWater ||
+                            tile == Tiles.lava ||
+                            tile == Tiles.calmLava
+                        ) && (
+                            aabb == null || (this.player.bb.intersects(aabb) ? false : this.level.isFree(aabb))
+                        )) {
+                            if (!this.gameMode.removeResource(selected)) {
+                                return
+                            }
+
+                            if (this.isConnected()) {
+                                // this.client.sendPlayerAction(x, y, z, click, selected)
+                            }
+
+                            this.level.netSetTile(x, y, z, selected)
+                            this.gameRenderer.itemInHandRenderer.place()
+                            Tile.tiles[selected]!.onPlaceByPlayer(this.level, x, y, z)
+                        }
+                    }
+                }
             }
         }
     }
@@ -298,14 +342,6 @@ export class Minecraft {
     public tick(): void {
         let oldGrabbed = this.mouseGrabbed
         this.mouseGrabbed = document.pointerLockElement == this.parent
-        //mouse.setLock(this.mouseGrabbed) // this wasn't actually doing anything
-        /*if (this.screen == null && !this.mouseGrabbed && clickedElement == this.parent && (mouse.buttonPressed(MouseButton.LEFT) || mouse.buttonPressed(MouseButton.RIGHT))) {
-            this.grabMouse()
-            this.mouse0 = true
-            this.mouse1 = true
-        } else if (this.mouseGrabbed) {
-            
-        }*/
 
         gl.bindTexture(gl.TEXTURE_2D, this.textures.loadTexture("./terrain.png"))
         this.textures.tick()
@@ -405,11 +441,11 @@ export class Minecraft {
         // TODO
     }
 
-    public hasConnection(): boolean {
+    public isConnected(): boolean {
         return false
     }
 
-    public createLevel(size: number) {
+    public generateNewLevel(size: number) {
         let authorName = this.user != null ? this.user.name : "anonymous"
         let level = new LevelGenerator().create(authorName, 128 << size, 128 << size, 64)
         this.gameMode.onSpawn(level)
@@ -423,7 +459,7 @@ export class Minecraft {
             this.gameMode.initLevel(level)
             level.font = this.font
             level.rendererContext = this
-            if (!this.hasConnection()) {
+            if (!this.isConnected()) {
                 this.player = null
             } else if (this.player != null) {
                 this.player.resetPos()

@@ -11,7 +11,7 @@ import { RenderBuffer } from "../../../../util/RenderBuffer";
 
 export class Tile {
     protected static random: Random = new Random()
-    public static tiles: Tile[] = new Array(256)
+    public static tiles: (Tile | null)[] = new Array(256)
     public static shouldTick: boolean[] = new Array(256)
     public static isSolid: boolean[] = Array(256)
     public static isCubeShaped: boolean[] = Array(256)

@@ -291,7 +291,8 @@ export class GameRenderer {
                 for (let yy = y - 1; yy <= y + 1; yy++) {
                     for (let zz = z - 1; zz <= z + 1; zz++) {
                         let tileId = level.getTile(xx, yy, zz)
-                        if (tileId != 0 && Tile.tiles[tileId].isSolidRender()) {
+                        let tile = Tile.tiles[tileId]
+                        if (tileId != 0 && tile != null && tile.isSolidRender()) {
                             shader.setColor(0.2, 0.2, 0.2, 1.0)
                             gl.depthFunc(gl.LESS)
 
@@ -299,7 +300,7 @@ export class GameRenderer {
                             t.begin()
 
                             for (let f = 0; f < 6; f++) {
-                                Tile.tiles[tileId].renderFace(t, xx, yy, zz, f)
+                                tile.renderFace(t, xx, yy, zz, f)
                             }
 
                             t.end(this.guiBuffer)
@@ -309,7 +310,7 @@ export class GameRenderer {
                             t.begin()
 
                             for (let f = 0; f < 6; f++) {
-                                Tile.tiles[tileId].renderFace(t, xx, yy, zz, f)
+                                tile.renderFace(t, xx, yy, zz, f)
                             }
 
                             t.end(this.guiBuffer)

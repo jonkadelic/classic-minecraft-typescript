@@ -1,4 +1,5 @@
 import { Level } from "../level/Level";
+import { Tile } from "../level/tile/Tile";
 import { Minecraft } from "../Minecraft";
 import { Player } from "../player/Player";
 
@@ -17,14 +18,27 @@ export abstract class GameMode {
 
     public openInventory(): void { }
 
-    public startDestroyBlock(x: number, y: number, z: number) { }
+    public startDestroyBlock(x: number, y: number, z: number) {
+        this.destroyBlock(x, y, z)
+    }
 
     public removeResource(count: number): boolean {
         return true
     }
 
     public destroyBlock(x: number, y: number, z: number): void {
-        // TODO
+        let level = this.minecraft.level!
+        let tile = Tile.tiles[level.getTile(x, y, z)]
+        let wasSet = level.netSetTile(x, y, z, 0)
+        if (tile != null && wasSet) {
+            if (this.minecraft.isConnected()) {
+                // this.minecraft.client.sendPlayerAction(x, y, z, 0, this.minecraft.player!.inventory.getSelected())
+            }
+
+            // TODO: sound
+
+            tile.destroy(level, x, y, z, this.minecraft.particleEngine)
+        }
     }
 
     public continueDestroyBlock(x: number, y: number, z: number, face: number): void { }

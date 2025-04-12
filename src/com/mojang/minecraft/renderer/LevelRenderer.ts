@@ -382,10 +382,11 @@ export class LevelRenderer {
     
             let t = Tesselator.instance
             let ss = 0.002
-            let tile = this.level!.getTile(h.x, h.y, h.z)
+            let tileId = this.level!.getTile(h.x, h.y, h.z)
+            let tile = Tile.tiles[tileId]
 
-            if (tile > 0) {
-                let bb = Tile.tiles[tile].getTileAABB(h.x, h.y, h.z).grow(ss, ss, ss)
+            if (tileId > 0 && tile != null) {
+                let bb = tile.getTileAABB(h.x, h.y, h.z).grow(ss, ss, ss)
 
                 t.begin()
                 t.vertex(bb.x0, bb.y0, bb.z0)

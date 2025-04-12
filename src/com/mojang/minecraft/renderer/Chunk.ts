@@ -58,10 +58,10 @@ export class Chunk {
                         let tileId = this.level.getTile(x, y, z)
                         if (tileId > 0) {
                             let tile = Tile.tiles[tileId]
-                            if (tile.getRenderLayer() != i) {
+                            if (tile!.getRenderLayer() != i) {
                                 renderNextLayer = true
                             } else {
-                                rendered = tile.render(this.level, x, y, z, Chunk.t) || rendered
+                                rendered = tile!.render(this.level, x, y, z, Chunk.t) || rendered
                             }
                         }
                     }

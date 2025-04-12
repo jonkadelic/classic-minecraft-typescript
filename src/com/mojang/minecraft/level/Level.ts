@@ -303,10 +303,10 @@ export class Level {
         let currentTile = this.getTile(x, y, z)
         this.blocks[x + z * this.width + y * this.width * this.height] = type
         if (currentTile != 0) {
-            Tile.tiles[currentTile].onRemove(this, x, y, z)
+            Tile.tiles[currentTile]!.onRemove(this, x, y, z)
         }
         if (type != 0) {
-            Tile.tiles[type].onPlace(this, x, y, z)
+            Tile.tiles[type]!.onPlace(this, x, y, z)
         }
         this.calcLightDepths(x, z, 1, 1)
 
@@ -423,7 +423,7 @@ export class Level {
 
     public getHighestTile(x: number, z: number): number {
         let y = this.depth
-        while ((this.getTile(x, y - 1, z) == 0 || Tile.tiles[this.getTile(x, y - 1, z)].getMaterial() != Material.none) && y > 0) {
+        while ((this.getTile(x, y - 1, z) == 0 || Tile.tiles[this.getTile(x, y - 1, z)]!.getMaterial() != Material.none) && y > 0) {
             y--
         }
 
@@ -471,7 +471,7 @@ export class Level {
                     if (this.isInLevel(tickData.x, tickData.y, tickData.z)) {
                         let tile = this.getTile(tickData.x, tickData.y, tickData.z)
                         if (tile == tickData.tileId && tile > 0) {
-                            Tile.tiles[tile].tick(this, tickData.x, tickData.y, tickData.z, this.random)
+                            Tile.tiles[tile]!.tick(this, tickData.x, tickData.y, tickData.z, this.random)
                         }
                     }
                 }
@@ -490,7 +490,7 @@ export class Level {
             let rz = r >> (xSizeBits + ySizeBits) & maxZ
             let tile = this.getTile(rx, ry, rz)
             if (Tile.shouldTick[tile]) {
-                Tile.tiles[tile].tick(this, rx, ry, rz, this.random)
+                Tile.tiles[tile]!.tick(this, rx, ry, rz, this.random)
             }
         }
     }
@@ -546,7 +546,7 @@ export class Level {
         for (let xx = x0; xx < x1; xx++) {
             for (let yy = y0; yy < y1; yy++) {
                 for (let zz = z0; zz < z1; zz++) {
-                    let tile: Tile = Tile.tiles[this.getTile(xx, yy, zz)]
+                    let tile = Tile.tiles[this.getTile(xx, yy, zz)]
                     if (tile == null || tile.getMaterial() == Material.none) continue
                     return true
                 }
@@ -595,7 +595,7 @@ export class Level {
         for (let xx = x0; xx < x1; xx++) {
             for (let yy = y0; yy < y1; yy++) {
                 for (let zz = z0; zz < z1; zz++) {
-                    let tile: Tile = Tile.tiles[this.getTile(xx, yy, zz)]
+                    let tile = Tile.tiles[this.getTile(xx, yy, zz)]
                     if (tile == null || tile.getMaterial() != material) continue
                     return true
                 }
@@ -610,7 +610,7 @@ export class Level {
         if (tile == 0) {
             return Material.none
         }
-        return Tile.tiles[tile].getMaterial()
+        return Tile.tiles[tile]!.getMaterial()
     }
 
     public isWater(x: number, y: number, z: number): boolean {
@@ -618,18 +618,22 @@ export class Level {
         if (tile == 0) {
             return false
         }
-        return Tile.tiles[tile].getMaterial() == Material.water
+        return Tile.tiles[tile]!.getMaterial() == Material.water
     }
 
     public addToTickNextTick(x: number, y: number, z: number, id: number): void {
         if (!this.networkMode) {
             let data = new TickNextTickData(x, y, z, id);
             if (id > 0) {
-                data.delay = Tile.tiles[id].getTickDelay()
+                data.delay = Tile.tiles[id]!.getTickDelay()
             }
 
             this.tickNextTickList.push(data)
         }
+    }
+
+    public isFree(bb: AABB): boolean {
+        return this.blockMap!.getEntities__(null, bb).length == 0
     }
 
     public findEntities(entity: Entity, aabb: AABB): Entity[] | null {
@@ -739,7 +743,7 @@ export class Level {
 
             let tileId = this.getTile(xa, ya, za)
             let tile = Tile.tiles[tileId]
-            if (tileId > 0 && tile.getMaterial() == Material.none) {
+            if (tileId > 0 && tile != null && tile.getMaterial() == Material.none) {
                 if (tile.isCubeShaped()) {
                     let h = tile.clip(xa, ya, za, a, b)
                     if (h != null) {
@@ -839,10 +843,10 @@ export class Level {
                     let id = this.getTile(xx, yy, zz)
                     if (id > 0) {
                         let tile = Tile.tiles[id]
-                        if (!tile.isExplodable()) continue
-                        // tile.dropItems(this, xx, yy, zz, 0.3)
+                        if (tile == null || !tile.isExplodable()) continue
+                        // TODO tile.dropItems(this, xx, yy, zz, 0.3)
                         this.setTile(xx, yy, zz, 0)
-                        Tile.tiles[id].wasExploded(this, xx, yy, zz)
+                        tile.wasExploded(this, xx, yy, zz)
                     }
                 }
             }

@@ -74,7 +74,7 @@ export class Gui extends GuiComponent {
                 let tex = this.minecraft.textures.loadTexture("./terrain.png")
                 gl.bindTexture(gl.TEXTURE_2D, tex)
                 t.begin()
-                Tile.tiles[id].renderInInventory(t)
+                Tile.tiles[id]!.renderInInventory(t)
                 t.end(buffer)
                 buffer.draw()
                 matrix.pop()

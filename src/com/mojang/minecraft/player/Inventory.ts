@@ -34,8 +34,8 @@ export class Inventory {
         if (var3 >= 0) {
             this.selected = var3
         } else {
-            if (replace && id > 0 && User.allowedTiles.includes(Tile.tiles[id])) {
-                this.replaceSlotTile(Tile.tiles[id])
+            if (replace && id > 0 && User.allowedTiles.includes(Tile.tiles[id]!)) {
+                this.replaceSlotTile(Tile.tiles[id]!)
             }
         }
     }
