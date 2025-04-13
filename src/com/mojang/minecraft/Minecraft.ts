@@ -22,7 +22,7 @@ import { User } from "./User";
 import { Gui } from "./gui/Gui";
 import { Options } from "./Options";
 import { Key, Keyboard } from "../../util/input/Keyboard";
-import { LevelGenerator } from "./level/levelgen/RandomLevelSource";
+import { LevelGen as LevelGen } from "./level/levelgen/LevelGen";
 import { WaterTexture } from "./renderer/ptexture/WaterTexture";
 import { LavaTexture } from "./renderer/ptexture/LavaTexture";
 import { GameMode } from "./gamemode/GameMode";
@@ -50,8 +50,8 @@ export class Minecraft {
     // @ts-ignore
     public particleEngine: ParticleEngine
     public user: User | null = null
-    private parent: HTMLCanvasElement
-    public pause: boolean = false
+    public parent: HTMLCanvasElement
+    private pause: boolean = false
     public textures: Textures
     // @ts-ignore
     public font: Font
@@ -92,16 +92,6 @@ export class Minecraft {
     }
 
     public init(): void {
-        fetch("shader/base.vert")
-            .then(response => response.text())
-            .then(text => {
-                fetch("shader/base.frag")
-                    .then(response => response.text())
-                    .then(text2 => {
-                        shader.init(text, text2)
-                    })
-            })
-
         this.checkGlError("Pre startup")
         gl.clearDepth(1.0)
         gl.enable(gl.DEPTH_TEST)
@@ -181,7 +171,7 @@ export class Minecraft {
     }
 
     public destroy(): void {
-        this.level?.save()
+        // this.level?.save()
     }
 
     public run(): void {
@@ -446,8 +436,11 @@ export class Minecraft {
     }
 
     public generateNewLevel(size: number) {
+        let startTime = window.performance.now()
         let authorName = this.user != null ? this.user.name : "anonymous"
-        let level = new LevelGenerator().create(authorName, 128 << size, 128 << size, 64)
+        let level = new LevelGen(this.progressRenderer).generateLevel(authorName, 128 << size, 128 << size, 64)
+        let delta = window.performance.now() - startTime
+        console.log("Generated level in " + delta + " ms")
         this.gameMode.onSpawn(level)
         this.loadLevel(level)
     }
@@ -536,5 +529,15 @@ export function main() {
     }, true)
 
     const minecraft = new Minecraft(canvas, canvas.width, canvas.height)
-    minecraft.run()
+
+    fetch("shader/base.vert")
+    .then(response => response.text())
+    .then(text => {
+        fetch("shader/base.frag")
+            .then(response => response.text())
+            .then(text2 => {
+                shader.init(text, text2)
+                minecraft.run()
+            })
+    })
 }

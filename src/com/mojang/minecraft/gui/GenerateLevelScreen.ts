@@ -23,14 +23,11 @@ export class GenerateLevelScreen extends Screen {
         if (button.id == 3) {
             this.minecraft.setScreen(this.parent)
             return
+        } else {
+            this.minecraft.generateNewLevel(button.id)
+            this.minecraft.setScreen(null)
+            this.minecraft.mouseGrabbed = false
         }
-
-        // TODO
-        this.minecraft.level!.regenerate()
-        this.minecraft.player!.resetPos()
-
-        this.minecraft.grabMouse()
-        this.minecraft.setScreen(null)
     }
 
     public override render(buffer: RenderBuffer, mx: number, my: number): void {

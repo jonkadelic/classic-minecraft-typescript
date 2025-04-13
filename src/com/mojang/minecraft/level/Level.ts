@@ -19,10 +19,10 @@ import { Font } from "../gui/Font";
 
 export class Level {
     private static readonly MAX_TICK_TILES_PER_TICK = 200
-    public width: number
-    public height: number
-    public depth: number
-    public blocks: number[]
+    public width: number = 0
+    public height: number = 0
+    public depth: number = 0
+    public blocks: number[] = []
     public name: string = ""
     public creator: string = ""
     public createTime: number = 0
@@ -30,11 +30,11 @@ export class Level {
     public ySpawn: number = 0
     public zSpawn: number = 0
     public rotSpawn: number = 0
-    private levelRenderers: LevelRenderer[] = []
-    private lightDepths: number[]
+    private levelListeners: LevelRenderer[] = []
+    private lightDepths: number[] = []
     private random: Random = new Random()
     private randValue = this.random.nextInt()
-    private addend = 1013904223
+    private addend = 0x3C6EF35F
     private tickNextTickList: TickNextTickData[] = []
     public blockMap: BlockMap | null = null
     private networkMode = false
@@ -52,7 +52,7 @@ export class Level {
     public growTrees: boolean = false
 
     public initTransient(): void {
-        this.levelRenderers = []
+        this.levelListeners = []
         this.lightDepths = new Array(this.width * this.height).fill(this.depth)
         this.calcLightDepths(0, 0, this.width, this.height)
         this.random = new Random()
@@ -84,77 +84,19 @@ export class Level {
         }
     }
 
-    public constructor(width: number, height: number, depth: number) {
-        this.width = width
-        this.height = height
-        this.depth = depth
-        this.blocks = new Array(width * height * depth)
-        this.lightDepths = new Array(width * height)
-        let mapLoaded = this.load()
-        if (!mapLoaded) {
-            this.regenerate()
-        }
-        this.calcLightDepths(0, 0, width, height)
-    }
-
-    public regenerate(): void {
-        this.blocks = new LevelGen(this.width, this.height, this.depth).generateMap()
-        let treeMap = new NoiseMap(2).read(this.width, this.height)
-        
-        // Trees
-        for (let x = 0; x < this.width; x++) {
-            for (let z = 0; z < this.height; z++) {
-                for (let y = 0; y < this.depth - 1; y++) {
-                    let i = (y * this.height + z) * this.width + x
-                    let id = this.blocks[i]
-                    if (id == Tiles.grass.id && this.random.nextInt(100) == 0 && treeMap[x + z * this.width] < 128) {
-                        this.maybeGrowTree(x, y + 1, z)
-                        break
-                    }
-                }
-            }
-        }
-
-        this.calcLightDepths(0, 0, this.width, this.height)
-        for (let i = 0; i < this.levelRenderers.length; i++) {
-            this.levelRenderers[i].allChanged()
-        }
-    }
-
-    public load(): boolean {
-        let level = localStorage.getItem("level")
-        if (level == null) {
-            return false
-        }
-        this.blocks = Array.from(Base256.decode(level))
-
-        this.calcLightDepths(0, 0, this.width, this.height)
-        for (let i = 0; i < this.levelRenderers.length; i++) {
-            this.levelRenderers[i].allChanged()
-        }
-        console.log("Loaded level")
-        return true
-    }
-
-    public save(): void {
-        let toWrite = Base256.encode(new Uint8Array(this.blocks))
-        try {
-            localStorage.setItem("level", toWrite)
-            console.log("Saved level: " + toWrite.length + " bytes")
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    public setData(xSize: number, zSize: number, ySize: number, blocks: number[]) {
-        this.width = xSize
-        this.height = zSize
-        this.depth = ySize
+    public setData(w: number, d: number, h: number, blocks: number[]) {
+        this.width = w
+        this.height = h
+        this.depth = d
         this.blocks = blocks
-        this.calcLightDepths(0, 0, xSize, zSize)
-        for (let i = 0; i < this.levelRenderers.length; i++) {
-            this.levelRenderers[i].allChanged()
+        this.lightDepths = new Array(w * h)
+        this.lightDepths.fill(this.depth)
+        this.calcLightDepths(0, 0, w, h)
+
+        for (let i = 0; i < this.levelListeners.length; i++) {
+            this.levelListeners[i].allChanged()
         }
+        
         this.tickNextTickList.length = 0
         this.findSpawn()
         this.initTransient()
@@ -186,37 +128,34 @@ export class Level {
     }
 
     public calcLightDepths(x0: number, y0: number, x1: number, y1: number): void {
-        let x = x0
-        while (x < x0 + x1) {
-            let z = y0
-            while (z < y0 + y1) {
+        for (let x = x0; x < x0 + x1; x++) {
+            for (let z = y0; z < y0 + y1; z++) {
                 let oldDepth = this.lightDepths[x + z * this.width]
                 let y = this.depth - 1
+                
                 while (y > 0 && !this.isLightBlocker(x, y, z)) {
                     y--
                 }
-                this.lightDepths[x + z * this.width] = y
+
+                this.lightDepths[x + z * this.width] = y + 1
                 if (oldDepth != y) {
                     let y10 = oldDepth < y ? oldDepth : y
                     let y11 = oldDepth > y ? oldDepth : y
-                    let i = 0
-                    while (i < this.levelRenderers.length) {
-                        this.levelRenderers[i].setDirty(x - 1, y10 - 1, z - 1, x + 1, y11 + 1, z + 1)
-                        i++
+
+                    for (let i = 0; i < this.levelListeners.length; i++) {
+                        this.levelListeners[i].setDirty(x - 1, y10 - 1, z - 1, x + 1, y11 + 1, z + 1)
                     }
                 }
-                z++
             }
-            x++
         }
     }
 
     public addListener(listener: LevelRenderer): void {
-        this.levelRenderers.push(listener)
+        this.levelListeners.push(listener)
     }
 
     public removeListener(listener: LevelRenderer): void {
-        this.levelRenderers.splice(this.levelRenderers.indexOf(listener), 1)
+        this.levelListeners.splice(this.levelListeners.indexOf(listener), 1)
     }
 
     public isLightBlocker(x: number, y: number, z: number): boolean {
@@ -310,8 +249,8 @@ export class Level {
         }
         this.calcLightDepths(x, z, 1, 1)
 
-        for (let i = 0; i < this.levelRenderers.length; i++) {
-            this.levelRenderers[i].setDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1)
+        for (let i = 0; i < this.levelListeners.length; i++) {
+            this.levelListeners[i].setDirty(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1)
         }
         return true
     }
