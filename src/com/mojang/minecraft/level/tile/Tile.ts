@@ -46,8 +46,9 @@ export class Tile {
         Tile.shouldTick[this.id] = shouldTick;
     }
 
-    public setData(particleGravity: number): Tile {
+    public setData(particleGravity: number, destroyProgress: number): Tile {
         this.particleGravity = particleGravity
+        this.destroyProgress = destroyProgress
         return this
     }
 

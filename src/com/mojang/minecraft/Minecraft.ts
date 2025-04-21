@@ -31,6 +31,7 @@ import { ProgressRenderer } from "./ProgressRenderer";
 import { Tiles } from "./level/tile/Tiles";
 import { Mob } from "./mob/Mob";
 import { ModelDispatcher } from "./model/ModelDispatcher";
+import { SurvivalMode } from "./gamemode/SurvivalMode";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
