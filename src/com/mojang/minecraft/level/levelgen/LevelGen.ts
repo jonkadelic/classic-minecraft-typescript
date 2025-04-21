@@ -22,7 +22,7 @@ export class LevelGen {
         this.progressListener = progressListener
     }
 
-    public generateLevel(userName: string, width: number, height: number, depth: number): Level {
+    public async generateLevel(userName: string, width: number, height: number, depth: number): Promise<Level> {
         this.progressListener.progressStart("Generate level")
         this.width = width
         this.height = height

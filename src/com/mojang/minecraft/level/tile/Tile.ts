@@ -277,6 +277,39 @@ export class Tile {
         }
     }
 
+    public dig(level: Level, x: number, y: number, z: number, face: number, particleEngine: ParticleEngine): void {
+        let o = 0.1
+        let xx = x + Tile.random.nextFloat() * (this.xx1 - this.xx0 - o * 2.0) + o + this.xx0
+        let yy = y + Tile.random.nextFloat() * (this.yy1 - this.yy0 - o * 2.0) + o + this.yy0
+        let zz = z + Tile.random.nextFloat() * (this.zz1 - this.zz0 - o * 2.0) + o + this.zz0
+
+        if (face == 0) {
+            yy = y + this.yy0 - o
+        }
+
+        if (face == 1) {
+            yy = y + this.yy1 + o
+        }
+
+        if (face == 2) {
+            zz = z + this.zz0 - o
+        }
+
+        if (face == 3) {
+            zz = z + this.zz1 + o
+        }
+
+        if (face == 4) {
+            xx = x + this.xx0 - o
+        }
+
+        if (face == 5) {
+            xx = x + this.xx1 + o
+        }
+
+        particleEngine.add(new Particle(level, xx, yy, zz, 0.0, 0.0, 0.0, this)) // TODO: setPower, scale
+    }
+
     public getMaterial(): Material {
         return Material.none
     }

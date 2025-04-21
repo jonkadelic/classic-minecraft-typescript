@@ -187,6 +187,9 @@ export class Minecraft {
         if (this.running) {
             mouse.update()
             if (this.pause) {
+                if (this.progressRenderer.shouldDisplay) {
+                    this.progressRenderer.render()
+                }
                 requestAnimationFrame(() => this.loop())
                 return
             }
@@ -201,8 +204,12 @@ export class Minecraft {
             this.checkGlError("Pre render")
 
             if (!this.noRender) {
-                this.gameMode.render(this.timer.a)
-                this.gameRenderer.render(this.timer.a)
+                if (this.progressRenderer.shouldDisplay) {
+                    this.progressRenderer.render()
+                } else {
+                    this.gameMode.render(this.timer.a)
+                    this.gameRenderer.render(this.timer.a)
+                }
             }
 
             this.checkGlError("Post render")
@@ -414,17 +421,10 @@ export class Minecraft {
             this.levelRenderer.tick()
         }
         
-        this.level!.tick()
+        this.level?.tick()
         this.particleEngine.tick()
 
-        this.player!.tick()
-    }
-
-    private isFree(aabb: AABB): boolean {
-        if (this.player!.bb.intersects(aabb)) {
-            return false
-        }
-        return true
+        this.player?.tick()
     }
 
     public static checkError(): void {
@@ -438,11 +438,13 @@ export class Minecraft {
     public generateNewLevel(size: number) {
         let startTime = window.performance.now()
         let authorName = this.user != null ? this.user.name : "anonymous"
-        let level = new LevelGen(this.progressRenderer).generateLevel(authorName, 128 << size, 128 << size, 64)
-        let delta = window.performance.now() - startTime
-        console.log("Generated level in " + delta + " ms")
-        this.gameMode.onSpawn(level)
-        this.loadLevel(level)
+        new LevelGen(this.progressRenderer).generateLevel(authorName, 128 << size, 128 << size, 64).then((level) => {
+            let delta = window.performance.now() - startTime
+            console.log("Generated level in " + delta + " ms")
+            this.gameMode.onSpawn(level)
+            this.loadLevel(level)
+            this.progressRenderer.shouldDisplay = false
+        })
     }
 
     public loadLevel(level: Level | null): void {
