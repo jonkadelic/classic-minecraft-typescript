@@ -5,8 +5,8 @@ import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 
 export class Cube {
-    private vertices: Vertex[] = []
-    private polygons: Polygon[] = []
+    public vertices: Vertex[] = []
+    public polygons: Polygon[] = []
     private xTexOffs: number
     private yTexOffs: number
     public x: number = 0

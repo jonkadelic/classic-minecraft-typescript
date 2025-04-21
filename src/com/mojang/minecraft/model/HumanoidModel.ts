@@ -4,6 +4,7 @@ import { Model } from "./Model";
 
 export class HumanoidModel extends Model {
     public head: Cube
+    public hair: Cube
     public body: Cube
     public arm0: Cube
     public arm1: Cube
@@ -14,6 +15,8 @@ export class HumanoidModel extends Model {
         super()
         this.head = new Cube(0, 0)
         this.head.addBox(-4, -8, -4, 8, 8, 8, g)
+        this.hair = new Cube(32, 0)
+        this.hair.addBox(-4.0, -8.0, -4.0, 8, 8, 8, g + 0.5)
         this.body = new Cube(16, 16)
         this.body.addBox(-4, 0, -2, 8, 12, 4, g)
         this.arm0 = new Cube(40, 16)

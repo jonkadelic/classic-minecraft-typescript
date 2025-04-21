@@ -342,10 +342,10 @@ export class GameRenderer {
 
         this.setupFog()
         if (this.mc.hitResult != null) {
-            // disable alpha test
+            shader.setAlphaTest(false)
             levelRenderer.renderHit(player, this.mc.hitResult, 0, player.inventory.getSelected(), a)
             levelRenderer.renderHitOutline(this.mc.hitResult, 0)
-            // enable alpha test
+            shader.setAlphaTest(true)
         }
 
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)

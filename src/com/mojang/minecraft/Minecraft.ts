@@ -29,6 +29,8 @@ import { GameMode } from "./gamemode/GameMode";
 import { CreativeMode } from "./gamemode/CreativeMode";
 import { ProgressRenderer } from "./ProgressRenderer";
 import { Tiles } from "./level/tile/Tiles";
+import { Mob } from "./mob/Mob";
+import { ModelDispatcher } from "./model/ModelDispatcher";
 
 export let gl: WebGLRenderingContext
 export let mouse: any
@@ -108,6 +110,7 @@ export class Minecraft {
         this.font = new Font("./default.png", this.textures)
 
         this.levelRenderer = new LevelRenderer(this, this.textures)
+        Mob.modelCache = new ModelDispatcher()
         gl.viewport(0, 0, this.width, this.height)
         if (false /* connectToIp != null && user != null */) {
 

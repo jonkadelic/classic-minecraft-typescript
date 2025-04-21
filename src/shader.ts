@@ -63,6 +63,17 @@ export class Shader {
         gl.uniform4f(this.getUniformLocation("uColor"), r, g, b, a)
     }
 
+    public setAlphaTest(enabled: boolean): void {
+        if (!this.program) return
+        gl.uniform1f(this.getUniformLocation("uAlphaTest"), enabled ? 1 : 0)
+    }
+
+    public setAlphaFunc(func: GLenum, ref: GLclampf): void {
+        if (!this.program) return
+        gl.uniform1f(this.getUniformLocation("uAlphaFunc"), func)
+        gl.uniform1f(this.getUniformLocation("uAlphaRef"), ref)
+    }
+
     public setFog(enabled: boolean): void {
         if (!this.program) return
         gl.uniform1f(this.getUniformLocation("uHasFog"), enabled ? 1 : 0)

@@ -32,7 +32,7 @@ export class Level {
     public rotSpawn: number = 0
     private levelListeners: LevelRenderer[] = []
     private lightDepths: number[] = []
-    private random: Random = new Random()
+    public random: Random = new Random()
     private randValue = this.random.nextInt()
     private addend = 0x3C6EF35F
     private tickNextTickList: TickNextTickData[] = []

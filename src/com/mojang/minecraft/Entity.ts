@@ -39,10 +39,12 @@ export class Entity {
     public xOld: number = 0.0
     public yOld: number = 0.0
     public zOld: number = 0.0
+    public textureId: WebGLTexture | null = null
     public ySlideOffset: number = 0.0
     public footSize: number = 0.0
     public noPhysics: boolean = false
     public pushthrough: number = 0.0
+    public hovered: boolean = false
 
     public constructor(level: Level) {
         this.level = level
@@ -293,7 +295,7 @@ export class Entity {
         return this.level.isLit(xTile, yTile, zTile)
     }
 
-    public render(a: number) {
+    public render(textures: Textures, a: number) {
     }
 
     public setLevel(level: Level): void {

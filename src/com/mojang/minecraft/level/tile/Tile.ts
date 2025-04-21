@@ -8,6 +8,7 @@ import { Vec3 } from "../../phys/Vec3";
 import { HitResult } from "../../HitResult";
 import { Material } from "../material/Material";
 import { RenderBuffer } from "../../../../util/RenderBuffer";
+import { Item } from "../../item/Item";
 
 export class Tile {
     protected static random: Random = new Random()
@@ -340,6 +341,26 @@ export class Tile {
 
     public getDestroyProgress(): number {
         return this.destroyProgress
+    }
+
+    public spawnResources(level: Level, x: number, y: number, z: number, chance?: number): void {
+        if (chance == undefined) {
+            chance = 1.0
+        }
+
+        if (!level.creativeMode) {
+            let n = this.getResourceCount()
+
+            for (let i = 0; i < n; i++) {
+                if (!(Tile.random.nextFloat() > chance)) {
+                    let o = 0.7
+                    let dx = Tile.random.nextFloat() * o + (1.0 - o) * 0.5
+                    let dy = Tile.random.nextFloat() * o + (1.0 - o) * 0.5
+                    let dz = Tile.random.nextFloat() * o + (1.0 - o) * 0.5
+                    level.addEntity(new Item(level, x + dx, y + dy, z + dz, this.getResource()))
+                }
+            }
+        }
     }
 
     public renderInHand(t: Tesselator, buffer: RenderBuffer): void {

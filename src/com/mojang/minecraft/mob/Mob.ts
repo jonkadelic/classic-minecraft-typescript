@@ -1,12 +1,16 @@
 import { Mth } from "../../../util/Mth";
 import { Entity } from "../Entity";
 import { Level } from "../level/Level";
+import { gl, matrix, shader } from "../Minecraft";
+import { ModelDispatcher } from "../model/ModelDispatcher";
+import { Textures } from "../renderer/Textures";
 import { AI } from "./ai/AI";
 import { BasicAI } from "./ai/BasicAI";
 
 export class Mob extends Entity {
     public static readonly ATTACK_DURATION: number = 5
     public static readonly TOTAL_AIR_SUPPLY: number = 300
+    public static modelCache: ModelDispatcher
     public invulnerableDuration: number = 20
     public rot: number = 0
     public timeOffs: number = 0
@@ -23,7 +27,7 @@ export class Mob extends Entity {
     public textureName: string = "/char.png"
     public allowAlpha: boolean = true
     public rotOffs: number = 0.0
-    public modelName: String | null = null
+    public modelName: string | null = null
     protected bobStrength: number = 1.0
     protected deathScore: number = 0
     public renderOffset: number = 0.0
@@ -178,8 +182,133 @@ export class Mob extends Entity {
         }
     }
 
-    public override render(a: number): void {
-        // TODO?: default Mob render from 0.30
+    protected bindTexture(textures: Textures): void {
+        this.textureId = textures.loadTexture(this.textureName)
+        gl.bindTexture(gl.TEXTURE_2D, this.textureId)
+    }
+
+    public override render(textures: Textures, a: number): void {
+        if (this.modelName != null) {
+            let attackTime = this.attackTime - a
+            if (attackTime < 0.0) {
+                attackTime = 0.0
+            }
+
+            while (this.yBodyRotO - this.yBodyRot < -180.0) {
+                this.yBodyRotO += 360.0
+            }
+
+            while (this.yBodyRotO - this.yBodyRot >= 180.0) {
+                this.yBodyRotO -= 360.0
+            }
+
+            while (this.xRotO - this.xRot < -180.0) {
+                this.xRotO += 360.0
+            }
+
+            while (this.xRotO - this.xRot >= 180.0) {
+                this.xRotO -= 360.0
+            }
+
+            while (this.yRotO - this.yRot < -180.0) {
+                this.yRotO += 360.0
+            }
+
+            while (this.yRotO - this.yRot >= 180.0) {
+                this.yRotO -= 360.0
+            }
+
+            let yBodyRot = this.yBodyRotO + (this.yBodyRot - this.yBodyRotO) * a
+            let run = this.oRun + (this.run - this.oRun) * a
+            let yRot = this.yRotO + (this.yRot - this.yRotO) * a
+            let xRot = this.xRotO + (this.xRot - this.xRotO) * a
+
+            yRot -= yBodyRot
+
+            matrix.push()
+            let animStep = this.animStepO + (this.animStep - this.animStepO) * a
+            let br = this.getBrightness(a)
+            shader.setColor(br, br, br)
+
+            let scale = 0.0625
+            let bob = -Math.abs(Mth.cos(animStep * 0.6662)) * 5.0 * run * this.bobStrength - 23.0
+            matrix.translate(
+                this.xo + (this.x - this.xo) * a,
+                this.yo + (this.y - this.yo) * a - 1.62 + this.renderOffset,
+                this.zo + (this.z - this.zo) * a
+            )
+
+            let fall = this.hurtTime - a
+            if (fall > 0.0 || this.health <= 0) {
+                if (fall < 0.0) {
+                    fall = 0.0
+                } else {
+                    let hurtPercentage = fall / this.hurtDuration
+                    fall = Mth.sin(hurtPercentage * hurtPercentage * hurtPercentage * hurtPercentage * Math.PI) * 14.0
+                }
+
+                if (this.health <= 0) {
+                    let deathTime = (this.deathTime + a) / 20.0
+                    fall += deathTime * deathTime * 800.0
+                    if (fall > 90.0) {
+                        fall = 90.0
+                    }
+                }
+    
+                matrix.rotate(180.0 - yBodyRot + this.rotOffs, 0.0, 1.0, 0.0)
+                matrix.scale(1.0, 1.0, 1.0)
+                matrix.rotate(-this.hurtDir, 0.0, 1.0, 0.0)
+                matrix.rotate(-fall, 0.0, 0.0, 1.0)
+                matrix.rotate(this.hurtDir, 0.0, 1.0, 0.0)
+                matrix.rotate(-(180.0 - yBodyRot + this.rotOffs), 0.0, 1.0, 0.0)    
+            }
+            
+            matrix.translate(0.0, -bob * scale, 0.0)
+            matrix.scale(1.0, -1.0, 1.0)
+            matrix.rotate(180.0 - yBodyRot + this.rotOffs, 0.0, 1.0, 0.0)
+            if (!this.allowAlpha) {
+                shader.setAlphaTest(false)
+            } else {
+                gl.disable(gl.CULL_FACE)
+            }
+
+            matrix.scale(-1.0, 1.0, 1.0)
+            Mob.modelCache.getModelById(this.modelName)!.attackTime = attackTime / 5.0
+            this.bindTexture(textures)
+            this.renderModel(textures, animStep, a, run, yRot, xRot, scale)
+            if (this.invulnerableTime > this.invulnerableDuration - 10) {
+                shader.setColor(1.0, 1.0, 1.0, 0.75)
+                gl.enable(gl.BLEND)
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE)
+                this.bindTexture(textures)
+                this.renderModel(textures, animStep, a, run, yRot, xRot, scale)
+                gl.disable(gl.BLEND)
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+            }
+
+            shader.setAlphaTest(true)
+            if (this.allowAlpha) {
+                gl.enable(gl.CULL_FACE)
+            }
+
+            shader.setColor(1.0, 1.0, 1.0, 1.0)
+            matrix.pop()
+        }
+    }
+
+    public renderModel(textures: Textures, time: number, a: number, r: number, yRot: number, xRot: number, scale: number): void {
+        Mob.modelCache.getModelById(this.modelName!)!.render(time, r, this.tickCount + a, yRot, xRot, scale)
+    }
+
+    public heal(amount: number): void {
+        if (this.health > 0) {
+            this.health += amount
+            if (this.health > 20) {
+                this.health = 20
+            }
+
+            this.invulnerableTime = Math.trunc(this.invulnerableDuration / 2)
+        }
     }
 
     public override hurt(attacker: Entity | null, damage: number): void {

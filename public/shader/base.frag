@@ -7,6 +7,10 @@ uniform bool uHasTexture;
 uniform bool uHasColor;
 uniform bool uHasNormal;
 
+uniform bool uAlphaTest;
+uniform int uAlphaFunc;
+uniform highp float uAlphaRef;
+
 uniform bool uHasFog;
 uniform highp int uFogMode;
 uniform highp vec4 uFogColor;
@@ -26,6 +30,16 @@ varying highp vec4 vColor;
 varying highp vec3 vNormal;
 
 varying highp vec4 vDiffuseColor;
+
+// Constants
+const int GL_NEVER = 0x200;
+const int GL_LESS = 0x201;
+const int GL_EQUAL = 0x202;
+const int GL_LEQUAL = 0x203;
+const int GL_GREATER = 0x204;
+const int GL_NOTEQUAL = 0x205;
+const int GL_GEQUAL = 0x206;
+const int GL_ALWAYS = 0x207;
 
 highp float fogFactorLinear(const highp float dist, const highp float start, const highp float end) {
   return clamp((end - dist) / (end - start), 0.0, 1.0);
@@ -74,5 +88,18 @@ void main(void) {
         gl_FragColor = fogAmount * texelColor + (1.0 - fogAmount) * uFogColor;
     } else {
         gl_FragColor = texelColor;
+    }
+
+    if (uAlphaTest) {
+        if ((uAlphaFunc == GL_NEVER) ||
+            (uAlphaFunc == GL_LESS && !(gl_FragColor.a < uAlphaRef)) ||
+            (uAlphaFunc == GL_EQUAL && !(gl_FragColor.a == uAlphaRef)) ||
+            (uAlphaFunc == GL_LEQUAL && !(gl_FragColor.a <= uAlphaRef)) ||
+            (uAlphaFunc == GL_GREATER && !(gl_FragColor.a > uAlphaRef)) ||
+            (uAlphaFunc == GL_NOTEQUAL && !(gl_FragColor.a != uAlphaRef)) ||
+            (uAlphaFunc == GL_GEQUAL && !(gl_FragColor.a >= uAlphaRef))
+        ) {
+            discard;
+        }
     }
 }
